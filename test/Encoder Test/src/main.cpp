@@ -2,8 +2,10 @@
 #include "driver/ledc.h"
 #include <Adafruit_AS5600.h>
 
-#define pwmChannel 1
-#define motor 27
+#define pwmChannel1 1
+#define pwmChannel2 2
+#define pwmOut1 5
+#define pwmOut2 7 
 #define TARGET_ANGLE 50
 
 Adafruit_AS5600 as5600;
@@ -21,11 +23,11 @@ void setup() {
   pinMode(motor, OUTPUT);
   */
 
-  ledcSetup(pwmChannel, frequency, 12);
-  ledcAttachPin(motor, pwmChannel);
+  ledcSetup(pwmChannel1,1000,12); // (pwmchannel to use,  frequency in Hz, number of bits)
+  ledcSetup(pwmChannel2,1000,12);
+  ledcAttachPin(pwmOut1, pwmChannel1);
+  ledcAttachPin(pwmOut2,pwmChannel2); 
   
-  
-
   Serial.begin(115200);
 
   // as5600 initialization
@@ -86,10 +88,14 @@ void loop() {
     // using a formula like duty_cycle = min(counts_left*5,4096)
     while (!reached_position(as5600.getAngle(), target_count)) {
       // Serial.printf("Count: %d\n", as5600.getAngle());
-      duty_cycle = min(counts_left*7/2,4096);
-      ledcWrite(pwmChannel,duty_cycle);
+      duty_cycle = 900;
+      
+      //min(counts_left*7/2,4096);
+      ledcWrite(pwmChannel1, duty_cycle); 
+      ledcWrite(pwmChannel2, 0);
     }
-    ledcWrite(pwmChannel,0);
+    //ledcWrite(pwmChannel1,0);
+    //ledcWrite(pwmChannel2, 0);   
     Serial.println("Position reached!");
     delay(500);
     Serial.printf("Actual stop count: %d\n", as5600.getAngle());
