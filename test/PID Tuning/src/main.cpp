@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "driver/ledc.h"
+#include <WiFi.h>
 
 #define Lread 26
 #define Rread 25
@@ -9,11 +10,6 @@
 #define rightpwmChannel 2
 #define leftpwmOut 13
 #define rightpwmOut 12
-
-//constants
-int thresh = 800;
-int kp = 0;
-int kd = 0;
 
 //updating variables
 int error = 0;
@@ -32,12 +28,67 @@ int p = 0;
 int d = 0;
 int con = 0;
 
+
+// wifi stuff
+const char* AP_ssid = "ESP32_Group9";
+const char* AP_pass = "roborobo";
+WiFiServer server(80);
+
+
+int kp = 0;
+int kd = 0;
+int speed_multiplier = 0;
+boolean collected = false;
+
+
 void motor(int PIDvalue);
 
 void setup() {
-//read proportional/derivative gain 
-  kp = analogRead(kpread);
-  kd = analogRead(kdread);
+  Serial.begin(115200);
+
+  // Start the soft AP
+  WiFi.softAP(AP_ssid, AP_pass);
+  IPAddress ip = WiFi.softAPIP();
+  Serial.printf("AP started. Connect to %s:%s, IP=%s\n", AP_ssid, AP_pass, ip.toString().c_str());
+
+  server.begin();
+
+  WiFiClient client;
+  while (!collected) {
+    // try to form connection with client
+    client = server.available();
+    while (client && client.connected()) {
+      if (client.available()) {
+
+        String line = client.readStringUntil('\n');
+        Serial.printf("Received: %s\n", line.c_str());
+
+        // Extract Values
+        switch (line.charAt(0)) {
+            case 'P':
+              kp = line.substring(1).toInt();
+              break;
+            case 'D':
+              kd = line.substring(1).toInt();
+              break;
+            case 'd':
+              speed_multiplier = line.substring(1).toInt();
+              break;
+            case 's':
+              collected = true;
+              break;
+        }   
+      }
+    }
+    delay(200);
+  }
+  
+  client.stop();
+  Serial.println("Client disconnected");
+  delay(500);
+
+
+
 
 //pwm setup
   ledcSetup(leftpwmChannel,100,12); // (pwmchannel to use,  frequency in Hz, number of bits)
@@ -53,16 +104,16 @@ void setup() {
 void loop() {
   
 //read sensors
-  left = analogRead(Lread);
-  right = analogRead(Rread);
+  left = digitalRead(Lread);
+  right = digitalRead(Rread);
 
   
 
-  if ((left>thresh)&&(right>thresh)) error = 0;
-  if ((left>thresh)&&(right<thresh)) error = -1;
-  if ((left<thresh)&&(right>thresh)) error = +1;
+  if (left&&right) error = 0;
+  if (left&&!right) error = -1;
+  if (!left&&right) error = +1;
 //history cases for when both sensors are off the line
-  if ((left<thresh)&&(right<thresh))
+  if (!left&&!right)
   {
     if (lasterr>0) error = 5;
     if (lasterr<=0) error=-5;
@@ -99,7 +150,7 @@ void loop() {
 
 void motor(int PIDvalue)
 {
-  speed = ((4096)-abs(error-lasterr)*819.2)*.2;
+  speed = ((4096)-abs(error-lasterr)*819.2)*speed_multiplier;
   
   int leftMotorSpeed = speed + PIDvalue;
   int rightMotorSpeed = speed - PIDvalue;
