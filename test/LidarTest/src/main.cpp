@@ -10,7 +10,7 @@ void setup() {
   Serial.println("VL53L0X test");
 
   // Initialize I2C
-  Wire.begin(25, 26);  // Wire.begin(sda, scl)
+  //Wire.begin(25, 26);  // Wire.begin(sda, scl)
 
   if (!lox.begin()) {
     Serial.println("Failed to boot VL53L0X");
