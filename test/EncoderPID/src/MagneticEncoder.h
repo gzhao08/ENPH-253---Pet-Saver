@@ -1,0 +1,15 @@
+#pragma once
+#include <Wire.h>
+
+class MagneticEncoder {
+    private:
+        TwoWire& wire; // Will have to mux
+        const int AS5600_ADDR = 0x36;
+        const int AS5600_MSG_REG = 0x0C;
+
+    public:
+        MagneticEncoder(TwoWire& WireObj);
+        uint16_t readRawAngle();
+        double readAngle();
+};
+
