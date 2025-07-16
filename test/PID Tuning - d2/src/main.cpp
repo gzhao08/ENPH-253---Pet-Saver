@@ -14,6 +14,7 @@ int error = 0;
 int left = 0;
 int right = 0;
 int lasterr = 0;
+int last2err = 0;
 int speed = 0; 
 
 //counters
@@ -24,6 +25,7 @@ int displayloop = 0;
 //control variables
 int p = 0;
 int d = 0;
+int d2 = 0;
 int con = 0;
 
 
@@ -35,6 +37,7 @@ WiFiServer server(80);
 
 int kp = 0;
 int kd = 0;
+int kd2 = 0;
 float speed_multiplier = 0;
 boolean collected = false;
 
@@ -81,6 +84,9 @@ void setup() {
               case 'D':
                 kd = line.substring(1).toInt();
                 break;
+              case 'E':
+                kd2 = line.substring(1).toInt();
+                break;
               case 'd': {
                 String str = line.substring(1); 
                 str.trim();
@@ -97,7 +103,7 @@ void setup() {
     }
     delay(200);
   }
-  Serial.printf("kp: %d - kd: %d - speed mult: %f", kp, kd, speed_multiplier);
+  Serial.printf("kp: %d - kd: %d - kd2: %d - speed mult: %f", kp, kd, kd2, speed_multiplier);
   client.stop();
   Serial.println("Client disconnected");
   delay(5000);
@@ -105,7 +111,7 @@ void setup() {
 
 
 
-  //pwm setup
+//pwm setup
   ledcSetup(leftpwmChannel, 100, 12); // (pwmchannel to use,  frequency in Hz, number of bits)
   ledcAttachPin(leftpwmOut,leftpwmChannel);
 
@@ -121,7 +127,7 @@ void setup() {
 
 void loop() {
   
-//read sensors
+  //read sensors
   left = digitalRead(Lread);
   right = digitalRead(Rread);
 
@@ -130,26 +136,27 @@ void loop() {
   if (left&&right) error = 0;
   if (left&&!right) error = -1;
   if (!left&&right) error = +1;
-//history cases for when both sensors are off the line
+  //history cases for when both sensors are off the line
   if (!left&&!right)
   {
     if (lasterr>0) error = 5;
     if (lasterr<=0) error=-5;
   }
 
-//approximating derivative
+  //approximating derivative
   if (!(error==lasterr))
   {
     run=runcounter;
     runcounter=1;
   }
 
-//pd control
+  //pd control
   p=kp*error/10;
   d=(int)((float)kd*(float)(error-lasterr)/(float)(run+runcounter));
-  con = p+d;
+  d2 = kd2*(error + last2err - 2*lasterr) / (float) ((run+runcounter) * (run+runcounter));
+  con = p+d-d2;
 
-//display print every 100
+  //display print every 100
  if (displayloop==100)
   {
     Serial.printf("%d %d %d %d %d %d %d\n", right, left, kp, kd, p, d, error);
@@ -159,11 +166,13 @@ void loop() {
   displayloop=displayloop+1;
   runcounter=runcounter+1;
 
-//motor control
+  //motor control
   motor(con);
 
-//history update
+  //history update
+  last2err = lasterr;
   lasterr=error;
+  
 }
 
 void motor(int PIDvalue)
