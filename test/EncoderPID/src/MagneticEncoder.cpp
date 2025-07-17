@@ -1,24 +1,35 @@
 #include "MagneticEncoder.h"
 
-MagneticEncoder::MagneticEncoder(TwoWire& wireObj) : wire(wireObj) {}
+/**
+ * Object representing a magnetic encoder
+ */
+MagneticEncoder::MagneticEncoder(){}
 
 /**
- * Read raw angle from sensor
- * WireObj depends on which I2C channel is used
+ * @param wireObj   Wire object related to I2C line being used
+ */
+void MagneticEncoder::begin(TwoWire* wireObj) {
+    this->wire = wireObj;
+}
+
+/**
+ * Read raw angle from magnetic encoder
+ * @return raw angle value from 0 to 4096 IF success
+ * @return 0xFFFF IF fail
  */
 uint16_t MagneticEncoder::readRawAngle() {
-    this->wire.beginTransmission(this->AS5600_ADDR);
-    this->wire.write(this->AS5600_MSG_REG);
+    this->wire->beginTransmission(this->AS5600_ADDR);
+    this->wire->write(this->AS5600_MSG_REG);
 
-    if (this->wire.endTransmission(false) != 0) { 
+    if (this->wire->endTransmission(false) != 0) { 
         return 0xFFFF; // Transmission failed
     }
 
-    this->wire.requestFrom(AS5600_ADDR, 2); // Request MSB and LSB
+    this->wire->requestFrom(AS5600_ADDR, 2); // Request MSB and LSB
 
-    if (this->wire.available() == 2) {
-        uint8_t msb = this->wire.read();
-        uint8_t lsb = this->wire.read();
+    if (this->wire->available() == 2) {
+        uint8_t msb = this->wire->read();
+        uint8_t lsb = this->wire->read();
         return ((uint16_t) msb << 8) | lsb;
     }
 
@@ -26,10 +37,9 @@ uint16_t MagneticEncoder::readRawAngle() {
 }
 
 /**
- * Reads angle 
- * WireObj depends on which I2C channel is used
- * Output range: 0 to 360
- * Something is wrong, Output = -1 
+ * Calculate the angle based on magnetic encoder output
+ * @return angle value from 0 to 360 IF success
+ * @return -1 IF something went wrong
  */
 double MagneticEncoder::readAngle() {
   uint16_t angle = readRawAngle();
@@ -40,7 +50,27 @@ double MagneticEncoder::readAngle() {
   }
 }
 
+/**
+ * Calculates the difference of toAngle and fromAngle
+ * Imagine them being vectors and dif = toAngle - fromAngle
+ * @param toAngle 
+ * @param fromAngle
+ * @return a value between -180 and 180. 
+ * Positive if increasing fromAngle to toAngle causes a smaller rotation than decreasing fromAngle
+ */
+double MagneticEncoder::angleDifference(double toAngle, double fromAngle) {
+  float diff = toAngle - fromAngle;
+  // Make sure it's between -360 to 360
+  diff = fmod(diff, 360);
 
+  if (diff > 180) {
+      diff -= 360;
+  } else if (diff < -180) {
+      diff += 360;
+  }
+
+  return diff;
+}
 
 
 
