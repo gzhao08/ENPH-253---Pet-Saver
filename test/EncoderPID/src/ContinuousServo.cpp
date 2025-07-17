@@ -1,6 +1,8 @@
 #include "ContinuousServo.h"
 
-// ContinuousServo::ContinuousServo()
+/**
+ * ContinuousServo object, consists of a motor and a magnetic encoder
+ */
 ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, 
 int pwmChannel1, int pwmChannel2) {
     this->motorPin1 = motorPin1;
@@ -9,23 +11,35 @@ int pwmChannel1, int pwmChannel2) {
     this->pwmChannel2 = pwmChannel2;
 }
 
+/**
+ * Sets up the ContinuousServo
+ */
 void ContinuousServo::begin(MagneticEncoder* enc) {
-    ledcSetup(pwmChannel1, 100, 12); // (pwmchannel to use,  frequency in Hz, number of bits)
+    // Setup pwm channels
+    // args: (pwmchannel to use,  frequency in Hz, number of bits)
+    ledcSetup(pwmChannel1, 100, 12);
     ledcAttachPin(motorPin1, pwmChannel1);
-
-    ledcSetup(pwmChannel2, 100, 12); // (pwmchannel to use,  frequency in Hz, number of bits)
+    ledcSetup(pwmChannel2, 100, 12);
     ledcAttachPin(motorPin2, pwmChannel2);
 
     this->encoder = enc;
+    this->targetAngle = this->encoder->getRelAngle();
 
-    this->pidController = new PID(
-        &this->Input, &this->Output, &this->Setpoint, 
-        this->Pk, this->Ik, this->Dk, DIRECT);
+    // PID controller object
+    this->pidController = new PID(&this->Input, &this->Output, &this->Setpoint, 
+                                this->Pk, this->Ik, this->Dk, DIRECT);
     this->pidController->SetMode(AUTOMATIC);              // PID Setup
     this->pidController->SetOutputLimits(-BIT_12_LIMIT, BIT_12_LIMIT);
     this->pidController->SetSampleTime(20);
+
 }
 
+/**
+ * Drive the motor with a certain duty cycle. 
+ * Positive sign means...
+ * Negative sign means...
+ * @param signedDuty 
+ */
 void ContinuousServo::drivePWM(int signedDuty) {
     int duty = (int) abs(signedDuty);
     duty = constrain(duty, 0, BIT_12_LIMIT);
@@ -40,105 +54,69 @@ void ContinuousServo::drivePWM(int signedDuty) {
 }
 
 void ContinuousServo::moveBy(int degrees) {
+    this->targetAngle = this->encoder->getRelAngle() + degrees;
 
 }
 
 void ContinuousServo::moveTo(int degrees) {
-    int rotations = degrees / 360;
-    int angleIncrement = degrees % 360;
-
-    int startAngle = this->encoder->readAngle();
-  
-    int currentRotation = 0;
-    float currentAngle = startAngle;
-    float prevAngle = startAngle;
-    float angleDifferenceThreshold = 1;
-
-  // // Blocking
-  // Count rotations
-    while (currentRotation != rotations) {
-        if (currentRotation < rotations) {
-        this->drivePWM(-4096); // Increase encoder
-    } else if (currentRotation > rotations) {
-        this->drivePWM(4096);; // Decrease encoder
-    } else {
-        this->drivePWM(0); // Stop
-    }
-
-    currentAngle = this->encoder->readAngle();
-
-    Serial.print("Reference angle: ");
-    Serial.println(startAngle);
-
-    Serial.print("Prev angle: ");
-    Serial.println(prevAngle);
-
-    Serial.print("Current angle: ");
-    Serial.println(currentAngle);
-
-
-    float prevAngleDifference = this->encoder->angleDifference(startAngle, prevAngle);
-    float currentAngleDifference = this->encoder->angleDifference(currentAngle, startAngle);
-
-    if (abs(prevAngleDifference) < 90 && abs(currentAngleDifference) < 90) { // Might bug
-      if (prevAngleDifference > 0 && currentAngleDifference > 0) { // Might bug, think about it
-        currentRotation++;
-      } else if (prevAngleDifference < 0 && currentAngleDifference < 0) {
-        currentRotation--;
-      }
-    }
-
-    prevAngle = currentAngle;
-
-    Serial.print("Current rotation: ");
-    Serial.println(currentRotation);
-    Serial.println("-----");
-  }
-
-  for (int i = 0; i < 100; i++) {
-    int targetAngle = (startAngle + angleIncrement) % 360;
-    this->PIDSequence(targetAngle);
-    delay(10);
-  }
+    this->targetAngle = degrees;
 }
 
-void ContinuousServo::PIDSequence(int targetValue) {
-    double angle = this->encoder->readAngle();
-    if (angle != -1) {
-        // PID Feedback
-        float angleError = this->encoder->angleDifference(targetValue, angle);
-        Input = angleError;
-        this->pidController->Compute();
-        this->drivePWM(Output);
-    
-        Serial.print(angle, 2);
-        Serial.println(" deg");
+/**
+ * PID Sequence uses relative encoder values
+ */
+void ContinuousServo::PIDSequence(int targetAngle) {
+    float encAngle = this->encoder->readAngle(); // Increment the encoder angle
+    double angle = this->encoder->getRelAngle();
 
-        Serial.print("Angle error: ");
-        Serial.println(angleError);
-        Serial.print("PID Output: ");
-        Serial.println(Output);
-    } else {
-        Serial.println("No AS5600 detected.");
-    }
+    // PID Feedback
+    float angleError = targetAngle - angle;
+    //  this->encoder->angleDifference(targetValue, angle);
+    Input = angleError;
+    this->pidController->Compute();
+    this->drivePWM(Output);
 
-
+    Serial.print(angle, 2);
+    Serial.println(" deg (relativeAngle)");
+    Serial.print("Angle read: ");
+    Serial.println(encAngle);
+    Serial.print("Target angle: ");
+    Serial.println(targetAngle);
+    Serial.print("Angle error: ");
+    Serial.println(angleError);
+    Serial.print("PID Output: ");
+    Serial.println(Output);
     Serial.println("-----");
 }
 
 void ContinuousServo::testSequence() {
-    moveTo(50);
-    delay(500);
-    moveTo(180);
-    delay(500);
-    moveTo(490);
+    unsigned long startTime = millis();
+    this->moveTo(60);
+    while (millis() - startTime < 500000) {
+        this->loop();
+        delay(500);
+
+    }
+    this->moveTo(300);
+    startTime = millis();
+    while (millis() - startTime < 5000) {
+        this->loop();
+    }
+
+    this->drivePWM(0);
+
+    // this->moveBy(360);
+    // startTime = millis();
+    // while (millis() - startTime < 1000) {
+    //     this->loop();
+    // }
 }
 
 /**
  * Run this inside void loop to enable servo feedback
  */
 void ContinuousServo::loop() {
-
+    this->PIDSequence(this->targetAngle);
 }
 
 

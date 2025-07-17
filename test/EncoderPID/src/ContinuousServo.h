@@ -19,14 +19,15 @@ class ContinuousServo {
         int pwmChannel2;
 
         MagneticEncoder* encoder;
-        // PID Controls
 
+        // PID Controls
+        float targetAngle;
         PID* pidController;
-        double Pk = 180;
-        double Ik;
+        double Pk = 50;
+        double Ik = 0;
         double Dk = 5;
     public: 
-        // PID Variables
+        // PID Variables (needs to be public because referenced in PID controller)
         double Setpoint = 0, Input = 0, Output = 0;
 
         ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2);

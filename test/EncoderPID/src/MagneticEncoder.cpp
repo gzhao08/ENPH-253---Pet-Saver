@@ -6,10 +6,14 @@
 MagneticEncoder::MagneticEncoder(){}
 
 /**
+ * Sets up magnetic encoder
  * @param wireObj   Wire object related to I2C line being used
  */
 void MagneticEncoder::begin(TwoWire* wireObj) {
     this->wire = wireObj;
+    this->currentAngle = this->readAngle();
+    this->prevAngle = this->currentAngle;
+    this->relAngle = currentAngle;
 }
 
 /**
@@ -25,7 +29,8 @@ uint16_t MagneticEncoder::readRawAngle() {
         return 0xFFFF; // Transmission failed
     }
 
-    this->wire->requestFrom(AS5600_ADDR, 2); // Request MSB and LSB
+    // Request MSB and LSB
+    this->wire->requestFrom(AS5600_ADDR, 2); 
 
     if (this->wire->available() == 2) {
         uint8_t msb = this->wire->read();
@@ -38,16 +43,41 @@ uint16_t MagneticEncoder::readRawAngle() {
 
 /**
  * Calculate the angle based on magnetic encoder output
+ * Also updates relative angle
  * @return angle value from 0 to 360 IF success
  * @return -1 IF something went wrong
  */
-double MagneticEncoder::readAngle() {
-  uint16_t angle = readRawAngle();
-  if (angle != 0xFFFF) {
-    return (angle * 360.0) / 4096.0;
+float MagneticEncoder::readAngle() {
+  uint16_t rawAngle = readRawAngle();
+  if (rawAngle != 0xFFFF) {
+    float angle = (rawAngle * 360.0) / 4096.0;
+    this->incrementRelAngle(angle);
+    return angle;
   } else {
+    Serial.println("readAngle went wrong!");
     return -1;
   }
+}
+
+/**
+ * Increments the relative angle of the encoder
+ * This modifies the angles
+ * Assumes angle change did not exceed 180 degrees
+ * @param newAngle 0 to 360;
+ */
+void MagneticEncoder::incrementRelAngle(float newAngle) {
+    this->currentAngle = newAngle;
+    float angleDifference = this->angleDifference(this->currentAngle, this->prevAngle);
+    this->relAngle += angleDifference;
+    this->prevAngle = this->currentAngle;
+}
+
+/**
+ * Set the current angle as home
+ */
+void MagneticEncoder::home() {
+    this->currentAngle = this->readAngle();
+    this->prevAngle = this->currentAngle;
 }
 
 /**
@@ -58,7 +88,7 @@ double MagneticEncoder::readAngle() {
  * @return a value between -180 and 180. 
  * Positive if increasing fromAngle to toAngle causes a smaller rotation than decreasing fromAngle
  */
-double MagneticEncoder::angleDifference(double toAngle, double fromAngle) {
+float MagneticEncoder::angleDifference(float toAngle, float fromAngle) {
   float diff = toAngle - fromAngle;
   // Make sure it's between -360 to 360
   diff = fmod(diff, 360);
@@ -70,6 +100,10 @@ double MagneticEncoder::angleDifference(double toAngle, double fromAngle) {
   }
 
   return diff;
+}
+
+float MagneticEncoder::getRelAngle() {
+    return this->relAngle;
 }
 
 

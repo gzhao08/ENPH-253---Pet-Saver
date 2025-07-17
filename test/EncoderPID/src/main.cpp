@@ -38,14 +38,14 @@ void setup() {
 
   encoder.begin(&Wire);
   servo.begin(&encoder);
-
   servo.testSequence();
+
 }
 
 
 
 void loop() {
-  Serial.println(encoder.readAngle());
+  // Serial.println(encoder.readAngle());
   // int time = millis() % 2500;
   // int targetAngle;
   // if (time < 500) {
