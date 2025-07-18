@@ -23,9 +23,22 @@ class ContinuousServo {
         // PID Controls
         float targetAngle;
         PID* pidController;
-        double Pk = 50;
+        double Pk = 180;
         double Ik = 0;
-        double Dk = 5;
+        double Dk = 1;
+        const int PIDSampleTime = 10;
+        unsigned long lastPIDTime = 0;
+
+
+        // Stability check
+        const float tolerance = 3;
+        const int stableThreshold = 20;
+        int stableCounter = 0;
+
+        void updateStability();
+        void PIDSequence(float targetValue);
+
+
     public: 
         // PID Variables (needs to be public because referenced in PID controller)
         double Setpoint = 0, Input = 0, Output = 0;
@@ -36,10 +49,10 @@ class ContinuousServo {
         void begin(MagneticEncoder* enc);
 
         void drivePWM(int signedDuty);
-        void moveBy(int degrees);
-        void moveTo(int degrees);
-        void PIDSequence(int targetValue);
+        void moveBy(float degrees);
+        void moveTo(float degrees);
         void testSequence();
+        bool reachedTarget();
 
         // Call in loop
         void loop();

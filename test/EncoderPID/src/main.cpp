@@ -38,13 +38,20 @@ void setup() {
 
   encoder.begin(&Wire);
   servo.begin(&encoder);
-  servo.testSequence();
+  // servo.testSequence();
 
 }
 
 
 
 void loop() {
+  if (Serial.available()) {
+    String line = Serial.readStringUntil('\n');
+    int movement = line.toInt();
+    Serial.printf("moveBy: %d\n", movement);
+    servo.moveBy(movement);
+  }
+  servo.loop();
   // Serial.println(encoder.readAngle());
   // int time = millis() % 2500;
   // int targetAngle;
