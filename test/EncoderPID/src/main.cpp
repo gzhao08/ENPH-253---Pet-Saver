@@ -3,18 +3,19 @@
 #include <PID_v1.h>
 #include "driver/ledc.h"
 
-#include "MagneticEncoder.h"
-#include "ContinuousServo.h"
+#include "../../../objects/MagneticEncoder.h"
+#include "../../../objects/ContinuousServo.h"
 
 #define AS5600_ADDR 0x36
 #include <AS5600.h>
 
-#define I2C_SCL_1 10
-#define I2C_SDA_1 9
+#define I2C_SCL_1 13
+#define I2C_SDA_1 15
 
 // When IN1 is HIGH, it is like when M1 is connected to Supply
-#define motor_IN1 32 
-#define motor_IN2 33
+#define motor_IN1 12 
+#define motor_IN2 2
+
 #define pwmChannel1 1
 #define pwmChannel2 2
 
@@ -29,29 +30,33 @@ double Dk1 = 5;
 
 double Setpoint = 0, Input = 0, Output = 0;
 
+int microswitchPin = 34;
 MagneticEncoder encoder;
 ContinuousServo servo(motor_IN1, motor_IN2, pwmChannel1, pwmChannel2);
 
+void homingSequence();
 void setup() {
   Serial.begin(115200);
   Wire.begin(I2C_SDA_1, I2C_SCL_1);
 
+  pinMode(microswitchPin, INPUT);
   encoder.begin(&Wire);
   servo.begin(&encoder);
   // servo.testSequence();
+  homingSequence();
 
 }
 
 
 
 void loop() {
-  if (Serial.available()) {
-    String line = Serial.readStringUntil('\n');
-    int movement = line.toInt();
-    Serial.printf("moveBy: %d\n", movement);
-    servo.moveBy(movement);
-  }
-  servo.loop();
+  // if (Serial.available()) {
+  //   String line = Serial.readStringUntil('\n');
+  //   int movement = line.toInt();
+  //   Serial.printf("moveBy: %d\n", movement);
+  //   servo.moveBy(movement);
+  // }
+  // servo.loop();
   // Serial.println(encoder.readAngle());
   // int time = millis() % 2500;
   // int targetAngle;
@@ -85,4 +90,33 @@ void runMotor(int dir) {
     ledcWrite(pwmChannel1, 0);
     ledcWrite(pwmChannel2, 0);
   }
+}
+
+void homingSequence() {
+  Serial.println(digitalRead(microswitchPin));
+  while(digitalRead(microswitchPin) != HIGH) {
+    servo.drivePWM(-800);
+    servo.loop();
+
+  }
+  servo.homingSequence();
+
+  servo.moveTo(-100);
+  while (!servo.reachedTarget()) {
+    servo.loop();
+  }
+  Serial.println("Bounced");
+
+  // servo.moveBy(20);
+  // while (!servo.reachedTarget()) {
+  //   servo.loop();
+  // }
+
+  // Serial.println("Reached target");
+  
+  
+  // servo.moveBy(10);
+  // while (!servo.reachedTarget()) {
+  //   servo.loop();
+  // }
 }

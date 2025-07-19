@@ -23,9 +23,9 @@ class ContinuousServo {
         // PID Controls
         float targetAngle;
         PID* pidController;
-        double Pk = 180;
+        double Pk = 175;
         double Ik = 0;
-        double Dk = 1;
+        double Dk = 4;
         const int PIDSampleTime = 10;
         unsigned long lastPIDTime = 0;
 
@@ -53,6 +53,7 @@ class ContinuousServo {
         void moveTo(float degrees);
         void testSequence();
         bool reachedTarget();
+        void homingSequence();
 
         // Call in loop
         void loop();

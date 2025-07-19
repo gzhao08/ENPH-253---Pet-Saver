@@ -78,6 +78,7 @@ void MagneticEncoder::incrementRelAngle(float newAngle) {
 void MagneticEncoder::home() {
     this->currentAngle = this->readAngle();
     this->prevAngle = this->currentAngle;
+    this->relAngle = 0;
 }
 
 /**
