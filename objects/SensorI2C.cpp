@@ -26,7 +26,7 @@ int SensorI2C::beginTransmission() {
  * @param stop Whether to send a stop message (release the bus)
  * @return status code of the transmission
  */
-int SensorI2C::endTransmission(bool stop=true) {
+int SensorI2C::endTransmission(bool stop) {
     return this->wireManager->endTransmission(this->muxLine, stop);
     // Implementation for ending transmission
     // This would typically involve releasing the I2C bus
@@ -39,7 +39,7 @@ int SensorI2C::endTransmission(bool stop=true) {
  * @param stop Whether to send a stop message (release the bus)
  * @return status code of the transmission
  */
-int SensorI2C::requestFrom(int address, int quantity, bool stop=true) {
+int SensorI2C::requestFrom(int address, int quantity, bool stop) {
     return this->wireManager->requestFrom(this->muxLine, address, quantity, stop);
 }
 

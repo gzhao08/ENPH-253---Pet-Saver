@@ -3,14 +3,16 @@
 /**
  * Object representing a magnetic encoder
  */
-MagneticEncoder::MagneticEncoder(){}
+MagneticEncoder::MagneticEncoder(int muxLine){
+    SensorI2C(this->AS5600_ADDR, muxLine);
+}
 
 /**
  * Sets up magnetic encoder
- * @param wireObj   Wire object related to I2C line being used
+ * @param wireManagerObject WireManager object to use for I2C communication
  */
-void MagneticEncoder::begin(TwoWire* wireObj) {
-    this->wire = wireObj;
+void MagneticEncoder::begin(WireManager* wireManagerObject) {
+    this->assignWireManager(wireManagerObject);
     this->currentAngle = this->readAngle();
     this->prevAngle = this->currentAngle;
     this->relAngle = currentAngle;
@@ -22,19 +24,19 @@ void MagneticEncoder::begin(TwoWire* wireObj) {
  * @return 0xFFFF IF fail
  */
 uint16_t MagneticEncoder::readRawAngle() {
-    this->wire->beginTransmission(this->AS5600_ADDR);
-    this->wire->write(this->AS5600_MSG_REG);
+    this->beginTransmission(this->AS5600_ADDR);
+    this->write(this->AS5600_MSB_REG);
 
-    if (this->wire->endTransmission(false) != 0) { 
+    if (this->endTransmission(false) != 0) { 
         return 0xFFFF; // Transmission failed
     }
 
     // Request MSB and LSB
-    this->wire->requestFrom(AS5600_ADDR, 2); 
+    this->requestFrom(AS5600_ADDR, 2); 
 
-    if (this->wire->available() == 2) {
-        uint8_t msb = this->wire->read();
-        uint8_t lsb = this->wire->read();
+    if (this->available() == 2) {
+        uint8_t msb = this->read();
+        uint8_t lsb = this->read();
         return ((uint16_t) msb << 8) | lsb;
     }
 

@@ -10,7 +10,7 @@ class SensorI2C {
         int muxLine;
 
     public:
-        SensorI2C(int address, int muxLine);
+        SensorI2C(int address, int muxLine=-1); // Default muxLine to -1 (no muxing)
         void assignWireManager(WireManager* wireManager);
         int beginTransmission();
         int endTransmission(bool stop=true);

@@ -1,13 +1,14 @@
 #pragma once
 #include <Wire.h>
 #include <Arduino.h>
+#include <WireManager.h>
+#include <SensorI2C.h>
 
-class MagneticEncoder {
+class MagneticEncoder : public SensorI2C {
     private:
         // I2C stuff
-        TwoWire* wire; // Will have to mux
         const int AS5600_ADDR = 0x36;
-        const int AS5600_MSG_REG = 0x0C;
+        const int AS5600_MSB_REG = 0x0C;
 
         // Relative angles
         float homeAngle = 0;
@@ -17,8 +18,8 @@ class MagneticEncoder {
 
         void incrementRelAngle(float newAngle);
     public:
-        MagneticEncoder();
-        void begin(TwoWire* wireObj);
+        MagneticEncoder(int muxLine=-1);
+        void begin(WireManager* wireManagerObject);
         uint16_t readRawAngle();
         float readAngle();
         float angleDifference(float toAngle, float fromAngle);
