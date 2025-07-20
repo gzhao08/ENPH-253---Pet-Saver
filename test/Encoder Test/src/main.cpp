@@ -6,7 +6,7 @@
 #define pwmChannel2 2
 #define pwmOut1 5
 #define pwmOut2 7 
-#define TARGET_ANGLE 50
+#define TARGET_ANGLE 10
 
 Adafruit_AS5600 as5600;
 
@@ -29,6 +29,7 @@ void setup() {
   ledcAttachPin(pwmOut2,pwmChannel2); 
   
   Serial.begin(115200);
+  Serial.println("test");
 
   // as5600 initialization
   if (!as5600.begin()) {
@@ -47,11 +48,11 @@ void setup() {
   as5600.setHysteresis(AS5600_HYSTERESIS_OFF);
 
   // analog output
-  as5600.setOutputStage(AS5600_OUTPUT_STAGE_ANALOG_FULL);
+  // as5600.setOutputStage(AS5600_OUTPUT_STAGE_ANALOG_FULL);
 
   // OR can do pwm!
-  // as5600.setOutputStage(AS5600_OUTPUT_STAGE_DIGITAL_PWM);
-  // as5600.setPWMFreq(AS5600_PWM_FREQ_920HZ);
+  as5600.setOutputStage(AS5600_OUTPUT_STAGE_DIGITAL_PWM);
+  as5600.setPWMFreq(AS5600_PWM_FREQ_920HZ);
 
   // setup filters
   as5600.setSlowFilter(AS5600_SLOW_FILTER_16X);
@@ -67,8 +68,6 @@ void setup() {
   while (!as5600.setZPosition(0));
   while (!as5600.setMPosition(4095));
   while (!as5600.setMaxAngle(4095));
-  
-
   
 }
 

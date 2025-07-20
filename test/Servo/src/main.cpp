@@ -23,22 +23,12 @@ void setup() {
 }
 
 void loop() {   
-  writePosition(0);
-  delay(2000); 
   writePosition(10);
-  delay(2000);
-  writePosition(20);
-  delay(2000); 
-  writePosition(30);
-  delay(2000);
-  writePosition(40);
-  delay(2000); 
+  delay(5000); 
   writePosition(50);
-  delay(2000);
-  writePosition(60);
-  delay(2000); 
-  writePosition(70);
-  delay(2000);
+  delay(5000); 
+  writePosition(90);
+  delay(5000);
 }
 
 void writePosition(int degrees) {

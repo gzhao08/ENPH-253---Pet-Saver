@@ -30,12 +30,12 @@ bool Microswitch::isPressed() {
 /**
  * 
  */
-bool justReleased() {} //TIMEFRAME? How are we storing values?
+bool justReleased() {} //TODO: TIMEFRAME? How are we storing values?
 
 /**
  * 
  */
-bool justPressed() {} //TIMEFRAME?
+bool justPressed() {} //TODO: TIMEFRAME?
 
 
 
