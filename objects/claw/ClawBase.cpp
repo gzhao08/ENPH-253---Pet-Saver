@@ -20,14 +20,14 @@ void ClawBase::home() {
     while (!home) {
         this->motor->moveBy(2);
         if (this->mswitch->isPressed()) {
-            this->motor-> // TODO: set homing pos
+            //this->motor-> // TODO: set homing pos
             home = true;
         }
     }    
 }
 
 float ClawBase::getPosition() {
-    this->motor-> //TODO: add methods to continuous servo to get positional information
+    //this->motor-> //TODO: add methods to continuous servo to get positional information
 }
 
 /**

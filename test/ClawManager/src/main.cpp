@@ -1,11 +1,14 @@
 #include <Arduino.h>
-#include "../../../objects/Servo/Servo.h"
-#include "../../../objects/Servo/ClawGrabber.h"
+#include "../../../objects/motors/Servo.h"
+#include "../../../objects/claw/ClawGrabber.h"
 
-Servo* servoGrab = new Servo(4, 1);
+Servo* servoGrab = new Servo(22, 1);
 ClawGrabber* grab = new ClawGrabber();
 
-ContinuousServo* 
+
+//ClawArm* arm = new ClawArm(); 
+
+//ContinuousServo* 
 
 void setup() {
   servoGrab->begin();

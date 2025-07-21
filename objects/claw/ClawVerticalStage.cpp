@@ -30,7 +30,7 @@ void ClawVerticalStage::home() {
 }
 
 float ClawVerticalStage::getPosition() {
-    this->motor-> //TODO: add methods to continuous servo to get positional information
+    //this->motor-> //TODO: add methods to continuous servo to get positional information
 
 }
 
