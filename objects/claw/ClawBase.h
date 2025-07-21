@@ -11,8 +11,8 @@
 
 class ClawBase {
     private:
-        ContinuousServo motor;
-        Microswitch mswitch;
+        ContinuousServo motorBase;
+        Microswitch mswitchBase;
 
         //position in degrees
         float position = -1;
@@ -21,10 +21,10 @@ class ClawBase {
 
     public: 
 
-        ClawBase(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin);
+        ClawBase(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen);
 
         // Call in setup
-        void begin();
+        void begin(WireManager* wireManager);
 
         void home();
         float getPosition();

@@ -1,26 +1,35 @@
 #include <Arduino.h>
+#include <Wire.h>
+#include "managers/WireManager.h"
 #include "motors/Servo.h"
 #include "motors/ContinuousServo.h"
 #include "claw/ClawGrabber.h"
 #include "claw/ClawArm.h"
 //#include "../../../objects/sensors/Microswitch"
 
+
+WireManager wireManager(8);
 ClawGrabber grab(22, 1);
 
 //int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin
 //mux: 1 is 1, 0 is 2, -1 is not muxing
-ClawArm arm(2, 12, 2, 3, 1, true, 22); 
+ClawArm arm(2, 12, 2, 3, 1, true, 22, true); 
 
 void setup() {
-  grab.begin(); 
+  // 1. Initialize Wire (I2C-SDA, I2C_SCL) -- clock next to dot then data
+  Wire.begin(5, 7);
+  // 2. Begin wire manager
+  wireManager.begin(&Wire);
+  // 3. Begin servo
+  arm.begin(&wireManager); 
 }
 
 void loop() {
 
 /** test arm */
-arm->setPosition(10);
+arm.setPosition(10);
 delay(1000);
-arm->setPosition(20);
+arm.setPosition(20);
 
 /** test grabber
 grab->setPositionDutyCycle(grab->PET_CLOSE);

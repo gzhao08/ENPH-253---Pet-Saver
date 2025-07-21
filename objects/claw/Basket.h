@@ -1,6 +1,6 @@
 #pragma once
 
-#include "objects/motors/Servo.h"
+#include "../motors/Servo.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include "driver/ledc.h"
