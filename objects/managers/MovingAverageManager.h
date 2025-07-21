@@ -1,5 +1,7 @@
 #pragma once
 
+// Local Libraries:
+
 class MovingAverageManager {
     public:
         MovingAverageManager(int size);

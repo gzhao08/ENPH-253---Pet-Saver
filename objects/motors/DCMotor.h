@@ -2,7 +2,9 @@
 
 #include <Arduino.h>
 #include "driver/ledc.h"
-#include "GlobalConstants.h"
+
+// Local Libraries:
+#include "../GlobalConstants.h"
 
 class DCMotor {
     private:

@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include "driver/ledc.h"
 
-// Our libraries
+// Local Libraries:
 #include "../motors/Servo.h"
 
 class Basket {

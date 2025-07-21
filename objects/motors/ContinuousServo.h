@@ -5,8 +5,8 @@
 #include <PID_v1.h>
 #include "driver/ledc.h"
 
-#include "MagneticEncoder.h"
-
+// Local Libraries:
+#include "../sensors/MagneticEncoder.h"
 #include "../motors/DCMotor.h"
 
 #define BIT_12_LIMIT 4096

@@ -1,11 +1,10 @@
 #pragma once
 
-
 #include <Arduino.h>
 #include <Wire.h>
 #include "driver/ledc.h"
 
-// Our library
+// Local Libraries:
 #include "../motors/ContinuousServo.h"
 #include "../sensors/Microswitch.h"
 

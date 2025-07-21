@@ -1,6 +1,10 @@
 #pragma once
 
-#include "WireManager.h"
+// Local Libraries:
+#include "../managers/WireManager.h"
+
+// WireManager class predefinition
+// this is necessary to avoid circular dependencies
 class WireManager;
 
 class SensorI2C {

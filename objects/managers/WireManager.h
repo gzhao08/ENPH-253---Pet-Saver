@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+// Local Libraries:
+
 class WireManager {
     private:
         TwoWire* wire; // The Wire object to use for I2C communication

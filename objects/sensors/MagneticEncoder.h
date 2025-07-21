@@ -2,9 +2,9 @@
 #include <Wire.h>
 #include <Arduino.h>
 
-// Our Library
-#include "WireManager.h"
-#include "SensorI2C.h"
+// Local Libraries:
+#include "../managers/WireManager.h"
+#include "../sensors/SensorI2C.h"
 
 class MagneticEncoder : public SensorI2C {
     private:
