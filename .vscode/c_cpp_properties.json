@@ -5,6 +5,7 @@
             "includePath": [
                 "C:/Users/Wayne/.platformio/**",
                 "C:\\Users\\Wayne\\Documents\\GitHub\\ENPH-253---Pet-Saver\\objects\\",
+                "C:\\Users\\brynn\\OneDrive - UBC\\Documents\\ENPH-253---Pet-Saver\\objects",
                 "${workspaceFolder}/**"
             ],
             "defines": [

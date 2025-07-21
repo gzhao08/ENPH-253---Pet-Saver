@@ -16,8 +16,8 @@ class ClawArm {
         float position = -1;
         
     public: 
-        int MIN_POSITION = 0;
-        int MAX_POSITION;
+        int MIN = 0;
+        int MAX;
 
         ClawArm();
 

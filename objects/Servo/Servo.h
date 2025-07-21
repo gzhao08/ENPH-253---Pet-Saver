@@ -13,9 +13,14 @@ class Servo {
         int positionDegrees = -1;
 
         int MIN_PERCENT = 3; 
-        int MAX_PERCENT = 12; 
-        int MIN_POSITION = 123; //0 degrees
-        int MAX_POSITION = 492; //180 degrees   
+        int MAX_PERCENT = 13; 
+
+        int RANGE_DEG = 180;
+        int RANGE_POS = 410;
+        int RANGE_DUTY = 10;
+
+        int MIN_POSITION = 122; //0 degrees
+        int MAX_POSITION = 533; //180 degrees   
         
     public:
         Servo(int motorPin, int pwmChannel);

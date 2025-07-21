@@ -47,7 +47,7 @@ void ClawGrabber::setPositionDutyCycle(float cycle) {
  * sets claw arms to be parallel to one another
  */
 void ClawGrabber::setParallel() {
-    this->motor->writeDutyCycle(10.5);
+    this->motor->writeDutyCycle(this->PARALLEL);
 }
 
 void ClawGrabber::testSequence() {

@@ -11,6 +11,11 @@ class ClawGrabber {
         Servo* motor;
         
     public: 
+        float OPEN = 11.9;     
+        float CLOSE = 9.4;
+        float PET_CLOSE;
+        float PARALLEL = 10.5;
+
         ClawGrabber();
 
         // Call in setup

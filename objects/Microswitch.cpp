@@ -25,17 +25,17 @@ bool Microswitch::isPressed() {
     else {
         return !digitalRead(this->switchPin);
     }
-}
+} 
 
 /**
  * 
  */
-bool justReleased() {} //TODO: TIMEFRAME? How are we storing values?
+//bool justReleased() {} //TODO: TIMEFRAME? How are we storing values?
 
 /**
  * 
  */
-bool justPressed() {} //TODO: TIMEFRAME?
+//bool justPressed() {} //TODO: TIMEFRAME?
 
 
 

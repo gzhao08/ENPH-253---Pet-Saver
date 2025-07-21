@@ -25,6 +25,10 @@ class ClawManager {
         float grabPos = -1;
 
     public: 
+
+        float LEFT_ANGLE; 
+        float RIGHT_ANGLE; 
+
         ClawManager();
 
         // Call in setup
