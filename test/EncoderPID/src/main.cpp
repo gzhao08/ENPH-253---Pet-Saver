@@ -4,7 +4,7 @@
 #include "driver/ledc.h"
 #include "../../../objects/GlobalConstants.h"
 #include "../../../objects/MagneticEncoder.h"
-#include "../../../objects/ContinuousServo.h"
+#include "ContinuousServo.h"
 #include "../../../objects/WireManager.h"
 
 #define AS5600_ADDR 0x36
