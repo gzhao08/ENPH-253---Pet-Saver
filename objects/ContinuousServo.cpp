@@ -61,6 +61,10 @@ void ContinuousServo::moveTo(float degrees) {
     this->targetAngle = degrees;
 }
 
+float ContinuousServo::getAngle() {
+    return this->encoder.getRelAngle();
+}
+
 /**
  * PID Sequence uses relative encoder values
  */

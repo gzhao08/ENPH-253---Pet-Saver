@@ -52,7 +52,7 @@ class ContinuousServo {
         void testSequence();
         bool reachedTarget();
         void home();
-
+        float getAngle();
         void setPIDTuningMode(bool mode);
         void setPIDTuningPins(int P_Pin, int D_Pin);
         // Call in loop
