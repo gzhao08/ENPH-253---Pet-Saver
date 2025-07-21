@@ -2,6 +2,7 @@
 
 /**
  * Object representing a magnetic encoder
+ * When a magnetic encoder is fixed, its output increases when a magnet rotates counter-clockwise
  */
 MagneticEncoder::MagneticEncoder(int muxLine) : SensorI2C(this->AS5600_ADDR, muxLine) {
 }

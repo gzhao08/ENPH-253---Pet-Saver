@@ -9,7 +9,7 @@ WireManager::WireManager(int muxPin) {
  * @param wireObj The TwoWire object to use for I2C communication.
  * You should call Wire.begin() too.
  */
-void begin(TwoWire* wireObj) {
+void WireManager::begin(TwoWire* wireObj) {
     pinMode(this->muxPin, OUTPUT);
     digitalWrite(this->muxPin, HIGH); // Set the mux to default line (1)
     this->wire = wireObj;
@@ -34,9 +34,9 @@ void WireManager::switchMuxLine(int muxLine) {
  * @param address The I2C address of the device.
  * @return Status code of the transmission.
  */
-int WireManager::beginTransmission(int muxLine, int address) {
+void WireManager::beginTransmission(int muxLine, int address) {
     this->switchMuxLine(muxLine);
-    return this->wire->beginTransmission(address);
+    this->wire->beginTransmission(address);
 }
 
 /**
@@ -58,7 +58,7 @@ int WireManager::endTransmission(int muxLine, bool stop) {
  * @param stop Whether to send a stop message (release the bus).
  * @return Status code of the transmission.
  */
-int WireManager::requestFrom(int muxLine, int address, int quantity, bool stop) {
+int WireManager::requestFrom(int muxLine, int address, int quantity, int stop) {
     this->switchMuxLine(muxLine);
     return this->wire->requestFrom(address, quantity, stop);
 }
@@ -82,4 +82,13 @@ int WireManager::available(int muxLine) {
 int WireManager::write(int muxLine, int value) {
     this->switchMuxLine(muxLine);
     return this->wire->write(value);
+}
+
+/**
+ * Read a byte from the I2C device.
+ * @param muxLine The multiplexer line to use (0 or 1).
+ */
+uint8_t WireManager::read(int muxLine) {
+    this->switchMuxLine(muxLine);
+    return this->wire->read();
 }

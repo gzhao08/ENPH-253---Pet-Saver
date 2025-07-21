@@ -4,13 +4,25 @@ unsigned long lastPrint = 0;
 /**
  * ContinuousServo object, consists of a motor and a magnetic encoder
  * This is a RELATIVE ANGLE based application (not the absolute reading of the encoder)
+ * Initializes encoder, motor, and PID controller
  */
-ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine) 
-: encoder(muxLine){
-    this->motorPin1 = motorPin1;
-    this->motorPin2 = motorPin2;
-    this->pwmChannel1 = pwmChannel1;
-    this->pwmChannel2 = pwmChannel2;
+ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide) 
+: encoder(muxLine), motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, 5),
+pidController(&this->Input, &this->Output, &this->Setpoint, this->Pk, this->Ik, this->Dk, DIRECT)
+ {
+    /**
+     * Working:
+     * - Encoder increases when magnet is rotated counter-clockwise
+     * - When looking at the side of the motor with the terminals, driving IN1 HIGH will rotate the motor clockwise.
+     * - Motor driven with PID output. PID output is + when want to increase the encoder output
+     * - When encoder is on the terminal side, IN1 high will decrease the encoder output
+     * - Therefore we need to multiply the PID output by -1 when the encoder is on the terminal side
+     */
+    if (encoderOnTerminalSide) {
+        this->DIRECTION_MULTIPLIER = -1;
+    } else {
+        this->DIRECTION_MULTIPLIER = 1;
+    }
 }
 
 /**
@@ -18,51 +30,32 @@ ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, 
  */
 void ContinuousServo::begin(WireManager* wireManager) {
     // Motor setup
-    // Setup pwm channels
-    // args: (pwmchannel to use,  frequency in Hz, number of bits)
-    ledcSetup(pwmChannel1, 100, 12);
-    ledcAttachPin(motorPin1, pwmChannel1);
-    ledcSetup(pwmChannel2, 100, 12);
-    ledcAttachPin(motorPin2, pwmChannel2);
+    motor.begin();
 
     // Encoder setup
     this->encoder.begin(wireManager);
     this->targetAngle = this->encoder.getRelAngle();
 
-    // PID controller object
-    this->pidController = new PID(&this->Input, &this->Output, &this->Setpoint, 
-                                this->Pk, this->Ik, this->Dk, DIRECT);
-    this->pidController->SetMode(AUTOMATIC);              // PID Setup
-    this->pidController->SetOutputLimits(-BIT_12_LIMIT, BIT_12_LIMIT);
-    this->pidController->SetSampleTime(this->PIDSampleTime);
-
+    // PID controller setup
+    this->pidController.SetMode(AUTOMATIC);
+    this->pidController.SetOutputLimits(-this->motor.getMaxDutyCycle(), this->motor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
+    this->pidController.SetSampleTime(this->PIDSampleTime);
 }
 
 /**
- * Drive the motor with a certain duty cycle. 
- * Positive sign means...
- * Negative sign means...
- * @param signedDuty 
+ * Move the servo by a certain number of degrees
+ * This is a relative movement, so it will add the degrees to the current relative angle
+ * @param degrees can be positive or negative
  */
-void ContinuousServo::drivePWM(int signedDuty) {
-    int duty = (int) abs(signedDuty);
-    duty = constrain(duty, 0, BIT_12_LIMIT);
-
-    if (signedDuty <= 0) {
-        ledcWrite(pwmChannel2, 0);
-        ledcWrite(pwmChannel1, duty);
-    } else {
-        ledcWrite(pwmChannel1, 0);
-        ledcWrite(pwmChannel2, duty);
-    }
-}
-
 void ContinuousServo::moveBy(float degrees) {
     this->stableCounter = 0;
     this->targetAngle = this->encoder.getRelAngle() + degrees;
-
 }
 
+/**
+ * Move the servo to a certain absolute angle
+ * @param degrees can be positive or negative
+ */
 void ContinuousServo::moveTo(float degrees) {
     this->stableCounter = 0;
     this->targetAngle = degrees;
@@ -78,8 +71,8 @@ void ContinuousServo::PIDSequence(float targetAngle) {
     // PID Feedback
     float angleError = targetAngle - relAngle;
     this->Input = angleError;
-    this->pidController->Compute();
-    this->drivePWM(this->Output/3); // Divide by 3 to limit to 5V
+    this->pidController.Compute();
+    this->motor.drivePWM(this->Output * this->DIRECTION_MULTIPLIER); // Divide by 3 to limit to 5V
 
     // Log messages
     if (millis() - lastPrint > 50000) {
@@ -96,21 +89,24 @@ void ContinuousServo::PIDSequence(float targetAngle) {
         Serial.println("-----");
         lastPrint = millis();
     }
-
 }
 
+/**
+ * Update the stability counter based on the current relative angle
+ */
 void ContinuousServo::updateStability() {
     float currentRelAngle = this->encoder.getRelAngle();
     if (abs(currentRelAngle - this->targetAngle) < this->tolerance) {
-        this->stableCounter = constrain(this->stableCounter+1, 0, this->stableThreshold);
+        this->stableCounter = constrain(this->stableCounter + 1, 0, this->stableThreshold);
     } else {
         this->stableCounter = 0;
     }
 }
 
+/**
+ * Check if the servo has reached its target position
+ */
 bool ContinuousServo::reachedTarget() {
-    // Serial.print("Stable counter: ");
-    // Serial.println(this->stableCounter);
     return this->stableCounter >= this->stableThreshold;
 }
 
@@ -123,10 +119,16 @@ void ContinuousServo::loop() {
         this->PIDSequence(this->targetAngle);
         this->lastPIDTime = currentTime;
         this->updateStability();
+
+        if (this->PIDTuningMode) {
+            this->tunePID();
+        }
     }
 }
 
-
+/**
+ * Sequence to test if the servo is working or not
+ */
 void ContinuousServo::testSequence() {
     unsigned long startTime = millis();
     // this->moveTo(60);
@@ -179,30 +181,41 @@ void ContinuousServo::testSequence() {
     // }
 }
 
-void ContinuousServo::homingSequence() {
+/**
+ * Set the current angle as home
+ * This also makes the servo want to stay at the current angle
+ * This is useful for homing the servo to a known position
+ */
+void ContinuousServo::home() {
     this->encoder.home();
     this->moveTo(0);
-    // if (dir == true) {
-    //     this->moveBy(10);
-    // } else {
-    //     this->moveBy(10);
-    // }
 }
 
+/**
+ * Set the PID tuning mode
+ */
+void ContinuousServo::setPIDTuningMode(bool mode) {
+    this->PIDTuningMode = mode;
+}
 
-// PID Tuning
-// int newKp = map(analogRead(P_Pin), 0, BIT_12_LIMIT, 0, 1000);
-// double newKd = ((double) map(analogRead(D_Pin), 0, BIT_12_LIMIT, 0, 1000)) / 30;
-// Serial.print("Kp: ");
-// Serial.println(newKp);
-// Serial.print("Kd: ");
-// Serial.println(newKd);
-// myPID.SetTunings(newKp, 0, newKd);
+/**
+ * Set the PD tuning pins
+ */
+void ContinuousServo::setPIDTuningPins(int P_Pin, int D_Pin) {
+    this->P_Pin = P_Pin;
+    this->D_Pin = D_Pin;
+}
 
-// Pk =  map(analogRead(34), 0, BIT_12_LIMIT, 0, 1000);
-// Serial.print("Kp: ");
-// Serial.println(Pk);
-
-// Dk =  map(analogRead(38), 0, BIT_12_LIMIT, 0, 1000)/30;
-// Serial.print("Kd: ");
-// Serial.println(Dk);
+/**
+ * Tune the PID controller using the analog pins
+ */
+void ContinuousServo::tunePID() {
+    // PID Tuning
+    double newKp = map(analogRead(this->P_Pin), 0, BIT_12_LIMIT, 0, 1000);
+    double newKd = ((double) map(analogRead(this->D_Pin), 0, BIT_12_LIMIT, 0, 1000)) / 30;
+    Serial.print("Kp: ");
+    Serial.println(newKp);
+    Serial.print("Kd: ");
+    Serial.println(newKd);
+    this->pidController.SetTunings(newKp, 0, newKd);
+}

@@ -2,12 +2,12 @@
 #include <Wire.h>
 #include <PID_v1.h>
 #include "driver/ledc.h"
-
+#include "../../../objects/GlobalConstants.h"
 #include "../../../objects/MagneticEncoder.h"
 #include "../../../objects/ContinuousServo.h"
+#include "../../../objects/WireManager.h"
 
 #define AS5600_ADDR 0x36
-#include <AS5600.h>
 
 #define I2C_SCL_1 13
 #define I2C_SDA_1 15
@@ -19,7 +19,6 @@
 #define pwmChannel1 1
 #define pwmChannel2 2
 
-#define BIT_12_LIMIT 4096
 #define P_Pin 34
 #define D_Pin 38
 
@@ -31,17 +30,25 @@ double Dk1 = 5;
 double Setpoint = 0, Input = 0, Output = 0;
 
 int microswitchPin = 34;
-MagneticEncoder encoder;
-ContinuousServo servo(motor_IN1, motor_IN2, pwmChannel1, pwmChannel2);
+
+WireManager wireManager(-1);
+ContinuousServo servo(motor_IN1, motor_IN2, pwmChannel1, pwmChannel2, -1, true);
 
 void homingSequence();
+
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
+  // Flow:
+
+  // 1. Initialize Wire
   Wire.begin(I2C_SDA_1, I2C_SCL_1);
+  // 2. Begin wire manager
+  wireManager.begin(&Wire);
+  // 3. Begin servo
+  servo.begin(&wireManager);
 
   pinMode(microswitchPin, INPUT);
-  encoder.begin(&Wire);
-  servo.begin(&encoder);
+
   // servo.testSequence();
   homingSequence();
 
@@ -73,50 +80,31 @@ void loop() {
   // }
 }
 
-/**
- * dir 0: CCW irt encoder
- * dir 1: CW irt encoder
- * else, stop
- * Pins must be driven low before high to prevent shoot through.
- */
-void runMotor(int dir) {
-  if (dir == 0) {
-    ledcWrite(pwmChannel2, 0);
-    ledcWrite(pwmChannel1, BIT_12_LIMIT);
-  } else if (dir == 1) {
-    ledcWrite(pwmChannel1, 0);
-    ledcWrite(pwmChannel2, BIT_12_LIMIT);
-  } else {
-    ledcWrite(pwmChannel1, 0);
-    ledcWrite(pwmChannel2, 0);
-  }
-}
+// void homingSequence() {
+//   Serial.println(digitalRead(microswitchPin));
+//   while(digitalRead(microswitchPin) != HIGH) {
+//     servo.drivePWM(-800);
+//     servo.loop();
 
-void homingSequence() {
-  Serial.println(digitalRead(microswitchPin));
-  while(digitalRead(microswitchPin) != HIGH) {
-    servo.drivePWM(-800);
-    servo.loop();
+//   }
+//   servo.homingSequence();
 
-  }
-  servo.homingSequence();
+//   servo.moveTo(-100);
+//   while (!servo.reachedTarget()) {
+//     servo.loop();
+//   }
+//   Serial.println("Bounced");
 
-  servo.moveTo(-100);
-  while (!servo.reachedTarget()) {
-    servo.loop();
-  }
-  Serial.println("Bounced");
+//   // servo.moveBy(20);
+//   // while (!servo.reachedTarget()) {
+//   //   servo.loop();
+//   // }
 
-  // servo.moveBy(20);
-  // while (!servo.reachedTarget()) {
-  //   servo.loop();
-  // }
-
-  // Serial.println("Reached target");
+//   // Serial.println("Reached target");
   
   
-  // servo.moveBy(10);
-  // while (!servo.reachedTarget()) {
-  //   servo.loop();
-  // }
-}
+//   // servo.moveBy(10);
+//   // while (!servo.reachedTarget()) {
+//   //   servo.loop();
+//   // }
+// }

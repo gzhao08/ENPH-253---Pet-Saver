@@ -23,7 +23,7 @@ void DCMotor::begin() {
 
 /**
  * Drive the motor with a certain duty cycle. 
- * @param signedDuty 
+ * @param signedDuty positive sign means driving IN1 HIGH, negative sign means driving IN2 HIGH.
  * When looking at the side of the motor with the terminals, 
  *  Driving IN1 HIGH will rotate the motor clockwise.
  *  Driving IN2 HIGH will rotate the motor counter-clockwise.
@@ -39,4 +39,12 @@ void DCMotor::drivePWM(int signedDuty) {
         ledcWrite(pwmChannel1, 0);
         ledcWrite(pwmChannel2, duty);
     }
+}
+
+/**
+ * Get the maximum duty cycle for the motor
+ * @return maximum duty cycle
+ */
+int DCMotor::getMaxDutyCycle() {
+    return this->maxDutyCycle;
 }

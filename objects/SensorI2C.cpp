@@ -17,8 +17,8 @@ void SensorI2C::assignWireManager(WireManager* wireManager) {
  * Begin tranmission to the I2C device at the sensor address.
  * @return status code of the transmission
  */
-int SensorI2C::beginTransmission() {
-    return this->wireManager->beginTransmission(this->muxLine, this->address);
+void SensorI2C::beginTransmission() {
+    this->wireManager->beginTransmission(this->muxLine, this->address);
 }
 
 /**
@@ -39,7 +39,7 @@ int SensorI2C::endTransmission(bool stop) {
  * @param stop Whether to send a stop message (release the bus)
  * @return status code of the transmission
  */
-int SensorI2C::requestFrom(int address, int quantity, bool stop) {
+int SensorI2C::requestFrom(int address, int quantity, int stop) {
     return this->wireManager->requestFrom(this->muxLine, address, quantity, stop);
 }
 
@@ -57,5 +57,13 @@ int SensorI2C::available() {
  */
 int SensorI2C::write(int value) {
     return this->wireManager->write(this->muxLine, value);
+}
+
+/**
+ * Read a byte from the I2C device.
+ * @return the byte read from the device
+ */
+uint8_t SensorI2C::read() {
+    return this->wireManager->read(this->muxLine);
 }
 
