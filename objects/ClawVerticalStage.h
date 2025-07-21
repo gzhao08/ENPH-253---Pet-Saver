@@ -33,5 +33,6 @@ class ClawVerticalStage {
         float getPosition();
         void setPosition(float angle);
         void testSequence();
+        void home();
     
 };

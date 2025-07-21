@@ -14,14 +14,17 @@ void ClawVerticalStage::begin(ContinuousServo* motor, Microswitch* mswitch) {
     this->motor = motor;
     this->mswitch = mswitch;
 }
-
+/**
+ * Home the claw vertical stage by moving it until the microswitch is pressed
+ * This will set the home position of the claw vertical stage
+ */
 void ClawVerticalStage::home() {
-    bool home = false; 
-    while (!home) {
+    bool isHome = false; 
+    while (!isHome) {
         this->motor->moveBy(180);
         if (this->mswitch->isPressed()) {
-            this->motor-> // TODO: set homing pos
-            home = true;
+            // this->motor-> // TODO: set homing pos
+            isHome = true;
         }
     }  
 }

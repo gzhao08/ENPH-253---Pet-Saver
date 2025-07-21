@@ -4,7 +4,7 @@
 
 class Microswitch {
     private: 
-        int switchPin
+        int switchPin;
         bool normallyOpen;
     public:
         Microswitch(int switchPin, bool normallyOpen);
