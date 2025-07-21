@@ -5,8 +5,8 @@ unsigned long lastPrint = 0;
  * ContinuousServo object, consists of a motor and a magnetic encoder
  * This is a RELATIVE ANGLE based application (not the absolute reading of the encoder)
  */
-ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, 
-int pwmChannel1, int pwmChannel2) {
+ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine) 
+: encoder(muxLine){
     this->motorPin1 = motorPin1;
     this->motorPin2 = motorPin2;
     this->pwmChannel1 = pwmChannel1;
@@ -16,7 +16,8 @@ int pwmChannel1, int pwmChannel2) {
 /**
  * Sets up the ContinuousServo
  */
-void ContinuousServo::begin(MagneticEncoder* enc) {
+void ContinuousServo::begin(WireManager* wireManager) {
+    // Motor setup
     // Setup pwm channels
     // args: (pwmchannel to use,  frequency in Hz, number of bits)
     ledcSetup(pwmChannel1, 100, 12);
@@ -24,24 +25,9 @@ void ContinuousServo::begin(MagneticEncoder* enc) {
     ledcSetup(pwmChannel2, 100, 12);
     ledcAttachPin(motorPin2, pwmChannel2);
 
-    this->encoder = enc;
-    this->targetAngle = this->encoder->getRelAngle();
-
-    // int newKp = map(analogRead(P_Pin), 0, BIT_12_LIMIT, 0, 1000);
-// double newKd = ((double) map(analogRead(D_Pin), 0, BIT_12_LIMIT, 0, 1000)) / 30;
-// Serial.print("Kp: ");
-// Serial.println(newKp);
-// Serial.print("Kd: ");
-// Serial.println(newKd);
-// myPID.SetTunings(newKp, 0, newKd);
-
-    // Pk =  map(analogRead(34), 0, BIT_12_LIMIT, 0, 1000);
-    // Serial.print("Kp: ");
-    // Serial.println(Pk);
-
-    // Dk =  map(analogRead(38), 0, BIT_12_LIMIT, 0, 1000)/30;
-    // Serial.print("Kd: ");
-    // Serial.println(Dk);
+    // Encoder setup
+    this->encoder.begin(wireManager);
+    this->targetAngle = this->encoder.getRelAngle();
 
     // PID controller object
     this->pidController = new PID(&this->Input, &this->Output, &this->Setpoint, 
@@ -73,7 +59,7 @@ void ContinuousServo::drivePWM(int signedDuty) {
 
 void ContinuousServo::moveBy(float degrees) {
     this->stableCounter = 0;
-    this->targetAngle = this->encoder->getRelAngle() + degrees;
+    this->targetAngle = this->encoder.getRelAngle() + degrees;
 
 }
 
@@ -86,8 +72,8 @@ void ContinuousServo::moveTo(float degrees) {
  * PID Sequence uses relative encoder values
  */
 void ContinuousServo::PIDSequence(float targetAngle) {
-    float absAngle = this->encoder->readAngle(); // Increment the encoder angle
-    double relAngle = this->encoder->getRelAngle();
+    float absAngle = this->encoder.readAngle(); // Increment the encoder angle
+    double relAngle = this->encoder.getRelAngle();
 
     // PID Feedback
     float angleError = targetAngle - relAngle;
@@ -114,7 +100,7 @@ void ContinuousServo::PIDSequence(float targetAngle) {
 }
 
 void ContinuousServo::updateStability() {
-    float currentRelAngle = this->encoder->getRelAngle();
+    float currentRelAngle = this->encoder.getRelAngle();
     if (abs(currentRelAngle - this->targetAngle) < this->tolerance) {
         this->stableCounter = constrain(this->stableCounter+1, 0, this->stableThreshold);
     } else {
@@ -181,7 +167,7 @@ void ContinuousServo::testSequence() {
         }
         Serial.print("Reached Target: ");
         Serial.println(i);
-        Serial.println(this->encoder->getRelAngle());
+        Serial.println(this->encoder.getRelAngle());
 
         delay(100);
     }
@@ -194,7 +180,7 @@ void ContinuousServo::testSequence() {
 }
 
 void ContinuousServo::homingSequence() {
-    this->encoder->home();
+    this->encoder.home();
     this->moveTo(0);
     // if (dir == true) {
     //     this->moveBy(10);

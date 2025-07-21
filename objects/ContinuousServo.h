@@ -18,7 +18,7 @@ class ContinuousServo {
         int pwmChannel1;
         int pwmChannel2;
 
-        MagneticEncoder* encoder;
+        MagneticEncoder encoder;
 
         // PID Controls
         float targetAngle;
@@ -37,18 +37,14 @@ class ContinuousServo {
 
         void updateStability();
         void PIDSequence(float targetValue);
-
+        void drivePWM(int signedDuty);
 
     public: 
         // PID Variables (needs to be public because referenced in PID controller)
         double Setpoint = 0, Input = 0, Output = 0;
 
-        ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2);
-
-        // Call in setup
-        void begin(MagneticEncoder* enc);
-
-        void drivePWM(int signedDuty);
+        ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine);
+        void begin(WireManager* wireManager); // Call in setup
         void moveBy(float degrees);
         void moveTo(float degrees);
         void testSequence();

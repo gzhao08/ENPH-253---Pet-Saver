@@ -1,8 +1,8 @@
 #pragma once
 #include <Wire.h>
 #include <Arduino.h>
-#include <WireManager.h>
-#include <SensorI2C.h>
+#include "WireManager.h"
+#include "SensorI2C.h"
 
 class MagneticEncoder : public SensorI2C {
     private:

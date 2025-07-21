@@ -3,8 +3,7 @@
 /**
  * Object representing a magnetic encoder
  */
-MagneticEncoder::MagneticEncoder(int muxLine){
-    SensorI2C(this->AS5600_ADDR, muxLine);
+MagneticEncoder::MagneticEncoder(int muxLine) : SensorI2C(this->AS5600_ADDR, muxLine) {
 }
 
 /**
@@ -24,7 +23,7 @@ void MagneticEncoder::begin(WireManager* wireManagerObject) {
  * @return 0xFFFF IF fail
  */
 uint16_t MagneticEncoder::readRawAngle() {
-    this->beginTransmission(this->AS5600_ADDR);
+    this->beginTransmission();
     this->write(this->AS5600_MSB_REG);
 
     if (this->endTransmission(false) != 0) { 
