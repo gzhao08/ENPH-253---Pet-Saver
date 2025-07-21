@@ -5,7 +5,7 @@
 #include <PID_v1.h>
 #include "driver/ledc.h"
 #include "MagneticEncoder.h"
-#include "DCMotor.h"
+#include "DCMotor/DCMotor.h"
 
 #define BIT_12_LIMIT 4096
 
