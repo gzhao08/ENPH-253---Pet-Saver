@@ -1,11 +1,13 @@
 #pragma once
 
-#include "ContinuousServo.h"
-#include "Microswitch.h"
+
 #include <Arduino.h>
 #include <Wire.h>
 #include "driver/ledc.h"
 
+// Our library
+#include "../motors/ContinuousServo.h"
+#include "../sensors/Microswitch.h"
 
 class ClawArm {
     private:

@@ -1,10 +1,11 @@
 #pragma once
 
-#include "objects/Servo.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include "driver/ledc.h"
 
+// Our libraries
+#include "../motors/Servo.h"
 
 class Basket {
     private:
