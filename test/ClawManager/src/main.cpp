@@ -6,9 +6,10 @@
 //#include "../../../objects/sensors/Microswitch"
 
 ClawGrabber grab(22, 1);
-ClawArm arm(); 
 
-
+//int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin
+//mux: 1 is 1, 0 is 2, -1 is not muxing
+ClawArm arm(2, 12, 2, 3, 1, true, 22); 
 
 void setup() {
   grab.begin(); 
