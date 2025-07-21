@@ -13,6 +13,4 @@ class Microswitch {
         Microswitch(int switchPin, bool normallyOpen);
         void begin();
         bool isPressed();
-        bool justReleased();
-        bool justPressed(); 
 };

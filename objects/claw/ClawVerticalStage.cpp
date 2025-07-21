@@ -3,16 +3,17 @@
 /**
  * ClawVerticalStage object, consists of a continuous servo and a microswitch
  */
-ClawVerticalStage::ClawVerticalStage(){}
+ClawVerticalStage::ClawVerticalStage(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin) : motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, muxLine, encoderOnTerminalSide), mswitch(switchPin) {}
+
 
 /**
  * Sets up magnetic encoder
  * @param motor Continuous servo object related to vertical stage
  * @param mswitch microswitch object related to vertical stage
  */
-void ClawVerticalStage::begin(ContinuousServo* motor, Microswitch* mswitch) {
-    this->motor = motor;
-    this->mswitch = mswitch;
+void ClawVerticalStage::begin() {
+    motor.begin();
+    mswitch.begin();
 }
 /**
  * Home the claw vertical stage by moving it until the microswitch is pressed

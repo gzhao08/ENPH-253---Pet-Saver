@@ -27,16 +27,5 @@ bool Microswitch::isPressed() {
     }
 } 
 
-/**
- * 
- */
-//bool justReleased() {} //TODO: TIMEFRAME? How are we storing values?
-
-/**
- * 
- */
-//bool justPressed() {} //TODO: TIMEFRAME?
-
-
 
 

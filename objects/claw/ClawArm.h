@@ -10,8 +10,8 @@
 
 class ClawArm {
     private:
-        ContinuousServo* motor;
-        Microswitch* mswitch;
+        ContinuousServo motor;
+        Microswitch mswitch;
 
         //position in degrees
         float position = -1;
@@ -20,10 +20,10 @@ class ClawArm {
         int MIN = 0;
         int MAX;
 
-        ClawArm();
+        ClawArm(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin);
 
         // Call in setup
-        void begin(ContinuousServo* motor, Microswitch* mswitch);
+        void begin();
 
         void home();
         float getPosition();

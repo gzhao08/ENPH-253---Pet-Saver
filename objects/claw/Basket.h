@@ -1,21 +1,20 @@
 #pragma once
 
+#include "objects/motors/Servo.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include "driver/ledc.h"
 
-// Local Libraries:
-#include "../motors/Servo.h"
 
 class Basket {
     private:
-        Servo* motor;
+        Servo motor;
         
     public: 
-        Basket();
+        Basket(int servoPin, int pwmChannel);
 
         // Call in setup
-        void begin(Servo* motor);
+        void begin();
 
         void reset();
         void release(); 

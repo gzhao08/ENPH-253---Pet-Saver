@@ -1,32 +1,36 @@
 #include <Arduino.h>
-#include "../../../objects/motors/Servo.h"
-#include "../../../objects/claw/ClawGrabber.h"
+#include "motors/Servo.h"
+#include "motors/ContinuousServo.h"
+#include "claw/ClawGrabber.h"
+#include "claw/ClawArm.h"
+//#include "../../../objects/sensors/Microswitch"
 
-Servo* servoGrab = new Servo(22, 1);
-ClawGrabber* grab = new ClawGrabber();
+ClawGrabber grab(22, 1);
+ClawArm arm(); 
 
 
-//ClawArm* arm = new ClawArm(); 
-
-//ContinuousServo* 
 
 void setup() {
-  servoGrab->begin();
-  grab->begin(servoGrab);
-
-
+  grab.begin(); 
 }
 
 void loop() {
+
+/** test arm */
+arm->setPosition(10);
+delay(1000);
+arm->setPosition(20);
+
+/** test grabber
 grab->setPositionDutyCycle(grab->PET_CLOSE);
 delay(5000);
 grab->setPositionDutyCycle(grab->PARALLEL);
 delay(500);
 grab->setPositionDutyCycle(grab->OPEN);
 delay(500);
-
-
-/** 
+ */
+  
+/** test servo
   servo->writePosition(0);
   delay(500);
   servo->writePosition(10);

@@ -9,18 +9,18 @@
 
 class ClawGrabber {
     private:
-        Servo* motor;
+        Servo motor;
         
     public: 
         float OPEN = 11.9;     
         float CLOSE = 9.4;
         float PET_CLOSE = 9.4;
-        float PARALLEL = 10.8;
+        float PARALLEL = 11;
 
-        ClawGrabber();
+        ClawGrabber(int motorPin, int pwmChannel);
 
         // Call in setup
-        void begin(Servo* motor);
+        void begin();
 
         float getPositionDegrees();
         float getPositionDutyCycle();

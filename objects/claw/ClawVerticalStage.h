@@ -10,8 +10,8 @@
 
 class ClawVerticalStage {
     private:
-        ContinuousServo* motor;
-        Microswitch* mswitch;
+        ContinuousServo motor;
+        Microswitch mswitch;
 
         float height = -1; //height in mm
         int pitch = 2; // pitch in mm
@@ -26,10 +26,10 @@ class ClawVerticalStage {
         int LOW_SENSE; 
         int HIGH_SENSE; 
 
-        ClawVerticalStage();
+        ClawVerticalStage(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin);
 
         // Call in setup
-        void begin(ContinuousServo* motor, Microswitch* mswitch);
+        void begin();
 
         float getPosition();
         void setPosition(float angle);

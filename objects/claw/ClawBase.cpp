@@ -3,31 +3,32 @@
 /**
  * ClawBase object, consists of a continuous servo and a microswitch
  */
-ClawBase::ClawBase(){}
+ClawBase::ClawBase(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin) : motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, muxLine, encoderOnTerminalSide), mswitch(switchPin) {}
+
 
 /**
  * Sets up magnetic encoder
  * @param motor Continuous servo object related to claw base
  * @param mswitch microswitch object related to claw base
  */
-void ClawBase::begin(ContinuousServo* motor, Microswitch* mswitch) {
-    this->motor = motor;
-    this->mswitch = mswitch;
+void ClawBase::begin() {
+    this->motor.begin();
+    this->mswitch.begin();
 }
 
 void ClawBase::home() {
     bool home = false; 
     while (!home) {
-        this->motor->moveBy(2);
-        if (this->mswitch->isPressed()) {
-            this->motor->home();
+        this->motor.moveBy(2);
+        if (this->mswitch.isPressed()) {
+            this->motor.home();
             home = true;
         }
     }    
 }
 
 float ClawBase::getPosition() {
-    return -1 * this->motor->getAngle(); 
+    return -1 * this->motor.getAngle(); 
 }
 
 /**
@@ -35,9 +36,9 @@ float ClawBase::getPosition() {
  */
 void ClawBase::setPosition(float angle) {
     if (this->MIN_POSITION <= angle && this->MAX_POSITION >= angle) {
-        float currentPos = this->getPosition();
+        float currentPos = this.getPosition();
         float moveAngle = -1 * (currentPos + 1000) - (angle + 1000);
-        this->motor->moveBy(moveAngle); //CCW is positive so multiply by -1
+        this->motor.moveBy(moveAngle); //CCW is positive so multiply by -1
     }
 }
 

@@ -3,28 +3,28 @@
 /**
  * ClawGrabber object, consists of a servo
  */
-ClawGrabber::ClawGrabber(){}
+ClawGrabber::ClawGrabber(int motorPin, int pwmChannel) : motor(motorPin, pwmChannel) {}
 
 /**
  * Sets up magnetic encoder
  * @param motor servo object related to claw grabber
  */
-void ClawGrabber::begin(Servo* motor) {
-    this->motor = motor;
+void ClawGrabber::begin() {
+    this->motor.begin();
 }
 
 /**
  * @return servo position in degrees (0 to 180 CW from west to east) or -1 if servo has not been moved yet
  */
 float ClawGrabber::getPositionDegrees() {
-    return this->motor->readPosition(); 
+    return this->motor.readPosition(); 
 }
 
 /**
  * @return servo duty cycle between 3 and 12 or -1 if servo has not been moved yet
  */
 float ClawGrabber::getPositionDutyCycle() {
-    return this->motor->readDutyCycle(); 
+    return this->motor.readDutyCycle(); 
 }
 
 /**
@@ -32,7 +32,7 @@ float ClawGrabber::getPositionDutyCycle() {
  * @param angle position in degrees to move servo to
  */
 void ClawGrabber::setPositionDegrees(float angle) {
-    this->motor->writePosition(angle);
+    this->motor.writePosition(angle);
 }
 
 /**
@@ -40,14 +40,14 @@ void ClawGrabber::setPositionDegrees(float angle) {
  * @param duty must be between 3 (3% = 0 deg) and 12 (12% = 180 deg)
  */
 void ClawGrabber::setPositionDutyCycle(float cycle) {
-    this->motor->writeDutyCycle(cycle);
+    this->motor.writeDutyCycle(cycle);
 }
 
 /**
  * sets claw arms to be parallel to one another
  */
 void ClawGrabber::setParallel() {
-    this->motor->writeDutyCycle(this->PARALLEL);
+    this->motor.writeDutyCycle(this->PARALLEL);
 }
 
 void ClawGrabber::testSequence() {
