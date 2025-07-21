@@ -22,24 +22,25 @@ bool home = false;
     while (!home) {
         this->motor->moveBy(10);
         if (this->mswitch->isPressed()) {
-            this->motor-> // TODO: set homing pos
+            this->motor->home(); // TODO: set homing pos
             home = true;
         }
     }
 }
 
 float ClawArm::getPosition() {
-    this->motor-> //TODO: add methods to continuous servo to get positional information
+    float angle = this->motor->getAngle(); 
+    return angle * 151 / 360;
 }
 
 /**
  * @param position final position of horizontal stage in mm from home position (0)
  */
 void ClawArm::setPosition(float position) {
-    if (this->MIN_POSITION <= angle && this->MAX_POSITION >= angle) {
-        currentPos = this->getPosition();
-        moveAngle = (currentPos - position) * 360 / 151;
-        this->motor->moveBy(moveAngle); //TODO: check -- assumed CW is positive
+    if (this->MIN <= position && this->MAX >= position) {
+        float currentPos = this->getPosition();
+        float moveAngle = -1 * (currentPos - position) * 360 / 151;
+        this->motor->moveBy(moveAngle); //CCW is positive so multiply by -1
     }
 }
 

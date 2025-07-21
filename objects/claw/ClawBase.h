@@ -16,7 +16,8 @@ class ClawBase {
 
         //position in degrees
         float position = -1;
-        
+        float MIN_POSITION = -120;
+        float MAX_POSITION = 120;
 
     public: 
 
@@ -25,6 +26,7 @@ class ClawBase {
         // Call in setup
         void begin(ContinuousServo* motor, Microswitch* mswitch);
 
+        void home();
         float getPosition();
         void setPosition(float angle);
         void testSequence();

@@ -23,14 +23,15 @@ void ClawVerticalStage::home() {
     while (!isHome) {
         this->motor->moveBy(180);
         if (this->mswitch->isPressed()) {
-            // this->motor-> // TODO: set homing pos
+            this->motor->home(); 
             isHome = true;
         }
     }  
 }
 
 float ClawVerticalStage::getPosition() {
-    //this->motor-> //TODO: add methods to continuous servo to get positional information
+    float angle = this->motor->getAngle(); 
+    return angle * 2 / 360;
 
 }
 
@@ -39,10 +40,11 @@ float ClawVerticalStage::getPosition() {
  * @param height above minimum height in mm
  */
 void ClawVerticalStage::setPosition(float height) {
+    //CW moves mechanism up
     if (this->MIN_HEIGHT <= height && this->MAX_HEIGHT >= height) {
-        currentPos = this->getPosition();
-        moveAngle = (currentPos - height) * 360 / 2; // 2mm corresponds to 1 rotation
-        this->motor->moveBy(moveAngle); //TODO: check -- assumed CW is positive; check if CW is up or down
+        float currentPos = this->getPosition();
+        float moveAngle = (height - currentPos) * 360 / 2; // 2mm corresponds to 1 rotation, positive if need to move up
+        this->motor->moveBy(-1 * moveAngle); //negative is CW, CW is up
     }
 }
 

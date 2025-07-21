@@ -25,6 +25,7 @@ class ClawArm {
         // Call in setup
         void begin(ContinuousServo* motor, Microswitch* mswitch);
 
+        void home();
         float getPosition();
         void setPosition(float distance);
         void testSequence();

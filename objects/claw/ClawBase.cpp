@@ -20,14 +20,14 @@ void ClawBase::home() {
     while (!home) {
         this->motor->moveBy(2);
         if (this->mswitch->isPressed()) {
-            //this->motor-> // TODO: set homing pos
+            this->motor->home();
             home = true;
         }
     }    
 }
 
 float ClawBase::getPosition() {
-    //this->motor-> //TODO: add methods to continuous servo to get positional information
+    return -1 * this->motor->getAngle(); 
 }
 
 /**
@@ -35,9 +35,9 @@ float ClawBase::getPosition() {
  */
 void ClawBase::setPosition(float angle) {
     if (this->MIN_POSITION <= angle && this->MAX_POSITION >= angle) {
-        currentPos = this->getPosition();
-        moveAngle = (currentPos + 1000) - (angle + 1000);
-        this->motor->moveBy(moveAngle); //TODO: check -- assumed CW is positive
+        float currentPos = this->getPosition();
+        float moveAngle = -1 * (currentPos + 1000) - (angle + 1000);
+        this->motor->moveBy(moveAngle); //CCW is positive so multiply by -1
     }
 }
 
