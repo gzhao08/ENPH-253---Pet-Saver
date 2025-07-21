@@ -61,6 +61,11 @@ void ContinuousServo::moveTo(float degrees) {
     this->targetAngle = degrees;
 }
 
+/**
+ * Return the current angle of the servo
+ * This is the relative angle of the servo in respect to the home position
+ * @return relative angle in degrees
+ */
 float ContinuousServo::getAngle() {
     return this->encoder.getRelAngle();
 }
