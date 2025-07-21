@@ -1,25 +1,27 @@
 #include <Arduino.h>
 #include "../../../objects/Servo/Servo.h"
+#include "../../../objects/Servo/ClawGrabber.h"
 
-Servo* servo = new Servo(4, 1);
+Servo* servoGrab = new Servo(4, 1);
+ClawGrabber* grab = new ClawGrabber();
+
+ContinuousServo* 
 
 void setup() {
-  servo->begin();
+  servoGrab->begin();
+  grab->begin(servoGrab);
+
+
 }
 
 void loop() {
-servo->writeDutyCycle(9.5);
+grab->setPositionDutyCycle(grab->PET_CLOSE);
+delay(5000);
+grab->setPositionDutyCycle(grab->PARALLEL);
 delay(500);
-servo->writeDutyCycle(10);
+grab->setPositionDutyCycle(grab->OPEN);
 delay(500);
-servo->writeDutyCycle(10.5);
-delay(500);
-servo->writeDutyCycle(11);
-delay(500);
-servo->writeDutyCycle(11.5);
-delay(500);
-servo->writeDutyCycle(12);
-delay(500);
+
 
 /** 
   servo->writePosition(0);

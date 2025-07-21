@@ -13,7 +13,7 @@ class ClawGrabber {
     public: 
         float OPEN = 11.9;     
         float CLOSE = 9.4;
-        float PET_CLOSE;
+        float PET_CLOSE = 9.4;
         float PARALLEL = 10.5;
 
         ClawGrabber();
