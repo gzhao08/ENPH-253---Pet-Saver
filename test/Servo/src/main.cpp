@@ -23,21 +23,12 @@ void setup() {
 }
 
 void loop() {   
-<<<<<<< HEAD
   if (Serial.available()) {
     String line = Serial.readStringUntil('\n');
     int pos = line.toInt();
     Serial.printf("Moving to %d", pos);
     writePosition(pos);
   }
-=======
-  writePosition(10);
-  delay(5000); 
-  writePosition(50);
-  delay(5000); 
-  writePosition(90);
-  delay(5000);
->>>>>>> 1771e7628f8193c6f7c8097a577ffd7baeee8283
 }
 
 void writePosition(int degrees) {

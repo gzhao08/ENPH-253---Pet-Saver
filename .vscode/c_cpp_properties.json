@@ -7,6 +7,8 @@
                 "C:\\Users\\Wayne\\Documents\\GitHub\\ENPH-253---Pet-Saver\\objects\\**",
                 "C:\\Users\\brynn\\OneDrive - UBC\\Documents\\ENPH-253---Pet-Saver\\objects\\**",
                 "C:/Users/brynn/.platformio/**",
+                "C:\\Users\\gordo\\Documents\\UBC\\S25\\ENPH 253\\Github\\ENPH-253---Pet-Saver\\**",
+                "C:/Users/gordo/.platformio/**",
                 "${workspaceFolder}/**"
             ],
             "defines": [
