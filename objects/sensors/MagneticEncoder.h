@@ -5,13 +5,10 @@
 // Local Libraries:
 #include "../managers/WireManager.h"
 #include "../sensors/SensorI2C.h"
+#include "../GlobalConstants.h"
 
 class MagneticEncoder : public SensorI2C {
     private:
-        // I2C stuff
-        const int AS5600_ADDR = 0x36;
-        const int AS5600_MSB_REG = 0x0C;
-
         // Relative angles
         float homeAngle = 0;
         float relAngle; // Angle relative to home

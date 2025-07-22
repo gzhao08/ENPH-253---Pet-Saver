@@ -7,8 +7,7 @@ unsigned long lastPrint = 0;
  * Initializes encoder, motor, and PID controller
  */
 ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide) 
-: encoder(muxLine), motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, 5),
-pidController(&this->Input, &this->Output, &this->Setpoint, this->Pk, this->Ik, this->Dk, DIRECT)
+: encoder(muxLine), motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, 5)
  {
     /**
      * Working:
@@ -36,10 +35,13 @@ void ContinuousServo::begin(WireManager* wireManager) {
     this->encoder.begin(wireManager);
     this->targetAngle = this->encoder.getRelAngle();
 
+
     // PID controller setup
-    this->pidController.SetMode(AUTOMATIC);
-    this->pidController.SetOutputLimits(-this->motor.getMaxDutyCycle(), this->motor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
-    this->pidController.SetSampleTime(this->PIDSampleTime);
+    this->pidController = new PID(&this->Input, &this->Output, &this->Setpoint, this->Pk, this->Ik, this->Dk, DIRECT);
+    this->pidController->SetMode(AUTOMATIC);
+    Serial.println(this->motor.getMaxDutyCycle());
+    this->pidController->SetOutputLimits(-this->motor.getMaxDutyCycle(), this->motor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
+    this->pidController->SetSampleTime(this->PIDSampleTime);
 }
 
 /**
@@ -80,11 +82,11 @@ void ContinuousServo::PIDSequence(float targetAngle) {
     // PID Feedback
     float angleError = targetAngle - relAngle;
     this->Input = angleError;
-    this->pidController.Compute();
+    this->pidController->Compute();
     this->motor.drivePWM(this->Output * this->DIRECTION_MULTIPLIER); // Divide by 3 to limit to 5V
 
     // Log messages
-    if (millis() - lastPrint > 50000) {
+    if (millis() - lastPrint > 500) {
         Serial.print(relAngle, 2);
         Serial.println(" deg (relativeAngle)");
         Serial.print("Angle read: ");
@@ -226,5 +228,5 @@ void ContinuousServo::tunePID() {
     Serial.println(newKp);
     Serial.print("Kd: ");
     Serial.println(newKd);
-    this->pidController.SetTunings(newKp, 0, newKd);
+    this->pidController->SetTunings(newKp, 0, newKd);
 }

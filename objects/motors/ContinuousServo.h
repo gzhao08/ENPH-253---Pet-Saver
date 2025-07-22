@@ -22,7 +22,7 @@ class ContinuousServo {
 
         // PID Controls
         float targetAngle;
-        PID pidController;
+        PID* pidController;
         double Pk = 175;
         double Ik = 0;
         double Dk = 4;
@@ -44,7 +44,7 @@ class ContinuousServo {
         void tunePID();
     public: 
         // PID Variables (needs to be public because referenced in PID controller)
-        double Setpoint = 0, Input = 0, Output = 0;
+        double Setpoint = 0, Input = 0, Output = 1;
 
         ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide);
 

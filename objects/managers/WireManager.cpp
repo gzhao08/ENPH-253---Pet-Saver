@@ -1,5 +1,9 @@
 #include "WireManager.h"
 
+/**
+ * WireManager constructor.
+ * @param muxPin The pin used to control the multiplexer. If not muxing, set to -1.
+ */
 WireManager::WireManager(int muxPin) {
     this->muxPin = muxPin;
 }
@@ -10,8 +14,10 @@ WireManager::WireManager(int muxPin) {
  * You should call Wire.begin() too.
  */
 void WireManager::begin(TwoWire* wireObj) {
-    pinMode(this->muxPin, OUTPUT);
-    digitalWrite(this->muxPin, HIGH); // Set the mux to default line (1)
+    if (this->muxPin != -1) {
+        pinMode(this->muxPin, OUTPUT);
+        digitalWrite(this->muxPin, HIGH); // Set the mux to default line (1)
+    }
     this->wire = wireObj;
 }
 
@@ -22,8 +28,11 @@ void WireManager::begin(TwoWire* wireObj) {
 // MuxLine 1 is JM1
 // MuxLine 0 is JM2
 void WireManager::switchMuxLine(int muxLine) {
+    if (this->muxPin == -1) {
+        return; // No muxing, do nothing
+    }
     if (muxLine != 0 && muxLine != 1) {
-        return;
+        return; // Invalid muxLine, do nothing
     }
     digitalWrite(this->muxPin, muxLine);
 }
