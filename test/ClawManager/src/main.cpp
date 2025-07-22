@@ -2,6 +2,7 @@
 #include <Wire.h>
 
 #include "managers/WireManager.h"
+#include "managers/DelayManager.h"
 #include "motors/Servo.h"
 #include "motors/ContinuousServo.h"
 #include "claw/ClawGrabber.h"
@@ -15,13 +16,14 @@ ClawGrabber grab(22, 1);
 
 int motorPin1 = 2;
 int motorPin2 = 12;
-int pwmChannel1 = 2;
+int pwmChannel1 = 2; //motor pin 1 goes to B
 int pwmChannel2 = 3; 
 int muxLine = 1; 
-bool encoderOnTerminalSide = false; 
+bool encoderOnTerminalSide = false; //false for arm, 
 int switchPin = 37; 
 bool normallyOpen = true; 
 
+DelayManager positionDelayManager(1000);
 //int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin
 //mux: 1 is 1, 0 is 2, -1 is not muxing
 ClawArm arm(motorPin1, motorPin2, pwmChannel1, pwmChannel2, muxLine, encoderOnTerminalSide, switchPin, normallyOpen); 
@@ -34,16 +36,58 @@ void setup() {
   wireManager.begin(&Wire);
   // 3. Begin servo
   arm.begin(&wireManager); 
+  positionDelayManager.reset();
 
   //arm.home();
 
   grab.begin();
   
+  
 }
 
+unsigned long lastUpdate = 0;
+bool home = true; 
+bool ten = true;
+int position = -10;
+
 void loop() {
-  arm.setPosition(10);
+
+  if (home) {
+    arm.home();
+  }
+
+  home = false; 
+
+  if (ten) {
+      arm.setPosition(10);
+  }
+  else {
+       arm.setPosition(50);
+  }
+
+  arm.loop();
+   
+  if (positionDelayManager.checkAndReset()) {
+    if (ten) {
+      ten = false;
+    } else {
+      ten = true;
+    }
+    
+    // home = false; 
+    // position -= 10; 
+    // if (position = -50) {
+    //   position = 0;
+    // }
+  }
+
+ 
+  // arm.setPosition(20);
   // arm.loop();
+  // delay(500);
+  // //arm.setPosition(20);
+  // arm.loop();
+  // delay(500);
 
   // Serial.println("WOI KENAPA GABSIA");
 /** test arm */

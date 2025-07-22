@@ -19,18 +19,20 @@ void ClawArm::begin(WireManager* wireManager) {
 }
 
 void ClawArm::home() {
-    bool home = false; 
-    while (!home) {
-        this->motorArm.moveBy(500);
-        //if(this->motorArm.reachedTarget()) {
-            //this->motorArm.moveBy(10);
-        //}
-        if (this->mswitchArm.isPressed()) {
-            this->motorArm.home();
-            home = true;
-        }
+    this->motorArm.home();
+
+    // bool home = false; 
+    // while (!home) {
+    //     this->motorArm.moveBy(500);
+    //     //if(this->motorArm.reachedTarget()) {
+    //         //this->motorArm.moveBy(10);
+    //     //}
+    //     if (this->mswitchArm.isPressed()) {
+    //         this->motorArm.home();
+    //         home = true;
+    //     }
         
-    }
+    // }
 }
 
 float ClawArm::getPosition() {
@@ -44,6 +46,7 @@ float ClawArm::getPosition() {
 void ClawArm::setPosition(float position) {
     if (this->MIN <= position && this->MAX >= position) {
         float angle = position * 360 / 151;
+        
         this->motorArm.moveTo(angle); 
     }
 }
@@ -54,6 +57,6 @@ void ClawArm::loop() {
 }
 
 void ClawArm::testSequence() {
-
+    
 }
 
