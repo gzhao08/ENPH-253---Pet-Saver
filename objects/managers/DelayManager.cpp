@@ -2,7 +2,6 @@
 
 DelayManager::DelayManager(unsigned long timeIntervalMs) {
     this->timeInterval = timeIntervalMs;
-    this->lastTriggerTime = millis();
 }
 
 void DelayManager::setTimeInterval(unsigned long timeIntervalMs) {
