@@ -13,12 +13,15 @@ void setup() {
   left.begin();
   right.begin();
 
-  steer.begin();
+  steer.begin(38,37,39,36); // put IR pins here -> left to right
 
   Serial.begin(115200);
 }
 
 void loop() {
-  steer.array.showState();
+  steer.array.takeReading(true);
+  steer.array.getError();
+  //steer.array.showState();
+  steer.array.update();
   delay(50);
 }

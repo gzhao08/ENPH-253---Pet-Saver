@@ -13,8 +13,6 @@ void SteeringManager::begin(int outerLeftPin, int innerLeftPin, int innerRightPi
     this->pidController.SetOutputLimits(-leftMotor->getMaxDutyCycle(), leftMotor->getMaxDutyCycle()); // Set output limits to motor max duty cycle
     this->pidController.SetSampleTime(this->PIDSampleTime);
 
-
-
     // Motor
     leftMotor->begin();
     rightMotor->begin();

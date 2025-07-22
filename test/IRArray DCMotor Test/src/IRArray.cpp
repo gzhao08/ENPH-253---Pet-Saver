@@ -34,7 +34,7 @@ void IRArray::takeReading(boolean show) {
 }
 
 void IRArray::showReading() {
-    Serial.printf("1: %d, 2: %d, 3: %d, 4: %d\n", r1, r2, r3, r4);
+    Serial.printf("%d %d %d %d\n", r1, r2, r3, r4);
 }
 
 void IRArray::showState() {
