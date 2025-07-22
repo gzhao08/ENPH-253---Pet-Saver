@@ -13,7 +13,14 @@ MagneticEncoder::MagneticEncoder(int muxLine) : SensorI2C(AS5600_ADDR, muxLine) 
  */
 void MagneticEncoder::begin(WireManager* wireManagerObject) {
     this->assignWireManager(wireManagerObject);
-    this->currentAngle = this->readAngle();
+
+    float readAngleResult = this->readAngle();
+    if (readAngleResult < 0) {
+        Serial.println("MagneticEncoder: Failed to read angle during begin()");
+        return;
+    } 
+
+    this->currentAngle = readAngleResult;
     this->prevAngle = this->currentAngle;
     this->relAngle = currentAngle;
 }
@@ -81,7 +88,12 @@ void MagneticEncoder::incrementRelAngle(float newAngle) {
  * Set the current angle as home
  */
 void MagneticEncoder::home() {
-    this->currentAngle = this->readAngle();
+    float readAngleResult = this->readAngle();
+    if (readAngleResult < 0) {
+        Serial.println("MagneticEncoder: Failed to read angle during home()");
+        return;
+    }
+    this->currentAngle = readAngleResult;
     this->prevAngle = this->currentAngle;
     this->relAngle = 0;
 }
@@ -109,6 +121,10 @@ float MagneticEncoder::angleDifference(float toAngle, float fromAngle) {
 }
 
 float MagneticEncoder::getRelAngle() {
+    float readAngleResult = this->readAngle(); // Ensure the relative angle is updated
+    if (readAngleResult < 0) {
+        Serial.println("MagneticEncoder: Failed to read angle in getRelAngle()");
+    }
     return this->relAngle;
 }
 

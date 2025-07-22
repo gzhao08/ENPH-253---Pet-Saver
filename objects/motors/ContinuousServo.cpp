@@ -75,8 +75,8 @@ float ContinuousServo::getAngle() {
  * PID Sequence uses relative encoder values
  */
 void ContinuousServo::PIDSequence(float targetAngle) {
-    float absAngle = this->encoder.readAngle(); // Increment the encoder angle
-    double relAngle = this->encoder.getRelAngle();
+    float absAngle = this->encoder.readAngle();
+    float relAngle = this->encoder.getRelAngle();
 
     // PID Feedback
     float angleError = targetAngle - relAngle;
@@ -140,37 +140,56 @@ void ContinuousServo::loop() {
  * Sequence to test if the servo is working or not
  */
 void ContinuousServo::testSequence() {
-    unsigned long startTime = millis();
-    // this->moveTo(60);
-    // while (millis() - startTime < 1000) {
-    //     this->loop();
-    //     if (this->reachedTarget()) {
-    //         Serial.println("Reached Target 1!!");
-    //     }
-    // }
+    DelayManager sequenceDelay(1000);
+    sequenceDelay.start();
+    
+    this->moveTo(60);
+    while (true) {
+        this->loop();
 
-    // delay(2000);
-    // this->moveTo(360);
-    // startTime = millis();
-    // while (millis() - startTime < 1000) {
-    //     this->loop();
-    //         if (this->reachedTarget()) {
-    //         Serial.println("Reached Target 2!!");
-    //     }
-    // }
-    // delay(2000);
+        if (this->reachedTarget()) {
+            Serial.println("Reached Target 1!!");
+        }
 
-    // this->moveBy(720);
-    //     startTime = millis();
+        if (sequenceDelay.checkAndReset()) {
+            Serial.println("Target 1 timeout, moving to next target");
+            break;
+        }
+    }
 
-    // while (millis() - startTime < 3000) {
-    //     this->loop();
-    //         if (this->reachedTarget()) {
-    //         Serial.println("Reached Target 3!!");
-    //     }
-    // }
+    delay(500);
 
-    for(int i = 0; i < 5; i++) {
+    this->moveTo(360);
+    while (true) {
+        this->loop();
+        if (this->reachedTarget()) {
+            Serial.println("Reached Target 2!!");
+            break;
+        }
+
+        if (sequenceDelay.checkAndReset()) {
+            Serial.println("Target 2 timeout, moving to next target");
+            break;
+        }
+    }
+    delay(500);
+
+    this->moveBy(540);
+    while (true) {
+        this->loop();
+        if (this->reachedTarget()) {
+            Serial.println("Reached Target 3!!");
+            break;
+        }
+
+        if (sequenceDelay.checkAndReset()) {
+            Serial.println("Target 3 timeout, moving to next target");
+            break;
+        }
+    }
+
+    Serial.println("Multiple rotation sequence: ");
+    for (int i = 0; i < 3; i++) {
         this->moveBy(360);
         this->loop();
         while (!this->reachedTarget()) {
@@ -183,12 +202,6 @@ void ContinuousServo::testSequence() {
 
         delay(100);
     }
-
-    // this->moveBy(360);
-    // startTime = millis();
-    // while (millis() - startTime < 1000) {
-    //     this->loop();
-    // }
 }
 
 /**

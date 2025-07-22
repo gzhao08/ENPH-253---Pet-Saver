@@ -8,6 +8,8 @@
 // Local Libraries:
 #include "../sensors/MagneticEncoder.h"
 #include "../motors/DCMotor.h"
+#include "../managers/DelayManager.h"
+#include "../managers/WireManager.h"
 
 #define BIT_12_LIMIT 4096
 
