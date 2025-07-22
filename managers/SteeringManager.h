@@ -3,15 +3,11 @@
 #include <Arduino.h>
 #include "IRArray.h"
 #include <PID_v1.h>
-#include "DCMotor.h"
+#include "DCMotor.h"  
+ 
 
-
-
-class SteeringManager() {
+class SteeringManager {
     private: 
-        // IR
-        IRArray array;   
-
         // PID
         PID pidController;
         int PIDSampleTime = 10;
@@ -25,23 +21,21 @@ class SteeringManager() {
         double Kd = 1.0;
 
         // Motor
-        DCMotor leftMotor;
-        DCMotor rightMotor;
+        DCMotor* leftMotor; 
+        DCMotor* rightMotor; 
 
         // Line Follow
-        boolean followLine = false; // should be volative global
-        
+        volatile boolean drive = false; // boolean indicating when to stop driving ; should be global and changed via interrupts
         
     public:
+        IRArray array; 
 
-        SteeringManager(DCMotor* left, DCMotor* right);
+        SteeringManager(DCMotor* left, DCMotor* right); 
 
-        void begin();
+        void begin(int outerLeftPin, int innerLeftPin, int innerRightPin, int outerRightPin);
         
         void forward(int duty);
         void backward(int duty);
-        void lineFollow();
-
-
-
-}
+        void stop();
+        void lineFollow(int baseSpeed);
+};

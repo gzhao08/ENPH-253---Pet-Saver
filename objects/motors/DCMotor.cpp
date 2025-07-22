@@ -42,6 +42,14 @@ void DCMotor::drivePWM(int signedDuty) {
 }
 
 /**
+ * Stop the motor by setting PWM channels to 0.
+ */
+void DCMotor::stop() {
+    ledcWrite(pwmChannel1, 0);
+    ledcWrite(pwmChannel2, 0);
+}
+
+/**
  * Get the maximum duty cycle for the motor
  * @return maximum duty cycle
  */

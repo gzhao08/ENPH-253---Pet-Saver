@@ -24,5 +24,6 @@ class DCMotor {
         DCMotor(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int maxVoltage=5);
         void begin();
         void drivePWM(int signedDuty);
+        void stop();
         int getMaxDutyCycle();
 };
