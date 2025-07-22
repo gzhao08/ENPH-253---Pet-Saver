@@ -18,7 +18,7 @@ class ClawArm {
         
     public: 
         int MIN = 0;
-        int MAX;
+        int MAX = 100;
 
         ClawArm(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen);
 
@@ -29,5 +29,6 @@ class ClawArm {
         float getPosition();
         void setPosition(float distance);
         void testSequence();
+        void loop();
     
 };

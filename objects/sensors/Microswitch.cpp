@@ -3,7 +3,7 @@
 /**
  * Object representing a microswitch
  */
-Microswitch::Microswitch(int pin, bool normallyOpen) {
+Microswitch::Microswitch(int switchPin, bool normallyOpen) {
     this->switchPin = switchPin; 
     this->normallyOpen = normallyOpen; 
 }

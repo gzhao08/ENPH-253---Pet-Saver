@@ -39,7 +39,6 @@ void ContinuousServo::begin(WireManager* wireManager) {
     // PID controller setup
     this->pidController = new PID(&this->Input, &this->Output, &this->Setpoint, this->Pk, this->Ik, this->Dk, DIRECT);
     this->pidController->SetMode(AUTOMATIC);
-    Serial.println(this->motor.getMaxDutyCycle());
     this->pidController->SetOutputLimits(-this->motor.getMaxDutyCycle(), this->motor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
     this->pidController->SetSampleTime(this->PIDSampleTime);
 }

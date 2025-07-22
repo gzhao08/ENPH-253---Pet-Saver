@@ -27,8 +27,10 @@ uint16_t MagneticEncoder::readRawAngle() {
     this->beginTransmission();
     this->write(AS5600_MSB_REG);
 
-    if (this->endTransmission(true) != 0) { 
+    int endTransmissionStatus = this->endTransmission(false);
+    if (endTransmissionStatus != 0) { 
         Serial.println("End transmission failed");
+        Serial.println(endTransmissionStatus);
         return 0xFFFF; // Transmission failed
     }
 

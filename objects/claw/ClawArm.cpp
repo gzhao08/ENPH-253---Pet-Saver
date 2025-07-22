@@ -19,13 +19,17 @@ void ClawArm::begin(WireManager* wireManager) {
 }
 
 void ClawArm::home() {
-bool home = false; 
+    bool home = false; 
     while (!home) {
-        this->motorArm.moveBy(10);
+        this->motorArm.moveBy(500);
+        //if(this->motorArm.reachedTarget()) {
+            //this->motorArm.moveBy(10);
+        //}
         if (this->mswitchArm.isPressed()) {
             this->motorArm.home();
             home = true;
         }
+        
     }
 }
 
@@ -39,10 +43,14 @@ float ClawArm::getPosition() {
  */
 void ClawArm::setPosition(float position) {
     if (this->MIN <= position && this->MAX >= position) {
-        float currentPos = this->getPosition();
-        float moveAngle = -1 * (currentPos - position) * 360 / 151;
-        this->motorArm.moveBy(moveAngle); //CCW is positive so multiply by -1
+        float angle = position * 360 / 151;
+        this->motorArm.moveTo(angle); 
     }
+}
+
+
+void ClawArm::loop() {
+    this->motorArm.loop();
 }
 
 void ClawArm::testSequence() {
