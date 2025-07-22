@@ -4,7 +4,7 @@
  * Object representing a magnetic encoder
  * When a magnetic encoder is fixed, its output increases when a magnet rotates counter-clockwise
  */
-MagneticEncoder::MagneticEncoder(int muxLine) : SensorI2C(this->AS5600_ADDR, muxLine) {
+MagneticEncoder::MagneticEncoder(int muxLine) : SensorI2C(AS5600_ADDR, muxLine) {
 }
 
 /**
@@ -25,14 +25,15 @@ void MagneticEncoder::begin(WireManager* wireManagerObject) {
  */
 uint16_t MagneticEncoder::readRawAngle() {
     this->beginTransmission();
-    this->write(this->AS5600_MSB_REG);
+    this->write(AS5600_MSB_REG);
 
-    if (this->endTransmission(false) != 0) { 
+    if (this->endTransmission(true) != 0) { 
+        Serial.println("End transmission failed");
         return 0xFFFF; // Transmission failed
     }
 
     // Request MSB and LSB
-    this->requestFrom(AS5600_ADDR, 2); 
+    this->requestFrom(2, true); 
 
     if (this->available() == 2) {
         uint8_t msb = this->read();

@@ -34,13 +34,12 @@ int SensorI2C::endTransmission(bool stop) {
 
 /**
  * Request data from the I2C device at the specified register address.
- * @param address Register address to read from
  * @param quantity The number of bytes to read
  * @param stop Whether to send a stop message (release the bus)
  * @return status code of the transmission
  */
-int SensorI2C::requestFrom(int address, int quantity, int stop) {
-    return this->wireManager->requestFrom(this->muxLine, address, quantity, stop);
+int SensorI2C::requestFrom(int quantity, int stop) {
+    return this->wireManager->requestFrom(this->muxLine, this->address, quantity, stop);
 }
 
 /**
