@@ -14,5 +14,5 @@ class WifiHelper {
         WifiHelper();
 
         void begin();
-        void startTune(double* kp, double* kd);   
+        void startTune(double* kp, double* kd, int* baseSpeed);   
 };

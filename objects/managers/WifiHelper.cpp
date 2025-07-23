@@ -8,6 +8,10 @@ WifiHelper::WifiHelper() {
     boolean collected = false;
 }
 
+/**
+ * Begin the WiFi helper by starting the soft AP
+ * Sets up the AP SSID and password
+ */
 void WifiHelper::begin() {
     // Start the soft AP
     while (AP_ssid == nullptr || AP_pass == nullptr) {
@@ -20,13 +24,18 @@ void WifiHelper::begin() {
     server.begin();
 }
 
-void WifiHelper::startTune(double* kp, double* kd) {
-
-    WiFi.softAP(AP_ssid, AP_pass);
-    IPAddress ip = WiFi.softAPIP();
-    Serial.printf("AP started. Connect to %s:%s, IP=%s\n", AP_ssid, AP_pass, ip.toString().c_str());
-    server.begin();
-
+/**
+ * Start the tuning process by waiting for client connections
+ * and reading the PID parameters from the client
+ * @param kp Pointer to the proportional gain variable
+ * @param kd Pointer to the derivative gain variable
+ * @param baseSpeed Pointer to the base speed variable
+ */
+void WifiHelper::startTune(double* kp, double* kd, int* baseSpeed) {
+    // WiFi.softAP(AP_ssid, AP_pass);
+    // IPAddress ip = WiFi.softAPIP();
+    // Serial.printf("AP started. Connect to %s:%s, IP=%s\n", AP_ssid, AP_pass, ip.toString().c_str());
+    // server.begin();
     WiFiClient client;
     boolean collected = false;
 
@@ -59,6 +68,9 @@ void WifiHelper::startTune(double* kp, double* kd) {
                         case 'D':
                             *kd = (double) line.substring(1).toInt();
                             break;
+                        case 'B':
+                            *baseSpeed = line.substring(1).toInt();
+                            break;
                         case 's':
                             collected = true;
                             break;
@@ -71,5 +83,6 @@ void WifiHelper::startTune(double* kp, double* kd) {
     Serial.printf("kp: %lf - kd: %lf\n", *kp, *kd);
     client.stop();
     Serial.println("Client disconnected");
-    delay(2000);
+    delay(1000);
 }
+
