@@ -32,12 +32,13 @@ class ContinuousServo {
         unsigned long lastPIDTime = 0;
 
         // PID Tuning
+        DelayManager pidTuningDelayManager;
         bool PIDTuningMode = false;
         int P_Pin; // Pin for tuning P
         int D_Pin; // Pin for tuning D
 
         // Stability check
-        const float tolerance = 3;
+        const float tolerance = 6;
         const int stableThreshold = 20;
         int stableCounter = 0;
 

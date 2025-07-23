@@ -13,7 +13,7 @@ class DCMotor {
         int pwmChannel1; // PWM channel for motorPin1
         int pwmChannel2; // PWM channel for motorPin2
 
-        const int hBridgeVoltage = 15;
+        const int hBridgeVoltage = 12; // Voltage of the H-Bridge, used to calculate max duty cycle
         int maxVoltage; // Maximum voltage for the motor
         int maxDutyCycle;
 

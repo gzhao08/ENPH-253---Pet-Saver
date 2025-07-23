@@ -7,7 +7,7 @@ unsigned long lastPrint = 0;
  * Initializes encoder, motor, and PID controller
  */
 ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide) 
-: encoder(muxLine), motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, 5)
+: encoder(muxLine), motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, 5), pidTuningDelayManager(1000)
  {
     /**
      * Working:
@@ -85,7 +85,7 @@ void ContinuousServo::PIDSequence(float targetAngle) {
     this->motor.drivePWM(this->Output * this->DIRECTION_MULTIPLIER); // Divide by 3 to limit to 5V
 
     // Log messages
-    if (millis() - lastPrint > 500) {
+    if (millis() - lastPrint > 1000) {
         Serial.print(relAngle, 2);
         Serial.println(" deg (relativeAngle)");
         Serial.print("Angle read: ");
@@ -140,8 +140,8 @@ void ContinuousServo::loop() {
  * Sequence to test if the servo is working or not
  */
 void ContinuousServo::testSequence() {
-    DelayManager sequenceDelay(1000);
-    sequenceDelay.start();
+    DelayManager sequenceDelay(3000);
+    sequenceDelay.reset();
     
     this->moveTo(60);
     while (true) {
@@ -236,9 +236,13 @@ void ContinuousServo::tunePID() {
     // PID Tuning
     double newKp = map(analogRead(this->P_Pin), 0, BIT_12_LIMIT, 0, 1000);
     double newKd = ((double) map(analogRead(this->D_Pin), 0, BIT_12_LIMIT, 0, 1000)) / 30;
-    Serial.print("Kp: ");
-    Serial.println(newKp);
-    Serial.print("Kd: ");
-    Serial.println(newKd);
+
+    if (pidTuningDelayManager.checkAndReset()) {
+        Serial.print("Kp: ");
+        Serial.println(newKp);
+        Serial.print("Kd: ");
+        Serial.println(newKd);
+    }
+
     this->pidController->SetTunings(newKp, 0, newKd);
 }

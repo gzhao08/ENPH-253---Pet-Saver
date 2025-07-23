@@ -1,7 +1,5 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <PID_v1.h>
-#include "driver/ledc.h"
 
 // Local Libraries:
 #include "GlobalConstants.h"
@@ -15,14 +13,14 @@
 #define I2C_SDA_1 15
 
 // When IN1 is HIGH, it is like when M1 is connected to Supply
-#define motor_IN1 32
-#define motor_IN2 33
+#define motor_IN1 12
+#define motor_IN2 2
 
 #define pwmChannel1 1
 #define pwmChannel2 2
 
 #define P_Pin 34
-#define D_Pin 38
+#define D_Pin 35
 
 // PID Control
 double Pk1 = 180; 
@@ -31,11 +29,13 @@ double Dk1 = 5;
 
 double Setpoint = 0, Input = 0, Output = 0;
 
-int microswitchPin = 34;
+// int microswitchPin = 34;
 
-WireManager wireManager(-1);
-MagneticEncoder encoder(-1);
-ContinuousServo servo(motor_IN1, motor_IN2, pwmChannel1, pwmChannel2, -1, true);
+WireManager wireManager(8);
+// MagneticEncoder encoder(0);
+// MagneticEncoder encoder2(1);
+
+ContinuousServo servo(motor_IN1, motor_IN2, pwmChannel1, pwmChannel2, 1, false);
 
 void homingSequence();
 
@@ -45,17 +45,17 @@ void setup() {
 
   // 1. Initialize Wire
   Wire.begin(I2C_SDA_1, I2C_SCL_1);
+  Wire.setClock(100000);
   // 2. Begin wire manager
   wireManager.begin(&Wire);
   // 3. Begin servo
   servo.begin(&wireManager);
 
-  encoder.begin(&wireManager);
-  Serial.println(encoder.readAngle());
+  servo.setPIDTuningMode(true);
+  servo.setPIDTuningPins(P_Pin, D_Pin);
 
-  pinMode(microswitchPin, INPUT);
+  // pinMode(microswitchPin, INPUT);
 
-  servo.testSequence();
   // homingSequence();
 
 }
@@ -63,6 +63,10 @@ void setup() {
 
 
 void loop() {
+    servo.testSequence();
+    Serial.println("Test sequence done");
+    
+
   // if (Serial.available()) {
   //   String line = Serial.readStringUntil('\n');
   //   int movement = line.toInt();

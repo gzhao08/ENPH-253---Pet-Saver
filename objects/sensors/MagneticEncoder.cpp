@@ -34,7 +34,7 @@ uint16_t MagneticEncoder::readRawAngle() {
     this->beginTransmission();
     this->write(AS5600_MSB_REG);
 
-    int endTransmissionStatus = this->endTransmission(false);
+    int endTransmissionStatus = this->endTransmission(false); // Repeated start
     if (endTransmissionStatus != 0) { 
         Serial.println("End transmission failed");
         Serial.println(endTransmissionStatus);
@@ -120,6 +120,10 @@ float MagneticEncoder::angleDifference(float toAngle, float fromAngle) {
   return diff;
 }
 
+/**
+ * Relative angle getter
+ * @return relative angle in degrees
+ */
 float MagneticEncoder::getRelAngle() {
     float readAngleResult = this->readAngle(); // Ensure the relative angle is updated
     if (readAngleResult < 0) {

@@ -18,7 +18,7 @@ void DCMotor::begin() {
     ledcSetup(this->pwmChannel2, this->pwmFrequency, this->pwmResolution);
     ledcAttachPin(motorPin2, pwmChannel2);
 
-    this->maxDutyCycle = map(this->maxVoltage, 0, this->hBridgeVoltage, 0, BIT_12_LIMIT);
+    this->maxDutyCycle = map(this->maxVoltage, 0, this->hBridgeVoltage, 0, BIT_12_LIMIT) * 0.8;
 }
 
 /**
