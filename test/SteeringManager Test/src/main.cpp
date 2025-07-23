@@ -32,17 +32,12 @@ void setup() {
 }
 
 void loop() {
-  // steer.forward(2000);
-  // delay(2000);
-  // steer.backward(800);
-  // delay(2000);
-
   // steer.array.takeReading(true);
   // steer.array.getError();
   // steer.array.update();
   // delay(50);
 
-  steer.lineFollow(baseSpeed);
+  //steer.lineFollow(baseSpeed);
 
   // left.drivePWM(1200);
   // right.drivePWM(1200);

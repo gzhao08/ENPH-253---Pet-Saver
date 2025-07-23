@@ -67,6 +67,38 @@ void SteeringManager::stop() {
 }
 
 /**
+ * Reverse the motors in place until the IR sensors detect that they are not on the line
+ * This is used to turn in place
+ * @param duty the positive duty cycle to drive the motors with
+ */
+void SteeringManager::reverse(int duty) {
+    this->array.takeReading(false);
+    if (!this->array.isOnLine()) {
+        return; // do nothing if not on line
+    }
+
+    while (this->array.isOnLine()) {
+        // turn in place until off line
+        leftMotor->drivePWM(duty);
+        rightMotor->drivePWM(-duty);
+        this->array.takeReading(false);
+    }
+
+    while (!this->array.isOnLine()) {
+        // turn in place until back on line
+        leftMotor->drivePWM(duty);
+        rightMotor->drivePWM(-duty);
+    }
+
+    while (!this->array.isCentered()) {
+        // turn in place until back on line
+        leftMotor->drivePWM(duty/2);
+        rightMotor->drivePWM(-duty/2);
+    }
+
+}
+
+/**
  * Line follow using the IR sensors and PID controller
  * @param baseSpeed the base speed to drive the motors at
  * The PID controller will adjust the speed of the motors based on the error from the IR sensors

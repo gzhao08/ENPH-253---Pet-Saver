@@ -24,5 +24,7 @@ class IRArray {
         void showState();
         int getError();
         void update();
+        boolean isOnLine();
+        boolean isCentered();
         
 };
