@@ -87,7 +87,7 @@ void MagneticEncoder::incrementRelAngle(float newAngle) {
 /**
  * Set the current angle as home
  */
-void MagneticEncoder::home() {
+void MagneticEncoder::setAsHome() {
     float readAngleResult = this->readAngle();
     if (readAngleResult < 0) {
         Serial.println("MagneticEncoder: Failed to read angle during home()");

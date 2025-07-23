@@ -205,12 +205,12 @@ void ContinuousServo::testSequence() {
 }
 
 /**
- * Set the current angle as home
+ * Set the current position as home
  * This also makes the servo want to stay at the current angle
  * This is useful for homing the servo to a known position
  */
-void ContinuousServo::home() {
-    this->encoder.home();
+void ContinuousServo::setAsHome() {
+    this->encoder.setAsHome();
     this->moveTo(0);
 }
 

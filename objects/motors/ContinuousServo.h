@@ -56,7 +56,7 @@ class ContinuousServo {
         void moveTo(float degrees);
         void testSequence();
         bool reachedTarget();
-        void home();
+        void setAsHome();
         float getAngle();
         void setPIDTuningMode(bool mode);
         void setPIDTuningPins(int P_Pin, int D_Pin);

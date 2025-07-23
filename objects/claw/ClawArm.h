@@ -13,19 +13,24 @@ class ClawArm {
         ContinuousServo motorArm;
         Microswitch mswitchArm;
 
-        //position in degrees
+        // position in degrees
         float position = -1;
+
+        const int HORIZONTAL_GEAR_CIRCUMFERENCE = 151; // mm
+        const float ANGLE_TO_MM_CONVERSION = 0.42; // Calibrated from 151/360
         
     public: 
-        int MIN = 0;
-        int MAX = 100;
+        // Minimum and maximum position in mm
+        int MIN_POSITION = 0;
+        int MAX_POSITION = 100;
 
         ClawArm(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen);
 
         // Call in setup
         void begin(WireManager* wireManager);
 
-        void home();
+        void setAsHome();
+        
         float getPosition();
         void setPosition(float distance);
         void testSequence();

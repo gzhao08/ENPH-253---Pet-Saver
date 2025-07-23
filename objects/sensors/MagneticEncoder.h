@@ -22,6 +22,6 @@ class MagneticEncoder : public SensorI2C {
         uint16_t readRawAngle();
         float readAngle();
         float angleDifference(float toAngle, float fromAngle);
-        void home();
+        void setAsHome();
         float getRelAngle();
 };
