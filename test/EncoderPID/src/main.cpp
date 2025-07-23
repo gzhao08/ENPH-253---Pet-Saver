@@ -9,12 +9,9 @@
 
 #define AS5600_ADDR 0x36
 
-#define I2C_SCL_1 13
-#define I2C_SDA_1 15
-
 // When IN1 is HIGH, it is like when M1 is connected to Supply
-#define motor_IN1 12
-#define motor_IN2 2
+#define motor_IN1 2
+#define motor_IN2 12
 
 #define pwmChannel1 1
 #define pwmChannel2 2
@@ -35,7 +32,7 @@ WireManager wireManager(8);
 // MagneticEncoder encoder(0);
 // MagneticEncoder encoder2(1);
 
-ContinuousServo servo(motor_IN1, motor_IN2, pwmChannel1, pwmChannel2, 1, false);
+ContinuousServo servo(motor_IN1, motor_IN2, pwmChannel1, pwmChannel2, 1, true);
 
 void homingSequence();
 
@@ -44,7 +41,7 @@ void setup() {
   // Flow:
 
   // 1. Initialize Wire
-  Wire.begin(I2C_SDA_1, I2C_SCL_1);
+  Wire.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
   Wire.setClock(100000);
   // 2. Begin wire manager
   wireManager.begin(&Wire);

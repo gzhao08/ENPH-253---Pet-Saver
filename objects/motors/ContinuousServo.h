@@ -25,9 +25,9 @@ class ContinuousServo {
         // PID Controls
         float targetAngle;
         PID* pidController;
-        double Pk = 175;
+        double Pk = 110;
         double Ik = 0;
-        double Dk = 4;
+        double Dk = 2.5;
         const int PIDSampleTime = 10;
         unsigned long lastPIDTime = 0;
 
