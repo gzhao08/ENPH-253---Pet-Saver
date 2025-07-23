@@ -38,8 +38,7 @@ void IRArray::showReading() {
 }
 
 void IRArray::showState() {
-    showReading();
-    Serial.printf("Error: %d, Last Error: %d\n", error, lastError);
+    Serial.printf("%d %d %d %d -- %d %d", r1, r2, r3, r4, error, lastError);
 }
 
 int IRArray::getError() {

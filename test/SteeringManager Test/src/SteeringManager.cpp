@@ -48,6 +48,7 @@ void SteeringManager::stop() {
 }
 
 void SteeringManager::lineFollow(int baseSpeed) {
+    // Serial.println()
     drive = true;
     this->array.takeReading(false);
     input = this->array.getError();
@@ -60,14 +61,20 @@ void SteeringManager::lineFollow(int baseSpeed) {
             pidController.Compute();
             lastComputeTime = millis();
             // drive motors
-            leftMotor->drivePWM(baseSpeed-output);
-            rightMotor->drivePWM(baseSpeed+output);
+            leftMotor->drivePWM(baseSpeed+output);
+            rightMotor->drivePWM(baseSpeed-output);
             
         }
         // update IR data every cycle so that error is accurate
         this->array.takeReading(false);
         input = this->array.getError();
+        array.showState();
+        Serial.printf(" -- %lf\n", output);
         this->array.update();
     }
     this->stop();
+}
+
+void SteeringManager::setPID(double kp, double kd) {
+    pidController.SetTunings(kp,kd,0);
 }

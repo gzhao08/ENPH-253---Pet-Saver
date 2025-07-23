@@ -20,13 +20,13 @@ void WifiHelper::begin() {
     server.begin();
 }
 
-void WifiHelper::startTune(double* kp, double* kd) {
+void WifiHelper::startTune(double* kp, double* kd, int* baseSpeed) {
 
-    WiFi.softAP(AP_ssid, AP_pass);
-    IPAddress ip = WiFi.softAPIP();
-    Serial.printf("AP started. Connect to %s:%s, IP=%s\n", AP_ssid, AP_pass, ip.toString().c_str());
-    server.begin();
 
+    // WiFi.softAP(AP_ssid, AP_pass);
+    // IPAddress ip = WiFi.softAPIP();
+    // Serial.printf("AP started. Connect to %s:%s, IP=%s\n", AP_ssid, AP_pass, ip.toString().c_str());
+    // server.begin();
     WiFiClient client;
     boolean collected = false;
 
@@ -59,6 +59,9 @@ void WifiHelper::startTune(double* kp, double* kd) {
                         case 'D':
                             *kd = (double) line.substring(1).toInt();
                             break;
+                        case 'B':
+                            *baseSpeed = line.substring(1).toInt();
+                            break;
                         case 's':
                             collected = true;
                             break;
@@ -71,5 +74,6 @@ void WifiHelper::startTune(double* kp, double* kd) {
     Serial.printf("kp: %lf - kd: %lf\n", *kp, *kd);
     client.stop();
     Serial.println("Client disconnected");
-    delay(2000);
+    delay(1000);
 }
+

@@ -39,16 +39,6 @@ class SteeringManager {
         void lineFollow(int baseSpeed);
 
         // Tune PID
-        void setKp(double Kp) { 
-            this->Kp = Kp; pidController.SetTunings(Kp, Ki, Kd); 
-        }
-        
-        void setKi(double Ki) { 
-            this->Ki = Ki; pidController.SetTunings(Kp, Ki, Kd); 
-        }
-
-        void setKd(double Kd) { 
-            this->Kd = Kd; pidController.SetTunings(Kp, Ki, Kd); 
-        }
+        void setPID(double kp, double kd);
 
 };
