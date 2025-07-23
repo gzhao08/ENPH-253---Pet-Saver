@@ -8,6 +8,10 @@ WifiHelper::WifiHelper() {
     boolean collected = false;
 }
 
+/**
+ * Begin the WiFi helper by starting the soft AP
+ * Sets up the AP SSID and password
+ */
 void WifiHelper::begin() {
     // Start the soft AP
     while (AP_ssid == nullptr || AP_pass == nullptr) {
@@ -20,9 +24,14 @@ void WifiHelper::begin() {
     server.begin();
 }
 
+/**
+ * Start the tuning process by waiting for client connections
+ * and reading the PID parameters from the client
+ * @param kp Pointer to the proportional gain variable
+ * @param kd Pointer to the derivative gain variable
+ * @param baseSpeed Pointer to the base speed variable
+ */
 void WifiHelper::startTune(double* kp, double* kd, int* baseSpeed) {
-
-
     // WiFi.softAP(AP_ssid, AP_pass);
     // IPAddress ip = WiFi.softAPIP();
     // Serial.printf("AP started. Connect to %s:%s, IP=%s\n", AP_ssid, AP_pass, ip.toString().c_str());
