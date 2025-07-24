@@ -1,1 +1,1 @@
-void begin();
+bool objectDetected();
