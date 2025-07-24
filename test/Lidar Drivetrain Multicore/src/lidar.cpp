@@ -28,7 +28,7 @@ void objectDetected(void *parameter) {
 
     if (measure.RangeStatus != 4 && measure.RangeMilliMeter !=8191) {  // 4 means out of range
         if(abs(measure.RangeMilliMeter-lastmeasure)>50){
-            return(true);
+            stopMotors = true;
         }
     }
   }

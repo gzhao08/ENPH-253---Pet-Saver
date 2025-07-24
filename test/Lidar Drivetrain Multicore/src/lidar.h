@@ -1,1 +1,3 @@
-void objectDetected(void *parameter);
+#pragma once; 
+void objectDetected (void *parameter);
+extern volatile boolean stopMotors;
