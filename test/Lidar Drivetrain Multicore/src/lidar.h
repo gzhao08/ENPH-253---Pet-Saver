@@ -1,1 +1,1 @@
-bool objectDetected();
+void objectDetected(void *parameter);

@@ -2,7 +2,7 @@
 #include <lidar.h>
 #include <Adafruit_VL53L0X.h>
 
-bool objectDetected(void *parameter) {
+void objectDetected(void *parameter) {
   Adafruit_VL53L0X lox = Adafruit_VL53L0X();
   int lastmeasure = 0;
 
