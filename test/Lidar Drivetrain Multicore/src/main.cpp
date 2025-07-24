@@ -6,16 +6,12 @@
 #include "lidar.h"
 #include "drivetrain.h"
 
-// Task function for core 0
-void task1(void *pvParameters);
-     
-// Task function for core 1
-void task2(void *pvParameters);
+volatile boolean stopMotors = false;
      
 void app_main() {
 // Create task for core 0
-xTaskCreatePinnedToCore(task1, "Task1", 2048, NULL, 5, NULL, 0);
+xTaskCreatePinnedToCore(driveTrain, "Task1", 2048, NULL, 5, NULL, 0);
      
 // Create task for core 1
-xTaskCreatePinnedToCore(task2, "Task2", 2048, NULL, 5, NULL, 1);
+xTaskCreatePinnedToCore(objectDetected, "Task2", 2048, NULL, 5, NULL, 1);
 }
