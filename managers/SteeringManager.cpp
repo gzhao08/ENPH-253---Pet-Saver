@@ -1,5 +1,7 @@
 #include "SteeringManager.h"
 
+volatile boolean drive = false; // boolean indicating when to stop driving ; should be global and changed via interrupts
+
 SteeringManager::SteeringManager(DCMotor* left, DCMotor* right)
     : leftMotor(left), rightMotor(right),
       pidController(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT)
@@ -7,6 +9,14 @@ SteeringManager::SteeringManager(DCMotor* left, DCMotor* right)
 
 }
 
+/**
+ * Initialize the DCMotor
+ * Sets up PID, motors, and IR sensors
+ * @param outerLeftPin Pin for the outer left IR sensor
+ * @param innerLeftPin Pin for the inner left IR sensor 
+ * @param innerRightPin Pin for the inner right IR sensor
+ * @param outerRightPin Pin for the outer right IR sensor
+ */
 void SteeringManager::begin(int outerLeftPin, int innerLeftPin, int innerRightPin, int outerRightPin) {
     // PID
     this->pidController.SetMode(AUTOMATIC);
@@ -21,7 +31,10 @@ void SteeringManager::begin(int outerLeftPin, int innerLeftPin, int innerRightPi
     this->array.begin(outerLeftPin, innerLeftPin, innerRightPin, outerRightPin);
 }
 
-
+/**
+ * Drive both motors forward with the same duty cycle
+ * @param duty the positive duty cycle to drive the motors forwards with
+ */
 void SteeringManager::forward(int duty) {
     drive = true;
     while (drive) {
@@ -31,6 +44,10 @@ void SteeringManager::forward(int duty) {
     this->stop();
 }
 
+/**
+ * Drive both motors backward with the same duty cycle
+ * @param duty the positive duty cycle to drive the motors backwards with
+ */
 void SteeringManager::backward(int duty) {
     drive = true;
     while (drive) {
@@ -40,31 +57,53 @@ void SteeringManager::backward(int duty) {
     this->stop();
 }
 
+/**
+ * Stop both motors
+ * Sets the PWM channels to 0
+ */
 void SteeringManager::stop() {
     leftMotor->stop();
     rightMotor->stop();
 }
 
+/**
+ * Line follow using the IR sensors and PID controller
+ * @param baseSpeed the base speed to drive the motors at
+ * The PID controller will adjust the speed of the motors based on the error from the IR sensors
+ */
 void SteeringManager::lineFollow(int baseSpeed) {
+    // Serial.println()
     drive = true;
     this->array.takeReading(false);
     input = this->array.getError();
     unsigned long lastComputeTime = millis();
     this->array.update();
     while (drive) {
-        // only poll and calculate data at PID sample rate
+        // only poll and calculate PID at PID sample rate
         if (millis() - lastComputeTime >= this->PIDSampleTime) {
             // compute PID
             pidController.Compute();
             lastComputeTime = millis();
             // drive motors
-            leftMotor->drivePWM(baseSpeed-output);
-            rightMotor->drivePWM(baseSpeed+output);
-            // update IR array
-            this->array.takeReading(false);
-            input = this->array.getError();
-            this->array.update();
+            leftMotor->drivePWM(baseSpeed+output);
+            rightMotor->drivePWM(baseSpeed-output);
+            
         }
+        // update IR data every cycle so that error is accurate
+        this->array.takeReading(false);
+        input = this->array.getError();
+        array.showState();
+        Serial.printf(" -- %lf\n", output);
+        this->array.update();
     }
     this->stop();
+}
+
+/**
+ * Set the PID controller tunings
+ * @param kp Proportional gain
+ * @param kd Derivative gain
+ */
+void SteeringManager::setPID(double kp, double kd) {
+    pidController.SetTunings(kp,kd,0);
 }
