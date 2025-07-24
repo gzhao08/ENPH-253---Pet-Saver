@@ -71,7 +71,9 @@ void SteeringManager::stop() {
  * This is used to turn in place
  * @param duty the positive duty cycle to drive the motors with
  */
-void SteeringManager::reverse(int duty) {
+void SteeringManager::reverse(int duty, boolean clockwise) {
+
+    // for some reason [left -> negative, right -> positive] is clockwise
     this->array.takeReading(false);
     if (!this->array.isOnLine()) {
         return; // do nothing if not on line
@@ -79,23 +81,28 @@ void SteeringManager::reverse(int duty) {
 
     while (this->array.isOnLine()) {
         // turn in place until off line
-        leftMotor->drivePWM(duty);
-        rightMotor->drivePWM(-duty);
-        this->array.takeReading(false);
+        leftMotor->drivePWM(-duty);
+        rightMotor->drivePWM(duty);
+        this->array.takeReading(true);
     }
+
+    Serial.println("Off line now");
+    delay(1000);
 
     while (!this->array.isOnLine()) {
         // turn in place until back on line
-        leftMotor->drivePWM(duty);
-        rightMotor->drivePWM(-duty);
+        leftMotor->drivePWM(-duty);
+        rightMotor->drivePWM(duty);
+        this->array.takeReading(true);
     }
+    Serial.println("Finish reverse");
 
-    while (!this->array.isCentered()) {
-        // turn in place until back on line
-        leftMotor->drivePWM(duty/2);
-        rightMotor->drivePWM(-duty/2);
-    }
-
+    // while (!this->array.isCentered()) {
+    //     // turn in place until back on line
+    //     leftMotor->drivePWM(duty/2);
+    //     rightMotor->drivePWM(-duty/2);
+    // }
+    stop();
 }
 
 /**

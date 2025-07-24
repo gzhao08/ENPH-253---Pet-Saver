@@ -21,28 +21,34 @@ void setup() {
 
   Serial.begin(115200);
 
-  WifiHelper wifi = WifiHelper();
-  wifi.begin();
-  Serial.println("Wifi Server Started");
-  wifi.startTune(&kp, &kd, &baseSpeed);
-  baseSpeed = constrain(baseSpeed,0,1000);
-  steer.setPID(kp,kd);
-
+  // WifiHelper wifi = WifiHelper();
+  // wifi.begin();
+  // Serial.println("Wifi Server Started");
+  // wifi.startTune(&kp, &kd, &baseSpeed);
+  // baseSpeed = constrain(baseSpeed,0,1000);
+  // steer.setPID(kp,kd);
+  delay(2000);
   
 }
 
 void loop() {
-  // steer.array.takeReading(true);
-  // steer.array.getError();
-  // steer.array.update();
-  // delay(50);
-
+  
+  // Line Following
   //steer.lineFollow(baseSpeed);
 
-  // left.drivePWM(1200);
-  // right.drivePWM(1200);
+  // Reversing
+  // steer.array.takeReading(true);
+  // while(!steer.array.isOnLine()) {
+  //   delay(1000);
+  //   steer.array.takeReading(true);
+  // }
+  // Serial.println("Found line, starting reverse");
+  // delay(1000);
+  // steer.reverse(800);
   // delay(5000);
-  // left.drivePWM(400);
-  // right.drivePWM(400);
-  // delay(5000);
+
+  steer.forward(800);
+
+
+
 }

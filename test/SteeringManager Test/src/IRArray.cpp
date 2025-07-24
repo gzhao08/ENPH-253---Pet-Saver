@@ -119,13 +119,13 @@ void IRArray::update() {
  * @return true if on line, false otherwise
  */
 boolean IRArray::isOnLine() {
-    return (r1 && r2 && r3 && r4); // if any of the readings are high then the robot should be on the line;
+    return (r1 || r2 || r3 || r4); // if any of the readings are high then the robot should be on the line;
 }
 
 /**
  * Check if the robot is centered on the line
  * @return true if centered, false otherwise
  */
-boolean IRArray::isOnLine() {
+boolean IRArray::isCentered() {
     return (r2 && r3); // if both inner sensors are high then the robot is centered on the line
 }
