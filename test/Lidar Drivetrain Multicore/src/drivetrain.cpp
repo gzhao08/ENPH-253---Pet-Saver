@@ -1,6 +1,7 @@
 #include <Arduino.h>
-#include "../lib/SteeringManager.h"  
-#include "../lib/WifiHelper.h"
+#include "../lib/SteeringManager/SteeringManager.h"  
+#include "../lib/WifiHelper/WifiHelper.h"
+#include "drivetrain.h"
 
 void driveTrain(void *parameter) {
 

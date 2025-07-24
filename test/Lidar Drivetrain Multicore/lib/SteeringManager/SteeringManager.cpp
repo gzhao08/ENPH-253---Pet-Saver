@@ -1,7 +1,5 @@
 #include "SteeringManager.h"
-#include "GlobalConstants.h"
-
-volatile boolean drive = false; // boolean indicating when to stop driving ; should be global and changed via interrupts
+#include "../GlobalConstants.h"
 
 SteeringManager::SteeringManager(DCMotor* left, DCMotor* right)
     : leftMotor(left), rightMotor(right),
@@ -37,7 +35,9 @@ void SteeringManager::begin(int outerLeftPin, int innerLeftPin, int innerRightPi
  * @param duty the positive duty cycle to drive the motors forwards with
  */
 void SteeringManager::forward(int duty) {
+    portENTER_CRITICAL(&mux);
     drive = true;
+    portEXIT_CRITICAL(&mux);
     while (drive) {
         leftMotor->drivePWM(duty);
         rightMotor->drivePWM(duty);
@@ -50,7 +50,9 @@ void SteeringManager::forward(int duty) {
  * @param duty the positive duty cycle to drive the motors backwards with
  */
 void SteeringManager::backward(int duty) {
+    portENTER_CRITICAL(&mux);
     drive = true;
+    portEXIT_CRITICAL(&mux);
     while (drive) {
         leftMotor->drivePWM(-duty);
         rightMotor->drivePWM(-duty);
@@ -126,7 +128,9 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
  */
 void SteeringManager::lineFollow(int baseSpeed) {
     // Serial.println()
+    portENTER_CRITICAL(&mux);
     drive = true;
+    portEXIT_CRITICAL(&mux);
     this->array.takeReading(false);
     input = this->array.getError();
     unsigned long lastComputeTime = millis();

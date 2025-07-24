@@ -6,6 +6,7 @@
 #include "DCMotor.h"  
 
 extern volatile boolean drive; // boolean indicating when to stop driving ; should be global and changed via interrupts
+extern portMUX_TYPE mux;
  
 class SteeringManager {
     private: 

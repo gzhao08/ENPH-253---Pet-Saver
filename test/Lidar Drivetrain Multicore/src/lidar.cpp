@@ -1,6 +1,8 @@
-#include <arduino.h>
+#include <Arduino.h>
 #include <lidar.h>
 #include <Adafruit_VL53L0X.h>
+
+
 
 void objectDetected(void *parameter) {
   Adafruit_VL53L0X lox = Adafruit_VL53L0X();
@@ -28,7 +30,9 @@ void objectDetected(void *parameter) {
 
     if (measure.RangeStatus != 4 && measure.RangeMilliMeter !=8191) {  // 4 means out of range
         if(abs(measure.RangeMilliMeter-lastmeasure)>50){
-            stopMotors = true;
+            portENTER_CRITICAL(&mux);
+            drive = false;
+            portEXIT_CRITICAL(&mux);
         }
     }
   }
