@@ -36,7 +36,7 @@ class SteeringManager {
         void forward(int duty);
         void backward(int duty);
         void stop();
-        void reverse(int duty, boolean clockwise);
+        void turnAround(int duty, boolean clockwise);
         void lineFollow(int baseSpeed);
 
         // Tune PID

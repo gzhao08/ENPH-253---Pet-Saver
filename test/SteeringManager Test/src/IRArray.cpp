@@ -1,4 +1,5 @@
 #include "IRArray.h"
+#include "GlobalConstants.h"
 
 /**
  * IRArray object, consists of 4 IR sensors

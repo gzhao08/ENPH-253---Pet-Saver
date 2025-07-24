@@ -1,4 +1,5 @@
 #include "SteeringManager.h"
+#include "GlobalConstants.h"
 
 volatile boolean drive = false; // boolean indicating when to stop driving ; should be global and changed via interrupts
 
@@ -71,29 +72,42 @@ void SteeringManager::stop() {
  * This is used to turn in place
  * @param duty the positive duty cycle to drive the motors with
  */
-void SteeringManager::reverse(int duty, boolean clockwise) {
+void SteeringManager::turnAround(int duty, boolean clockwise) {
 
+    // IMPORTANT:
     // for some reason [left -> negative, right -> positive] is clockwise
+
+    // clockwise means the robot is moving right so error should be positive
+    // counter-clockwise means the robot is moving left so error should be negative
+    
+    if (!clockwise) {
+        duty = -duty; // if counter-clockwise, invert the duty cycle
+    }
+
     this->array.takeReading(false);
     if (!this->array.isOnLine()) {
-        return; // do nothing if not on line
+        return; //do nothing if not on line
     }
 
     while (this->array.isOnLine()) {
         // turn in place until off line
+        this->array.takeReading(true);
+        this->array.getError();
+        this->array.update();
         leftMotor->drivePWM(-duty);
         rightMotor->drivePWM(duty);
-        this->array.takeReading(true);
     }
 
     Serial.println("Off line now");
     delay(1000);
 
-    while (!this->array.isOnLine()) {
+    while (!this->array.isCentered()) {
         // turn in place until back on line
         leftMotor->drivePWM(-duty);
         rightMotor->drivePWM(duty);
         this->array.takeReading(true);
+        this->array.getError();
+        this->array.update();
     }
     Serial.println("Finish reverse");
 
