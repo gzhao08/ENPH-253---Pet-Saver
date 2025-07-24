@@ -14,7 +14,7 @@ void objectDetected(void *parameter) {
   Serial.println("VL53L0X test");
 
   // Initialize I2C
-  //Wire.begin(25, 26);  // Wire.begin(sda-21, scl-22)
+  Wire.begin(15, 13);  // Wire.begin(sda-21, scl-22)
 
   if (!lox.begin()) {
     Serial.println("Failed to boot VL53L0X");
@@ -22,6 +22,10 @@ void objectDetected(void *parameter) {
   }
 
   Serial.println("VL53L0X ready!");
+
+  while (!startRead) {
+    delay(200); // wait for the drivetrain to set startRead to true (done PID tuning)
+  }
 
   while (true){
     VL53L0X_RangingMeasurementData_t measure;
@@ -33,6 +37,8 @@ void objectDetected(void *parameter) {
             portENTER_CRITICAL(&mux);
             drive = false;
             portEXIT_CRITICAL(&mux);
+            Serial.println("detected change");
+            lastmeasure = measure.RangeMilliMeter;
         }
     }
   }

@@ -78,6 +78,7 @@ void WifiHelper::startTune(double* kp, double* kd, int* baseSpeed) {
                             break;
                     }   
                 }
+                delay(50);
             }
         }
         delay(200);

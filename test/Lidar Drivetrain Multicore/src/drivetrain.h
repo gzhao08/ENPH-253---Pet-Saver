@@ -1,3 +1,3 @@
 #pragma once
-extern volatile boolean stopMotors;
+extern volatile boolean startRead;
 void driveTrain(void *parameter);

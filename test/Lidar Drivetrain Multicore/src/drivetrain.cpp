@@ -29,8 +29,8 @@ void driveTrain(void *parameter) {
     baseSpeed = constrain(baseSpeed,0,1000);
     steer.setPID(kp,kd);
     delay(2000);
-
-
+    
+    startRead = true; // start reading the lidar data
 
 
     //----------------------------LOOP----------------------------//
