@@ -27,6 +27,7 @@ void driveTrain(void *parameter) {
     wifi.begin();
     Serial.println("Wifi Server Started");
     wifi.startTune(&kp, &kd, &baseSpeed);
+    wifi.end();
     baseSpeed = constrain(baseSpeed,0,1000);
     steer.setPID(kp,kd);
     delay(2000);
@@ -37,17 +38,30 @@ void driveTrain(void *parameter) {
     //----------------------------LOOP----------------------------//
     // Line Following
 
-    while (true) {
-        // Before doorway: SECTION 1
-        steer.lineFollow(SECTION_0_SPEED);
-        // After doorway -- sense pet and turn
-        delay(3000);
-        steer.lineFollow(SECTION_1_SPEED);
-        // After turn -- ramp
-        steer.lineFollow(SECTION_2_SPEED);
-        delay(1000);
-        // After ramp -- lower speed
-        steer.lineFollow(700);
-    }
+    // while (true) {
+    //     // Before doorway: SECTION 1
+    //     steer.lineFollow(SECTION_0_SPEED);
+    //     // After doorway -- sense pet and turn
+    //     delay(3000);
+    //     steer.lineFollow(SECTION_1_SPEED);
+    //     // After turn -- ramp
+    //     steer.lineFollow(SECTION_2_SPEED);
+    //     delay(1000);
+    //     // After ramp -- lower speed
+    //     steer.lineFollow(700);
+    // }
+
+    
+
+    // Before doorway: SECTION 1
+    steer.lineFollow(SECTION_0_SPEED);
+    // After doorway -- sense pet and turn
+    delay(3000);
+    steer.lineFollow(SECTION_1_SPEED);
+    // After turn -- ramp
+    steer.lineFollow(SECTION_2_SPEED);
+    delay(1000);
+    // After ramp -- lower speed
+    steer.lineFollow(700);
     
 }

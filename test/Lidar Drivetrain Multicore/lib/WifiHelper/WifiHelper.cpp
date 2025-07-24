@@ -88,13 +88,18 @@ void WifiHelper::startTune(double* kp, double* kd, int* baseSpeed) {
     Serial.println("Client disconnected");
     server.stopAll();
     Serial.println("Server stopped");
+    //delay(500);
+}
 
+/**
+ * End the WiFi helper by stopping the server and disconnecting the AP
+ * This will also turn off the WiFi mode
+ */
+void WifiHelper::end() {
     WiFi.softAPdisconnect(true);  // Disconnect AP
     WiFi.mode(WIFI_OFF);          // Turn off WiFi mode
 
     esp_wifi_stop();              // Stop WiFi task
     esp_wifi_deinit();            // Deinit WiFi driver
-    
-    delay(1000);
+    delay(500);           
 }
-

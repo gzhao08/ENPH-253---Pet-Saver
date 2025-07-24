@@ -15,7 +15,8 @@
 #define ERR_2 3
 #define ERR_1 1
 
-#define SECTION_0_SPEED 600   // Before doorway
+// Map Division
+#define SECTION_0_SPEED 600   // Before doorway -- 0 indexing for use in arrays
 #define SECTION_1_SPEED 500   // After doorway, curve before ramp
 #define SECTION_2_SPEED 1100  // Ramp
 
