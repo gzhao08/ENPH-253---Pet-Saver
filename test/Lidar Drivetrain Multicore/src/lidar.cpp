@@ -2,7 +2,7 @@
 #include <lidar.h>
 #include <Adafruit_VL53L0X.h>
 
-bool objectDetected() {
+bool objectDetected(void *parameter) {
   Adafruit_VL53L0X lox = Adafruit_VL53L0X();
   int lastmeasure = 0;
 
@@ -21,7 +21,7 @@ bool objectDetected() {
 
   Serial.println("VL53L0X ready!");
 
-  while (1){
+  while (true){
     VL53L0X_RangingMeasurementData_t measure;
 
     lox.rangingTest(&measure, false); // pass in 'true' to get debug data
