@@ -1,12 +1,15 @@
 #include <Arduino.h>
 #include <lidar.h>
 #include <Adafruit_VL53L0X.h>
+#include "../lib/GlobalConstants.h"
 
 
 
 void objectDetected(void *parameter) {
   Adafruit_VL53L0X lox = Adafruit_VL53L0X();
-  int lastmeasure = 0;
+  //int lastmeasure = 0;
+  int section = 0;
+  int thresholds[2] = {DOORWAY_THRESH, RAMP_THRESH}; // thresholds for each section
 
   Serial.begin(115200);
   while (!Serial);
@@ -33,13 +36,14 @@ void objectDetected(void *parameter) {
     lox.rangingTest(&measure, false); // pass in 'true' to get debug data
 
     if (measure.RangeStatus != 4 && measure.RangeMilliMeter !=8191) {  // 4 means out of range
-        if(abs(measure.RangeMilliMeter-lastmeasure)>50){
+        if(measure.RangeMilliMeter<thresholds[section]){
             portENTER_CRITICAL(&mux);
             drive = false;
             portEXIT_CRITICAL(&mux);
             Serial.println("detected change");
-            lastmeasure = measure.RangeMilliMeter;
+            section++;
         }
+        //lastmeasure = measure.RangeMilliMeter;
     }
   }
 }

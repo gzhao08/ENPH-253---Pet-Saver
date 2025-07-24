@@ -15,5 +15,10 @@
 #define ERR_2 3
 #define ERR_1 1
 
+#define SECTION_0_SPEED 600   // Before doorway
+#define SECTION_1_SPEED 500   // After doorway, curve before ramp
+#define SECTION_2_SPEED 1100  // Ramp
 
+#define DOORWAY_THRESH 50
+#define RAMP_THRESH 60
 

@@ -2,6 +2,7 @@
 #include "../lib/SteeringManager/SteeringManager.h"  
 #include "../lib/WifiHelper/WifiHelper.h"
 #include "drivetrain.h"
+#include "../lib/GlobalConstants.h"
 
 void driveTrain(void *parameter) {
 
@@ -29,7 +30,7 @@ void driveTrain(void *parameter) {
     baseSpeed = constrain(baseSpeed,0,1000);
     steer.setPID(kp,kd);
     delay(2000);
-    
+
     startRead = true; // start reading the lidar data
 
 
@@ -37,13 +38,13 @@ void driveTrain(void *parameter) {
     // Line Following
 
     while (true) {
-        // Before doorway
-        steer.lineFollow(700);
+        // Before doorway: SECTION 1
+        steer.lineFollow(SECTION_0_SPEED);
         // After doorway -- sense pet and turn
         delay(3000);
-        steer.lineFollow(500);
+        steer.lineFollow(SECTION_1_SPEED);
         // After turn -- ramp
-        steer.lineFollow(1100);
+        steer.lineFollow(SECTION_2_SPEED);
         delay(1000);
         // After ramp -- lower speed
         steer.lineFollow(700);
