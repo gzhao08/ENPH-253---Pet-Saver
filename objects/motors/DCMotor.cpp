@@ -17,8 +17,18 @@ void DCMotor::begin() {
     ledcAttachPin(motorPin1, pwmChannel1);
     ledcSetup(this->pwmChannel2, this->pwmFrequency, this->pwmResolution);
     ledcAttachPin(motorPin2, pwmChannel2);
+    this->setMaxVoltage(this->maxVoltage);
+}
 
-    this->maxDutyCycle = map(this->maxVoltage, 0, this->hBridgeVoltage, 0, BIT_12_LIMIT) * 0.8;
+void DCMotor::updateMaxDutyCycle() {
+    // Update the max duty cycle based on the current max voltage
+    const float SAFETY_MARGIN = 0.5; // Safety margin to prevent over-driving the motor
+    this->maxDutyCycle = map(this->maxVoltage, 0, this->hBridgeVoltage, 0, BIT_12_LIMIT) - map(SAFETY_MARGIN, 0, this->hBridgeVoltage, 0, BIT_12_LIMIT);
+}
+
+void DCMotor::setMaxVoltage(int voltage) {
+    this->maxVoltage = voltage;
+    this->updateMaxDutyCycle();
 }
 
 /**

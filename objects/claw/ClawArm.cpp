@@ -32,7 +32,7 @@ void ClawArm::homingSequence() {
         this->motorArm.loop();
     }
     this->setAsHome();
-    Serial.println("Homing sequence done");
+    Serial.println("Arm Homing sequence done");
 }
 
 /**

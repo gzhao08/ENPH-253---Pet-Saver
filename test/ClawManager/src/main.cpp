@@ -7,6 +7,7 @@
 #include "motors/ContinuousServo.h"
 #include "claw/ClawGrabber.h"
 #include "claw/ClawArm.h"
+#include "claw/ClawVerticalStage.h"
 #include "sensors/Microswitch.h"
 #include "GlobalConstants.h"
 
@@ -22,13 +23,25 @@ int armPwmChannel1 = 2; //motor pin 1 goes to B
 int armPwmChannel2 = 3; 
 int armMuxLine = 1; 
 bool armEncoderOnTerminalSide = true; //false for arm, 
-int armSwitchPin = 38; 
+int armSwitchPin = 37; 
 bool armNormallyOpen = true; 
 
 DelayManager positionDelayManager(4000);
 //muxLine: 1 is 1, 0 is 2, -1 is not muxing
 ClawArm arm(armMotorPin1, armMotorPin2, armPwmChannel1, armPwmChannel2, armMuxLine, armEncoderOnTerminalSide, 
   armSwitchPin, armNormallyOpen); 
+
+int verticalStageMotorPin1 = 33;
+int verticalStageMotorPin2 = 32;
+int verticalStagePwmChannel1 = 4; //motor pin 1 goes to B
+int verticalStagePwmChannel2 = 5; 
+int verticalStageMuxLine = 0; 
+bool verticalStageEncoderOnTerminalSide = true; //false for arm, 
+int verticalStageSwitchPin = 38; 
+bool verticalStageNormallyOpen = true; 
+
+ClawVerticalStage verticalStage(verticalStageMotorPin1, verticalStageMotorPin2, verticalStagePwmChannel1, verticalStagePwmChannel2, verticalStageMuxLine, verticalStageEncoderOnTerminalSide,
+  verticalStageSwitchPin, verticalStageNormallyOpen);
 
 void setup() {
   Serial.begin(115200);
@@ -38,6 +51,7 @@ void setup() {
   wireManager.begin(&Wire);
   // 3. Begin servo
   arm.begin(&wireManager); 
+  verticalStage.begin(&wireManager);
   positionDelayManager.reset();
 
   //arm.home();
@@ -45,7 +59,8 @@ void setup() {
   grab.begin();
   
   arm.homingSequence();
-  arm.testSequence();
+  // arm.testSequence();
+  verticalStage.homingSequence();
 }
 
 unsigned long lastUpdate = 0;
@@ -54,11 +69,15 @@ bool ten = true;
 void loop() {
   if (ten) {
       arm.setPosition(10);
+      verticalStage.setPosition(10);
+
   } else {
-       arm.setPosition(100);
+      arm.setPosition(100);
+      verticalStage.setPosition(50);
   }
 
   arm.loop();
+  verticalStage.loop();
    
   if (positionDelayManager.checkAndReset()) {
     if (ten) {

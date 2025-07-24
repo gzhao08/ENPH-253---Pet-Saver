@@ -6,8 +6,8 @@ unsigned long lastPrint = 0;
  * This is a RELATIVE ANGLE based application (not the absolute reading of the encoder)
  * Initializes encoder, motor, and PID controller
  */
-ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide) 
-: encoder(muxLine), motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, 5), pidTuningDelayManager(1000)
+ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int maxVoltage) 
+: encoder(muxLine), motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, maxVoltage), pidTuningDelayManager(1000)
  {
     /**
      * Working:
@@ -35,13 +35,18 @@ void ContinuousServo::begin(WireManager* wireManager) {
     this->encoder.begin(wireManager);
     this->targetAngle = this->encoder.getRelAngle();
 
-
     // PID controller setup
     this->pidController = new PID(&this->Input, &this->Output, &this->Setpoint, this->Pk, this->Ik, this->Dk, DIRECT);
     this->pidController->SetMode(AUTOMATIC);
     this->pidController->SetOutputLimits(-this->motor.getMaxDutyCycle(), this->motor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
     this->pidController->SetSampleTime(this->PIDSampleTime);
 }
+
+void ContinuousServo::setMaxVoltage(int voltage) {
+    this->motor.setMaxVoltage(voltage);
+    this->pidController->SetOutputLimits(-this->motor.getMaxDutyCycle(), this->motor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
+}
+
 
 /**
  * Move the servo by a certain number of degrees
@@ -245,4 +250,8 @@ void ContinuousServo::tunePID() {
     }
 
     this->pidController->SetTunings(newKp, 0, newKd);
+}
+
+void ContinuousServo::setPDTuning(float Kp, float Kd) {
+    this->pidController->SetTunings(Kp, 0, Kd);
 }

@@ -13,20 +13,21 @@ class ClawVerticalStage {
         ContinuousServo motorVertical;
         Microswitch mswitchVertical;
 
-        float height = -1; //height in mm
-        int pitch = 2; // pitch in mm
+        const float ANGLE_TO_MM_CONVERSION = -0.022; // Calibrating from 2mm pitch * 4 starts / 360 degrees
+        const float MM_TO_ANGLE_CONVERSION = 1 / ANGLE_TO_MM_CONVERSION;
+
+        const int MIN_HEIGHT = 0;
+        const int MAX_HEIGHT = 100;
+        const int IDLE_HEIGHT = 50;
+
+        const int LOW_PET_HEIGHT = 10;
+        const int HIGH_PET_HEIGHT = 90;
+        const int LOW_PET_SENSING_HEIGHT = 20;
+        const int HIGH_PET_SENSING_HEIGHT = 80;
 
     public: 
-
-        int MIN_HEIGHT = 0;
-        int MAX_HEIGHT;
-        int RESET_HEIGHT; 
-        int LOW_PET; 
-        int HIGH_PET; 
-        int LOW_SENSE; 
-        int HIGH_SENSE; 
-
-        ClawVerticalStage(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen);
+        ClawVerticalStage(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
+            int switchPin, bool normallyOpen);
 
         // Call in setup
         void begin(WireManager* wireManager);
@@ -34,6 +35,10 @@ class ClawVerticalStage {
         float getPosition();
         void setPosition(float angle);
         void testSequence();
-        void home();
+        void homingSequence();
+        void setAsHome();
+        bool reachedTarget();
+        void loop();
+
     
 };

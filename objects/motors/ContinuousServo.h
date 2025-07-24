@@ -49,7 +49,7 @@ class ContinuousServo {
         // PID Variables (needs to be public because referenced in PID controller)
         double Setpoint = 0, Input = 0, Output = 1;
 
-        ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide);
+        ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int maxVoltage = 5);
 
         void begin(WireManager* wireManager); // Call in setup
         void moveBy(float degrees);
@@ -60,6 +60,8 @@ class ContinuousServo {
         float getAngle();
         void setPIDTuningMode(bool mode);
         void setPIDTuningPins(int P_Pin, int D_Pin);
+        void setMaxVoltage(int voltage); // Set the voltage of the motor, which will update the max duty cycle
+        void setPDTuning(float Kp, float Kd); // Set the PD tuning values
         // Call in loop
         void loop();
         

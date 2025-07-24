@@ -18,30 +18,45 @@ void ClawBase::begin(WireManager* wireManager) {
     this->mswitchBase.begin();
 }
 
-void ClawBase::home() {
-    bool home = false; 
-    while (!home) {
-        this->motorBase.moveBy(2);
-        if (this->mswitchBase.isPressed()) {
-            this->motorBase.home();
-            home = true;
-        }
-    }    
+void ClawBase::setAsHome() {
+    this->motorBase.setAsHome(); // Set home position to minimum angle
+}
+
+void ClawBase::homingSequence() {
+    int overshootMotorAngle = (this->MIN_BASE_ANGLE_POSITION - this->MAX_BASE_ANGLE_POSITION) * this->BASE_TO_ENCODER_ANGLE_CONVERSION * 1.1;
+    this->motorBase.moveBy(overshootMotorAngle); 
+    
+    while (!this->mswitchBase.isPressed()) {
+        this->motorBase.loop();
+    }
+    this->setAsHome();
+    Serial.println("Base Homing sequence done");
+}
+
+/**
+ * @return true if the claw base has reached the target position, false otherwise
+ */
+float ClawBase::reachedTarget() {
+    return this->motorBase.reachedTarget();
 }
 
 float ClawBase::getPosition() {
-    return -1 * this->motorBase.getAngle(); 
+    float encoderAngle = this->motorBase.getAngle();
+    return (encoderAngle * this->ENCODER_TO_BASE_ANGLE_CONVERSION) + this->MIN_BASE_ANGLE_POSITION; // convert to mm
 }
 
 /**
  * rotates claw base to desired position (always rotates towards front of robot)
  */
-void ClawBase::setPosition(float angle) {
-    if (this->MIN_POSITION <= angle && this->MAX_POSITION >= angle) {
-        float currentPos = this->getPosition();
-        float moveAngle = -1 * (currentPos + 1000) - (angle + 1000);
-        this->motorBase.moveBy(moveAngle); //CCW is positive so multiply by -1
-    }
+void ClawBase::setPosition(float position) {
+    float constrainedPosition = constrain(position, this->MIN_BASE_ANGLE_POSITION, this->MAX_BASE_ANGLE_POSITION);
+    float shiftedPosition = constrainedPosition - this->MIN_BASE_ANGLE_POSITION;
+    float relAngle = shiftedPosition * this->BASE_TO_ENCODER_ANGLE_CONVERSION;
+    this->motorBase.moveTo(relAngle);
+}
+
+void ClawBase::loop() {
+    this->motorBase.loop();
 }
 
 void ClawBase::testSequence() {

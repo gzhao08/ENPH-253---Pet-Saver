@@ -14,10 +14,12 @@ class ClawBase {
         ContinuousServo motorBase;
         Microswitch mswitchBase;
 
-        //position in degrees
-        float position = -1;
-        float MIN_POSITION = -120;
-        float MAX_POSITION = 120;
+        const int HORIZONTAL_GEAR_CIRCUMFERENCE = 151; // mm
+        const float ENCODER_TO_BASE_ANGLE_CONVERSION = -0.4; // Calibrated from 6/15
+        const float BASE_TO_ENCODER_ANGLE_CONVERSION = 1 / ENCODER_TO_BASE_ANGLE_CONVERSION; // 1mm corresponds to 1/0.42 degrees
+
+        const int MIN_BASE_ANGLE_POSITION = -120;
+        const int MAX_BASE_ANGLE_POSITION = 120;
 
     public: 
 
@@ -26,9 +28,13 @@ class ClawBase {
         // Call in setup
         void begin(WireManager* wireManager);
 
-        void home();
+        void setAsHome();
+        void homingSequence();
+        float reachedTarget();
+
         float getPosition();
-        void setPosition(float angle);
+        void setPosition(float position);
         void testSequence();
-    
+
+        void loop();
 };
