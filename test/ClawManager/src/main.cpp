@@ -8,30 +8,32 @@
 #include "claw/ClawGrabber.h"
 #include "claw/ClawArm.h"
 #include "sensors/Microswitch.h"
+#include "GlobalConstants.h"
 
 
-WireManager wireManager(8); 
 ClawGrabber grab(22, 1);
 
+int muxPin = 8;
+WireManager wireManager(muxPin); 
 
-int motorPin1 = 2;
-int motorPin2 = 12;
-int pwmChannel1 = 2; //motor pin 1 goes to B
-int pwmChannel2 = 3; 
-int muxLine = 1; 
-bool encoderOnTerminalSide = false; //false for arm, 
-int switchPin = 37; 
-bool normallyOpen = true; 
+int armMotorPin1 = 2;
+int armMotorPin2 = 12;
+int armPwmChannel1 = 2; //motor pin 1 goes to B
+int armPwmChannel2 = 3; 
+int armMuxLine = 1; 
+bool armEncoderOnTerminalSide = true; //false for arm, 
+int armSwitchPin = 38; 
+bool armNormallyOpen = true; 
 
-DelayManager positionDelayManager(1000);
-//int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin
-//mux: 1 is 1, 0 is 2, -1 is not muxing
-ClawArm arm(motorPin1, motorPin2, pwmChannel1, pwmChannel2, muxLine, encoderOnTerminalSide, switchPin, normallyOpen); 
+DelayManager positionDelayManager(4000);
+//muxLine: 1 is 1, 0 is 2, -1 is not muxing
+ClawArm arm(armMotorPin1, armMotorPin2, armPwmChannel1, armPwmChannel2, armMuxLine, armEncoderOnTerminalSide, 
+  armSwitchPin, armNormallyOpen); 
 
 void setup() {
   Serial.begin(115200);
   // 1. Initialize Wire (I2C-SDA, I2C_SCL) -- clock next to dot then data
-  Wire.begin(15, 13);
+  Wire.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
   // 2. Begin wire manager
   wireManager.begin(&Wire);
   // 3. Begin servo
@@ -42,27 +44,18 @@ void setup() {
 
   grab.begin();
   
-  
+  arm.homingSequence();
+  arm.testSequence();
 }
 
 unsigned long lastUpdate = 0;
-bool home = true; 
 bool ten = true;
-int position = -10;
 
 void loop() {
-
-  if (home) {
-    arm.home();
-  }
-
-  home = false; 
-
   if (ten) {
       arm.setPosition(10);
-  }
-  else {
-       arm.setPosition(50);
+  } else {
+       arm.setPosition(100);
   }
 
   arm.loop();
@@ -73,13 +66,14 @@ void loop() {
     } else {
       ten = true;
     }
-    
-    // home = false; 
-    // position -= 10; 
-    // if (position = -50) {
-    //   position = 0;
-    // }
   }
+  
+  //   // home = false; 
+  //   // position -= 10; 
+  //   // if (position = -50) {
+  //   //   position = 0;
+  //   // }
+  // }
 
  
   // arm.setPosition(20);

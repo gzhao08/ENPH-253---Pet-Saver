@@ -18,9 +18,9 @@ ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, 
      * - Therefore we need to multiply the PID output by -1 when the encoder is on the terminal side
      */
     if (encoderOnTerminalSide) {
-        this->DIRECTION_MULTIPLIER = -1;
-    } else {
         this->DIRECTION_MULTIPLIER = 1;
+    } else {
+        this->DIRECTION_MULTIPLIER = -1;
     }
 }
 

@@ -22,35 +22,39 @@ void ClawArm::begin(WireManager* wireManager) {
 
 void ClawArm::setAsHome() {
     this->motorArm.setAsHome();
+}
 
-    // bool home = false; 
-    // while (!home) {
-    //     this->motorArm.moveBy(500);
-    //     //if(this->motorArm.reachedTarget()) {
-    //         //this->motorArm.moveBy(10);
-    //     //}
-    //     if (this->mswitchArm.isPressed()) {
-    //         this->motorArm.home();
-    //         home = true;
-    //     }
-        
-    // }
+void ClawArm::homingSequence() {
+    int overRetractionAngle = -227 / this->ANGLE_TO_MM_CONVERSION * 1.2; // 227mm is the distance from home to the end of the claw arm
+    this->motorArm.moveBy(overRetractionAngle);
+
+    while (!this->mswitchArm.isPressed()) {
+        this->motorArm.loop();
+    }
+    this->setAsHome();
+    Serial.println("Homing sequence done");
+}
+
+/**
+ * @return true if the claw arm has reached the target position, false otherwise
+ */
+float ClawArm::reachedTarget() {
+    return this->motorArm.reachedTarget();
 }
 
 float ClawArm::getPosition() {
     float angle = this->motorArm.getAngle(); 
-    return -angle * this->ANGLE_TO_MM_CONVERSION;
+    return angle * this->ANGLE_TO_MM_CONVERSION;
 }
 
 /**
  * @param position final position of horizontal stage in mm from home position (0)
  */
 void ClawArm::setPosition(float position) {
-    if (this->MIN_POSITION <= position && this->MAX_POSITION >= position) {
-        float angle = position * 360 / this->HORIZONTAL_GEAR_CIRCUMFERENCE; // 151mm corresponds to 360 degrees
-        
-        this->motorArm.moveTo(angle); 
-    }
+    // Limit the position
+    float movePosition = constrain(position, this->MIN_POSITION, this->MAX_POSITION);
+    float relAngle = movePosition * this->MM_TO_ANGLE_CONVERSION; // convert to angle in degrees
+    this->motorArm.moveTo(relAngle);
 }
 
 
@@ -59,6 +63,49 @@ void ClawArm::loop() {
 }
 
 void ClawArm::testSequence() {
+    Serial.println("Claw Arm test sequence started");
+    this->setPosition(0);
+    while (!this->reachedTarget()) {
+        this->loop();
+    }
+    Serial.println("Reached target position 0");
+    delay(1000);
+    this->setPosition(50);
+    while (!this->reachedTarget()) {
+        this->loop();
+    }
+    Serial.println("Reached target position 50");
+    delay(1000);
+    this->setPosition(100);
+    while (!this->reachedTarget()) {
+        this->loop();
+    }
+    Serial.println("Reached target position 100");
+    delay(1000);
+    this->setPosition(150);
+    while (!this->reachedTarget()) {
+        this->loop();
+    }
+    Serial.println("Reached target position 150");
+    delay(1000);
+    this->setPosition(200);
+    while (!this->reachedTarget()) {
+        this->loop();
+    }
+    Serial.println("Reached target position 200");
+    delay(1000);
+    this->setPosition(50);
+    while (!this->reachedTarget()) {
+        this->loop();
+    }
+    Serial.println("Reached target position 50 again");
+    delay(1000);
+    this->setPosition(0);
+    while (!this->reachedTarget()) {
+        this->loop();
+    }
+    Serial.println("Reached target position 0 again");
+    Serial.println("Claw Arm test sequence done");
     
 }
 

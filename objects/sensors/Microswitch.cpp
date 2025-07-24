@@ -12,7 +12,7 @@ Microswitch::Microswitch(int switchPin, bool normallyOpen) {
  * sets up microswitch object
  */
 void Microswitch::begin() {
-    pinMode(this->switchPin, INPUT_PULLUP);
+    pinMode(this->switchPin, INPUT);
 }
 
 /**
