@@ -85,14 +85,14 @@ void WifiHelper::startTune(double* kp, double* kd, int* baseSpeed) {
     Serial.printf("kp: %lf - kd: %lf\n", *kp, *kd);
     client.stop();
     Serial.println("Client disconnected");
-    server.stopAll();
-    Serial.println("Server stopped");
+    // server.stopAll();
+    // Serial.println("Server stopped");
 
-    WiFi.softAPdisconnect(true);  // Disconnect AP
-    WiFi.mode(WIFI_OFF);          // Turn off WiFi mode
+    // WiFi.softAPdisconnect(true);  // Disconnect AP
+    // WiFi.mode(WIFI_OFF);          // Turn off WiFi mode
 
-    esp_wifi_stop();              // Stop WiFi task
-    esp_wifi_deinit();            // Deinit WiFi driver
+    // esp_wifi_stop();              // Stop WiFi task
+    // esp_wifi_deinit();            // Deinit WiFi driver
     
     delay(1000);
 }

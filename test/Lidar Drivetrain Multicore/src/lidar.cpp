@@ -7,7 +7,7 @@
 
 void objectDetected(void *parameter) {
   Adafruit_VL53L0X lox = Adafruit_VL53L0X();
-  //int lastmeasure = 0;
+  int lastmeasure = 0;
   int section = 0;
   int thresholds[2] = {DOORWAY_THRESH, RAMP_THRESH}; // thresholds for each section
 
@@ -31,19 +31,26 @@ void objectDetected(void *parameter) {
   }
 
   while (true){
-    VL53L0X_RangingMeasurementData_t measure;
+    while (startRead) {
+      
+      VL53L0X_RangingMeasurementData_t measure;
 
-    lox.rangingTest(&measure, false); // pass in 'true' to get debug data
+      lox.rangingTest(&measure, false); // pass in 'true' to get debug data
 
-    if (measure.RangeStatus != 4 && measure.RangeMilliMeter !=8191) {  // 4 means out of range
-        if(measure.RangeMilliMeter<thresholds[section]){
-            portENTER_CRITICAL(&mux);
-            drive = false;
-            portEXIT_CRITICAL(&mux);
-            Serial.println("detected change");
-            section++;
-        }
-        //lastmeasure = measure.RangeMilliMeter;
+      if (measure.RangeStatus != 4 && measure.RangeMilliMeter !=8191) {  // 4 means out of range
+          if(measure.RangeMilliMeter<thresholds[section]  /*&& abs(measure.RangeMilliMeter - lastmeasure) > 50*/){
+              portENTER_CRITICAL(&mux);
+              drive = false;
+              portEXIT_CRITICAL(&mux);
+              Serial.println(measure.RangeMilliMeter);
+              lastmeasure = measure.RangeMilliMeter;
+              ++section %= 2;
+          }
+      }
+      
     }
+    Serial.println("Waiting for startRead to be true");
+    delay(100);
+    
   }
 }

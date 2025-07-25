@@ -2,6 +2,7 @@
 #include "SteeringManager.h"  
 #include <WiFi.h>
 #include "WifiHelper.h" 
+
     
 DCMotor left = DCMotor(22,19,1,2,15); 
 DCMotor right = DCMotor(20,21,3,4,15);    
@@ -17,16 +18,16 @@ void setup() {
   left.begin();
   right.begin();
 
-  steer.begin(39,36,38,37); // put IR pins here -> left to right
+  steer.begin(35,34,36,39); // put IR pins here -> left to right vp: 36 vn: 39
 
   Serial.begin(115200);
 
-  // WifiHelper wifi = WifiHelper();
-  // wifi.begin();
-  // Serial.println("Wifi Server Started");
-  // wifi.startTune(&kp, &kd, &baseSpeed);
-  // baseSpeed = constrain(baseSpeed,0,1000);
-  // steer.setPID(kp,kd);
+  WifiHelper wifi = WifiHelper();
+  wifi.begin();
+  Serial.println("Wifi Server Started");
+  wifi.startTune(&kp, &kd, &baseSpeed);
+  baseSpeed = constrain(baseSpeed,0,1000);
+  steer.setPID(kp,kd);
   delay(2000);
   
 }
@@ -34,7 +35,7 @@ void setup() {
 void loop() {
   
   // Line Following
-  //steer.lineFollow(baseSpeed);
+  steer.lineFollow(baseSpeed);
 
   // Reversing
   // steer.array.takeReading(true);
@@ -47,8 +48,17 @@ void loop() {
   // steer.reverse(800);
   // delay(5000);
 
-  steer.forward(800);
+  // steer.array.takeReading(false);
+  // steer.array.getError();
+  // steer.array.showState();
+  // Serial.print("\n");
+  // steer.array.update();
 
+  // Serial.println("begin");
+  // left.drivePWM(800);
+  // delay(2000);
+  // right.drivePWM(800);
+  // delay(2000);
 
 
 }

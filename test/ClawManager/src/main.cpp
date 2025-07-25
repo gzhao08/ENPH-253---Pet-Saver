@@ -52,34 +52,34 @@ int position = -10;
 
 void loop() {
 
-  if (home) {
-    arm.home();
-  }
+  // if (home) {
+  //   arm.home();
+  // }
 
-  home = false; 
+  // home = false; 
 
-  if (ten) {
-      arm.setPosition(10);
-  }
-  else {
-       arm.setPosition(50);
-  }
+  // if (ten) {
+  //     arm.setPosition(10);
+  // }
+  // else {
+  //      arm.setPosition(50);
+  // }
 
-  arm.loop();
+  // arm.loop();
    
-  if (positionDelayManager.checkAndReset()) {
-    if (ten) {
-      ten = false;
-    } else {
-      ten = true;
-    }
+  // if (positionDelayManager.checkAndReset()) {
+  //   if (ten) {
+  //     ten = false;
+  //   } else {
+  //     ten = true;
+  //   }
     
-    // home = false; 
-    // position -= 10; 
-    // if (position = -50) {
-    //   position = 0;
-    // }
-  }
+  //   // home = false; 
+  //   // position -= 10; 
+  //   // if (position = -50) {
+  //   //   position = 0;
+  //   // }
+  // }
 
  
   // arm.setPosition(20);
@@ -102,7 +102,7 @@ void loop() {
 // delay(1000);
 
 
-/** test grabber 
+/** test grabber */
 grab.setPositionDutyCycle(grab.PET_CLOSE);
 delay(2000);
 grab.setPositionDutyCycle(grab.PARALLEL); //parallel from closed
@@ -111,7 +111,7 @@ grab.setPositionDutyCycle(grab.OPEN);
 delay(500);
 grab.setPositionDutyCycle(10); //parallel from open
 delay(5000);
-*/
+
  
   
 /** test servo
