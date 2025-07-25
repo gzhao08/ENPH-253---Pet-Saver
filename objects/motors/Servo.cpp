@@ -9,7 +9,7 @@
 /**
  * Object representing a servo motor
  */
-Servo::Servo(int motorPin, int pwmChannel) {
+MyServo::MyServo(int motorPin, int pwmChannel) {
     this->motorPin = motorPin; 
     this->pwmChannel = pwmChannel;
 }
@@ -17,7 +17,7 @@ Servo::Servo(int motorPin, int pwmChannel) {
 /**
  * Sets up servo object 
  */
-void Servo::begin() {
+void MyServo::begin() {
     ledcSetup(this->pwmChannel, this->servoFreq, 12); 
     ledcAttachPin(this->motorPin, this->pwmChannel);
 }
@@ -26,7 +26,7 @@ void Servo::begin() {
  * moves servo to given position
  * @param angle position in degrees to move servo to
  */
-void Servo::writePosition(int angle) {
+void MyServo::writePosition(int angle) {
     // convert angle to PWM frequency out of 4096 (12 bits)
     int position = angle * this->RANGE_POS / this->RANGE_DEG + this->MIN_POSITION;
     Serial.println(angle);
@@ -42,7 +42,7 @@ void Servo::writePosition(int angle) {
  * moves servo to position corresponding to a certain duty cycle
  * @param duty must be between 3 (3% = 0 deg) and 12 (12% = 180 deg)
  */
-void Servo::writeDutyCycle(float duty) {
+void MyServo::writeDutyCycle(float duty) {
     if (this->MIN_PERCENT <= duty && this->MAX_PERCENT >= duty) {
         ledcWrite(this->pwmChannel, int(duty * 4096 / 100));
         this->dutyCycle = duty; 
@@ -53,14 +53,14 @@ void Servo::writeDutyCycle(float duty) {
 /**
  * @return servo position in degrees (0 to 180 CW from west to east) or -1 if servo has not been moved yet
  */
-float Servo::readPosition() {
+float MyServo::readPosition() {
     return this->positionDegrees;
 }
 
 /**
  * @return servo duty cycle between 3 and 12 or -1 if servo has not been moved yet
  */
-float Servo::readDutyCycle() {
+float MyServo::readDutyCycle() {
     return this->dutyCycle; 
 }
 

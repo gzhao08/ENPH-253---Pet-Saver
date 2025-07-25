@@ -11,7 +11,7 @@
 #include "sensors/Microswitch.h"
 #include "GlobalConstants.h"
 
-
+// MyServo servoMotor(22, 1);
 ClawGrabber grab(22, 1);
 
 int muxPin = 8;
@@ -46,46 +46,46 @@ ClawVerticalStage verticalStage(verticalStageMotorPin1, verticalStageMotorPin2, 
 void setup() {
   Serial.begin(115200);
   // 1. Initialize Wire (I2C-SDA, I2C_SCL) -- clock next to dot then data
-  Wire.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
-  // 2. Begin wire manager
-  wireManager.begin(&Wire);
-  // 3. Begin servo
-  arm.begin(&wireManager); 
-  verticalStage.begin(&wireManager);
-  positionDelayManager.reset();
+  // Wire.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
+  // // 2. Begin wire manager
+  // wireManager.begin(&Wire);
+  // // 3. Begin servo
+  // arm.begin(&wireManager); 
+  // verticalStage.begin(&wireManager);
+  // positionDelayManager.reset();
 
-  //arm.home();
+  // //arm.home();
 
   grab.begin();
   
-  arm.homingSequence();
-  // arm.testSequence();
-  verticalStage.homingSequence();
+  // arm.homingSequence();
+  // // arm.testSequence();
+  // verticalStage.homingSequence();
 }
 
 unsigned long lastUpdate = 0;
 bool ten = true;
 
 void loop() {
-  if (ten) {
-      arm.setPosition(10);
-      verticalStage.setPosition(10);
+  // if (ten) {
+  //     arm.setPosition(10);
+  //     verticalStage.setPosition(10);
 
-  } else {
-      arm.setPosition(100);
-      verticalStage.setPosition(50);
-  }
+  // } else {
+  //     arm.setPosition(100);
+  //     verticalStage.setPosition(50);
+  // }
 
-  arm.loop();
-  verticalStage.loop();
+  // arm.loop();
+  // verticalStage.loop();
    
-  if (positionDelayManager.checkAndReset()) {
-    if (ten) {
-      ten = false;
-    } else {
-      ten = true;
-    }
-  }
+  // if (positionDelayManager.checkAndReset()) {
+  //   if (ten) {
+  //     ten = false;
+  //   } else {
+  //     ten = true;
+  //   }
+  // }
   
   //   // home = false; 
   //   // position -= 10; 
@@ -115,57 +115,56 @@ void loop() {
 // delay(1000);
 
 
-/** test grabber 
-grab.setPositionDutyCycle(grab.PET_CLOSE);
-delay(2000);
-grab.setPositionDutyCycle(grab.PARALLEL); //parallel from closed
-delay(500);
-grab.setPositionDutyCycle(grab.OPEN);
-delay(500);
-grab.setPositionDutyCycle(10); //parallel from open
-delay(5000);
-*/
+// test grabber 
+  grab.setPositionDutyCycle(grab.PET_CLOSE);
+  delay(2000);
+  grab.setPositionDutyCycle(grab.PARALLEL); //parallel from closed
+  delay(500);
+  grab.setPositionDutyCycle(grab.OPEN);
+  delay(500);
+  grab.setPositionDutyCycle(10); //parallel from open
+  delay(5000);
+
  
   
-/** test servo
-  servo.writePosition(0);
-  delay(500);
-  servo.writePosition(10);
-  delay(500);
-  servo.writePosition(20);
-  delay(500);
-  servo.writePosition(30);
-  delay(500);
-  servo.writePosition(40);
-  delay(500);
-  servo.writePosition(50);
-  delay(500);
-  servo.writePosition(60);
-  delay(500);
-  servo.writePosition(70);
-  delay(500);
-  servo.writePosition(80);
-  delay(500);
-  servo.writePosition(90);
-  delay(500);
-  servo.writePosition(100);
-  delay(500);
-  servo.writePosition(110);
-  delay(500);
-  servo.writePosition(120);
-  delay(500); 
-  servo.writePosition(130);
-  delay(500);
-  servo.writePosition(140);
-  delay(500);
-  servo.writePosition(150);
-  delay(500);
-  servo.writePosition(160);
-  delay(500);
-  servo.writePosition(170);
-  delay(500);
-  servo.writePosition(180);
-  delay(500);
-*/ 
+// test servo
+  // servo.writePosition(0);
+  // delay(500);
+  // servo.writePosition(10);
+  // delay(500);
+  // servo.writePosition(20);
+  // delay(500);
+  // servo.writePosition(30);
+  // delay(500);
+  // servo.writePosition(40);
+  // delay(500);
+  // servo.writePosition(50);
+  // delay(500);
+  // servo.writePosition(60);
+  // delay(500);
+  // servo.writePosition(70);
+  // delay(500);
+  // servo.writePosition(80);
+  // delay(500);
+  // servo.writePosition(90);
+  // delay(500);
+  // servo.writePosition(100);
+  // delay(500);
+  // servo.writePosition(110);
+  // delay(500);
+  // servo.writePosition(120);
+  // delay(500); 
+  // servo.writePosition(130);
+  // delay(500);
+  // servo.writePosition(140);
+  // delay(500);
+  // servo.writePosition(150);
+  // delay(500);
+  // servo.writePosition(160);
+  // delay(500);
+  // servo.writePosition(170);
+  // delay(500);
+  // servo.writePosition(180);
+  // delay(500);
 
 }

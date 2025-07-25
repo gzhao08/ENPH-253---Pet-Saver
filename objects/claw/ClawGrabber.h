@@ -9,7 +9,7 @@
 
 class ClawGrabber {
     private:
-        Servo motor;
+        MyServo motor;
         
     public: 
         float OPEN = 11.9;     

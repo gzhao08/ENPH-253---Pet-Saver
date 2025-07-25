@@ -8,7 +8,7 @@
 
 class Basket {
     private:
-        Servo motor;
+        MyServo motor;
         
     public: 
         Basket(int servoPin, int pwmChannel);
