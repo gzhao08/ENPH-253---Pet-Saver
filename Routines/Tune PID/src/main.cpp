@@ -44,11 +44,14 @@ void loop() {
   // Serial.print("\n");
   // steer.array.update();
 
-  // Serial.println("begin");
+  // Serial.println("left");
   // left.drivePWM(800);
   // delay(2000);
+  // left.stop();
+  // Serial.println("right");
   // right.drivePWM(800);
   // delay(2000);
+  // right.stop();
 
 
 }
