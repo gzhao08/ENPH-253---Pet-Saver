@@ -18,6 +18,7 @@ mswitchArm(switchPin, normallyOpen) {}
 void ClawArm::begin(WireManager* wireManager) {
     this->motorArm.begin(wireManager);
     this->mswitchArm.begin();
+    this->motorArm.setPDTuning(55, 0.77);
 }
 
 void ClawArm::setAsHome() {
@@ -107,5 +108,13 @@ void ClawArm::testSequence() {
     Serial.println("Reached target position 0 again");
     Serial.println("Claw Arm test sequence done");
     
+}
+
+void ClawArm::setPIDTuningMode(bool mode) {
+    this->motorArm.setPIDTuningMode(mode);
+}
+
+void ClawArm::setPIDTuningPins(int P_Pin, int D_Pin) {
+    this->motorArm.setPIDTuningPins(P_Pin, D_Pin);
 }
 

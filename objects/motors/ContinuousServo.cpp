@@ -1,6 +1,5 @@
 #include "ContinuousServo.h"
 
-unsigned long lastPrint = 0;
 /**
  * ContinuousServo object, consists of a motor and a magnetic encoder
  * This is a RELATIVE ANGLE based application (not the absolute reading of the encoder)
@@ -90,19 +89,21 @@ void ContinuousServo::PIDSequence(float targetAngle) {
     this->motor.drivePWM(this->Output * this->DIRECTION_MULTIPLIER); // Divide by 3 to limit to 5V
 
     // Log messages
-    if (millis() - lastPrint > 1000) {
-        Serial.print(relAngle, 2);
-        Serial.println(" deg (relativeAngle)");
-        Serial.print("Angle read: ");
-        Serial.println(absAngle);
-        Serial.print("Target angle: ");
-        Serial.println(targetAngle);
-        Serial.print("Angle error: ");
-        Serial.println(angleError);
-        Serial.print("PID Output: ");
-        Serial.println(Output);
-        Serial.println("-----");
-        lastPrint = millis();
+    if (this->logPIDOutput) {
+        if (millis() - this->lastPrint > 1000) {
+            Serial.print(relAngle, 2);
+            Serial.println(" deg (relativeAngle)");
+            Serial.print("Angle read: ");
+            Serial.println(absAngle);
+            Serial.print("Target angle: ");
+            Serial.println(targetAngle);
+            Serial.print("Angle error: ");
+            Serial.println(angleError);
+            Serial.print("PID Output: ");
+            Serial.println(Output);
+            Serial.println("-----");
+            this->lastPrint = millis();
+        }
     }
 }
 

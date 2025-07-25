@@ -15,7 +15,7 @@ mswitchVertical(switchPin, normallyOpen) {}
 void ClawVerticalStage::begin(WireManager* wireManager) {
     motorVertical.begin(wireManager);
     mswitchVertical.begin();
-    motorVertical.setPDTuning(200, 2);
+    motorVertical.setPDTuning(this->PID_P, this->PID_D);
     motorVertical.setMaxVoltage(8); // My max duty cycle is 0.8 * duty cycle mapping
     // Serial.println("motorVertical max duty cycle: " + String(motorVertical.getMaxDutyCycle()));
 }
@@ -63,6 +63,14 @@ void ClawVerticalStage::loop() {
  */
 bool ClawVerticalStage::reachedTarget() {
     return this->motorVertical.reachedTarget();
+}
+
+void ClawVerticalStage::setPIDTuningMode(bool mode) {
+    this->motorVertical.setPIDTuningMode(mode);
+}
+
+void ClawVerticalStage::setPIDTuningPins(int P_Pin, int D_Pin) {
+    this->motorVertical.setPIDTuningPins(P_Pin, D_Pin);
 }
 
 void ClawVerticalStage::testSequence() {

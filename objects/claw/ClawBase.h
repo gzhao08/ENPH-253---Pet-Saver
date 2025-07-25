@@ -11,7 +11,6 @@
 
 class ClawBase {
     private:
-        ContinuousServo motorBase;
         Microswitch mswitchBase;
 
         const int HORIZONTAL_GEAR_CIRCUMFERENCE = 151; // mm
@@ -22,6 +21,7 @@ class ClawBase {
         const int MAX_BASE_ANGLE_POSITION = 120;
 
     public: 
+        ContinuousServo motorBase;
 
         ClawBase(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen);
 

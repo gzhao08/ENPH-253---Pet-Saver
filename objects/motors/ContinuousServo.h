@@ -45,9 +45,11 @@ class ContinuousServo {
         void updateStability();
         void PIDSequence(float targetValue);
         void tunePID();
+        unsigned long lastPrint = 0;
     public: 
         // PID Variables (needs to be public because referenced in PID controller)
         double Setpoint = 0, Input = 0, Output = 1;
+        bool logPIDOutput = false;
 
         ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int maxVoltage = 5);
 
