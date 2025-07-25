@@ -13,7 +13,7 @@ class DCMotor {
         int pwmChannel1; // PWM channel for motorPin1
         int pwmChannel2; // PWM channel for motorPin2
 
-        const int hBridgeVoltage = 15;
+        const int hBridgeVoltage = 12;
         int maxVoltage; // Maximum voltage for the motor
         int maxDutyCycle;
 
@@ -21,7 +21,7 @@ class DCMotor {
         const int pwmFrequency = 100;
         const int pwmResolution = 12;
     public:
-        DCMotor(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int maxVoltage=5);
+        DCMotor(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int maxVoltage);
         void begin();
         void drivePWM(int signedDuty);
         void stop();
