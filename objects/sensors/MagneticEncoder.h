@@ -15,11 +15,11 @@ class MagneticEncoder : public SensorI2C {
         float prevAngle;
         float currentAngle;
 
+        uint16_t readRawAngle();
         void incrementRelAngle(float newAngle);
     public:
         MagneticEncoder(int muxLine=-1);
         void begin(WireManager* wireManagerObject);
-        uint16_t readRawAngle();
         float readAngle();
         float angleDifference(float toAngle, float fromAngle);
         void setAsHome();

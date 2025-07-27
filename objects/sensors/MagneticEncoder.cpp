@@ -36,7 +36,7 @@ uint16_t MagneticEncoder::readRawAngle() {
 
     int endTransmissionStatus = this->endTransmission(false); // Repeated start
     if (endTransmissionStatus != 0) { 
-        Serial.println("End transmission failed");
+        Serial.print("End transmission failed with status: ");
         Serial.println(endTransmissionStatus);
         return 0xFFFF; // Transmission failed
     }
@@ -66,6 +66,7 @@ float MagneticEncoder::readAngle() {
     this->incrementRelAngle(angle);
     return angle;
   } else {
+    // This is safe because incrementRelAngle will not be called (no sudden jumps)
     Serial.println("readAngle went wrong!");
     return -1;
   }
@@ -90,7 +91,8 @@ void MagneticEncoder::incrementRelAngle(float newAngle) {
 void MagneticEncoder::setAsHome() {
     float readAngleResult = this->readAngle();
     if (readAngleResult < 0) {
-        Serial.println("MagneticEncoder: Failed to read angle during home()");
+        // The function failed, don't setAsHome.
+        Serial.println("MagneticEncoder: Failed to read angle during setAsHome()");
         return;
     }
     this->currentAngle = readAngleResult;
