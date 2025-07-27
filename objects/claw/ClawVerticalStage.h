@@ -7,51 +7,37 @@
 // Local Libraries:
 #include "../motors/ContinuousServo.h"
 #include "../sensors/Microswitch.h"
+#include "../claw/ClawPart.h"
 
-class ClawVerticalStage {
+class ClawVerticalStage : public ClawPart {
     private:
-        Microswitch mswitchVertical;
+        String _partName = "Claw Vertical Stage";
 
-        const float ANGLE_TO_MM_CONVERSION = -0.022; // Calibrating from 2mm pitch * 4 starts / 360 degrees
-        const float MM_TO_ANGLE_CONVERSION = 1 / ANGLE_TO_MM_CONVERSION;
+        const float _ENCODER_TO_POS_CONVERSION = -0.022; /// Calibrating from 2mm pitch * 4 starts / 360 degrees
+        const float _POS_TO_ENCODER_CONVERSION = 1 / _ENCODER_TO_POS_CONVERSION; // 1mm corresponds to 1/0.42 degrees
+        const int _ABS_POS_LIMIT = 120;
+        const int _MIN_POSITION = 0;
+        const int _MAX_POSITION = 100;
 
-        const int ABS_POS_LIMIT = 120;
-        const int MIN_HEIGHT = 0;
-        const int MAX_HEIGHT = 100;
+        // PID Parameters
+        const float _Pk = 55;
+        const float _Dk = 0.77;
+
+        // Servo parameters
+        const int _servoMaxVoltage = 8;
+        const int _servoTolerance = 10; // How much can angle deviate from target
+
         const int IDLE_HEIGHT = 50;
 
         const int LOW_PET_HEIGHT = 10;
         const int HIGH_PET_HEIGHT = 90;
         const int LOW_PET_SENSING_HEIGHT = 20;
         const int HIGH_PET_SENSING_HEIGHT = 80;
-
-        // PID Parameters
-        const int Pk = 55;
-        const int Dk = 0.7;
-
-        // Servo parameters
-        const int servoMaxVoltage = 8;
-        const int servoTolerance = 10; // Angle tolerance for motor stability
-
-
     public: 
-        ContinuousServo motorVertical;
-
         ClawVerticalStage(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
             int switchPin, bool normallyOpen);
-
-        // Call in setup
-        void begin(WireManager* wireManager);
-
-        float getPosition();
-        void setPosition(float angle);
         void testSequence();
-        void homingSequence();
-        void setAsHome();
-        bool reachedTarget();
-        void loop();
-        void setPIDTuningMode(bool mode);
-        void setPIDTuningPins(int P_Pin, int D_Pin);
+
 
     
 };

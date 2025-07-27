@@ -3,76 +3,26 @@
 /**
  * ClawVerticalStage object, consists of a continuous servo and a microswitch
  */
-ClawVerticalStage::ClawVerticalStage(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen) : 
-motorVertical(motorPin1, motorPin2, pwmChannel1, pwmChannel2, muxLine, encoderOnTerminalSide), 
-mswitchVertical(switchPin, normallyOpen) {}
+ClawVerticalStage::ClawVerticalStage(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
+    int switchPin, bool normallyOpen) : 
+    ClawPart(motorPin1, motorPin2, pwmChannel1, pwmChannel2, muxLine, encoderOnTerminalSide, 
+        switchPin, normallyOpen) {
+        this->partName = this->_partName; // For debugging purposes
 
-/**
- * Sets up 
- */
-void ClawVerticalStage::begin(WireManager* wireManager) {
-    motorVertical.begin(wireManager);
-    motorVertical.setPDTuning(this->Pk, this->Dk);
-    motorVertical.setMaxVoltage(this->servoMaxVoltage); 
-    motorVertical.tolerance = this->servoTolerance;
+        // Conversion and positions
+        this->ENCODER_TO_POS_CONVERSION = this->_ENCODER_TO_POS_CONVERSION;
+        this->POS_TO_ENCODER_CONVERSION = this->_POS_TO_ENCODER_CONVERSION;
+        this->ABS_POS_LIMIT = this->_ABS_POS_LIMIT; // Position limit (for homing purposes)
+        this->MIN_POSITION = this->_MIN_POSITION;
+        this->MAX_POSITION = this->_MAX_POSITION;
 
-    mswitchVertical.begin();
-}
+        // PID Parameters
+        this->Pk = this->_Pk;
+        this->Dk = this->_Dk;
 
-/**
- * Sets current position as home
- */
-void ClawVerticalStage::setAsHome() {
-    this->motorVertical.setAsHome();
-}
-
-/**
- * Home the claw vertical stage by moving it until the microswitch is pressed
- * This will set the home position of the claw vertical stage
- */
-void ClawVerticalStage::homingSequence() {
-    int overshootAngle = -this->ABS_POS_LIMIT * MM_TO_ANGLE_CONVERSION * 1.2;
-    this->motorVertical.moveBy(18000); // Move down to ensure we are not at the top
-    while (!this->mswitchVertical.isPressed()) {
-        this->loop();
-    }  
-    this->setAsHome();
-    Serial.println("Homing sequence done");
-}
-
-float ClawVerticalStage::getPosition() {
-    float angle = this->motorVertical.getAngle(); 
-    return angle * this->ANGLE_TO_MM_CONVERSION; // convert to mm
-}
-
-/**
- * raises claw to desired height
- * @param height above minimum height in mm
- */
-void ClawVerticalStage::setPosition(float position) {
-    //CW moves mechanism up
-    float movePosition = constrain(position, this->MIN_HEIGHT, this->MAX_HEIGHT);
-    float relAngle = movePosition * this->MM_TO_ANGLE_CONVERSION; // convert to angle in degrees
-    this->motorVertical.moveTo(relAngle); //negative is CW, CW is up
-}
-
-void ClawVerticalStage::loop() {
-    this->motorVertical.loop();
-}
-
-/**
- * @return true if the claw vertical stage has reached the target position, false otherwise
- */
-bool ClawVerticalStage::reachedTarget() {
-    return this->motorVertical.reachedTarget();
-}
-
-void ClawVerticalStage::setPIDTuningMode(bool mode) {
-    this->motorVertical.setPIDTuningMode(mode);
-}
-
-void ClawVerticalStage::setPIDTuningPins(int P_Pin, int D_Pin) {
-    this->motorVertical.setPIDTuningPins(P_Pin, D_Pin);
+        // Servo Parameters
+        this->servoMaxVoltage = this->_servoMaxVoltage;
+        this->servoTolerance = this->_servoTolerance; // How much can angle deviate from target
 }
 
 void ClawVerticalStage::testSequence() {

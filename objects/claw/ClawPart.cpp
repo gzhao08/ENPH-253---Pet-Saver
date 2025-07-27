@@ -30,7 +30,7 @@ void ClawPart::setAsHome() {
 
 /**
  * Home the claw by moving it until the microswitch is pressed
- * This will set the home position of the claw
+ * This will set the home position of the claw part
  */
 void ClawPart::homingSequence() {
     int overshootAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 1.2;
@@ -45,20 +45,20 @@ void ClawPart::homingSequence() {
             break;
         }
     }  
-    
+
     this->setAsHome();
     Serial.println("Current position of " + this->partName + " is set as home");
 }
 
 /**
- * @return true if the claw base has reached the target position, false otherwise
+ * @return true if the claw part has reached the target position, false otherwise
  */
 bool ClawPart::reachedTarget() {
     return this->continuousServo.reachedTarget();
 }
 
 /**
- * Get position of part of claw
+ * Get position of claw part
  */
  float ClawPart::getPosition() {
     float angle = this->continuousServo.getAngle();
@@ -66,7 +66,7 @@ bool ClawPart::reachedTarget() {
  }
 
  /** 
-  * Move the part of the claw to the desired position
+  * Move the claw part to the desired position
  */
 void ClawPart::setPosition(float position) {
     float constrainedPosition = constrain(position, this->MIN_POSITION, this->MAX_POSITION);
