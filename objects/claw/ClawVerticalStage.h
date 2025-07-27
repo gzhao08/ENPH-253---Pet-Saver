@@ -37,7 +37,4 @@ class ClawVerticalStage : public ClawPart {
         ClawVerticalStage(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
             int switchPin, bool normallyOpen);
         void testSequence();
-
-
-    
 };

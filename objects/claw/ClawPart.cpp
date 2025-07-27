@@ -11,13 +11,13 @@ microswitch(switchPin, normallyOpen) {}
  * Sets up claw part
  */
 void ClawPart::begin(WireManager* wireManager) {
-    continuousServo.begin(wireManager);
+    this->continuousServo.begin(wireManager);
 
-    continuousServo.setPDTuning(this->Pk, this->Dk);
-    continuousServo.setMaxVoltage(this->servoMaxVoltage); 
-    continuousServo.tolerance = this->servoTolerance;
+    this->continuousServo.setPDTuning(this->Pk, this->Dk);
+    this->continuousServo.setMaxVoltage(this->servoMaxVoltage); 
+    this->continuousServo.tolerance = this->servoTolerance;
 
-    microswitch.begin();
+    this->microswitch.begin();
 }
 
 /**

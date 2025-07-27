@@ -8,33 +8,29 @@
 // Local Libraries:
 #include "../motors/ContinuousServo.h"
 #include "../sensors/Microswitch.h"
+#include "../claw/ClawPart.h"
 
-class ClawBase {
+class ClawBase : public ClawPart {
     private:
-        Microswitch mswitchBase;
+        String _partName = "Claw Base";
 
-        const int HORIZONTAL_GEAR_CIRCUMFERENCE = 151; // mm
-        const float ENCODER_TO_BASE_ANGLE_CONVERSION = -0.4; // Calibrated from 6/15
-        const float BASE_TO_ENCODER_ANGLE_CONVERSION = 1 / ENCODER_TO_BASE_ANGLE_CONVERSION; // 1mm corresponds to 1/0.42 degrees
+        const float _ENCODER_TO_POS_CONVERSION = -0.4; /// Calibrating from 2mm pitch * 4 starts / 360 degrees
+        const float _POS_TO_ENCODER_CONVERSION = 1 / _ENCODER_TO_POS_CONVERSION; // 1mm corresponds to 1/0.42 degrees
+        const int _ABS_POS_LIMIT = 80;
+        const int _MIN_POSITION = -80;
+        const int _MAX_POSITION = 80;
 
-        const int MIN_BASE_ANGLE_POSITION = -80;
-        const int MAX_BASE_ANGLE_POSITION = 80;
+        // PID Parameters
+        const float _Pk = 55;
+        const float _Dk = 0.77;
+
+        // Servo parameters
+        const int _servoMaxVoltage = 8;
+        const int _servoTolerance = 10; // How much can angle deviate from target
+
 
     public: 
-        ContinuousServo motorBase;
-
-        ClawBase(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen);
-
-        // Call in setup
-        void begin(WireManager* wireManager);
-
-        void setAsHome();
-        void homingSequence();
-        float reachedTarget();
-
-        float getPosition();
-        void setPosition(float position);
+        ClawBase(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
+            int switchPin, bool normallyOpen);
         void testSequence();
-
-        void loop();
 };
