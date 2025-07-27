@@ -15,17 +15,18 @@ class DCMotor {
 
         const int hBridgeVoltage = 12; // Voltage of the H-Bridge, used to calculate max duty cycle
         int maxVoltage; // Maximum voltage for the motor
-        int maxDutyCycle;
+        int maxDutyCycle; // Max duty cycle of DC motor. This will affect drivePWM
 
-        // PWM stuff
+        // PWM stuff (ledc setup)
         const int pwmFrequency = 100;
         const int pwmResolution = 12;
+        void updateMaxDutyCycle();
+
     public:
         DCMotor(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int maxVoltage=6);
         void begin();
         void drivePWM(int signedDuty);
         void stop();
         int getMaxDutyCycle();
-        void updateMaxDutyCycle();
         void setMaxVoltage(int voltage);
 };

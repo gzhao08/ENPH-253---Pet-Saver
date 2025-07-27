@@ -20,12 +20,13 @@ void DCMotor::begin() {
     this->setMaxVoltage(this->maxVoltage);
 }
 
+// Update the max duty cycle based on the current max voltage
 void DCMotor::updateMaxDutyCycle() {
-    // Update the max duty cycle based on the current max voltage
-    const float SAFETY_MARGIN = 0.5; // Safety margin to prevent over-driving the motor
+    const float SAFETY_MARGIN = 0.0; // Safety margin to prevent over-driving the motor
     this->maxDutyCycle = map(this->maxVoltage, 0, this->hBridgeVoltage, 0, BIT_12_LIMIT) - map(SAFETY_MARGIN, 0, this->hBridgeVoltage, 0, BIT_12_LIMIT);
 }
 
+// Set max voltage of motor
 void DCMotor::setMaxVoltage(int voltage) {
     this->maxVoltage = voltage;
     this->updateMaxDutyCycle();
@@ -37,6 +38,7 @@ void DCMotor::setMaxVoltage(int voltage) {
  * When looking at the side of the motor with the terminals, 
  *  Driving IN1 HIGH will rotate the motor clockwise.
  *  Driving IN2 HIGH will rotate the motor counter-clockwise.
+ *  Note: Might be wrong, check!
  */
 void DCMotor::drivePWM(int signedDuty) {
     int duty = abs(signedDuty);
