@@ -76,11 +76,16 @@ void ClawArm::loop() {
     this->motorArm.loop();
 }
 
-
+/**
+ * Set PID Tuning mode to true or false
+ */
 void ClawArm::setPIDTuningMode(bool mode) {
     this->motorArm.setPIDTuningMode(mode);
 }
 
+/**
+ * Set PID tuning pins
+ */
 void ClawArm::setPIDTuningPins(int P_Pin, int D_Pin) {
     this->motorArm.setPIDTuningPins(P_Pin, D_Pin);
 }
