@@ -1,25 +1,24 @@
 #include <Arduino.h>
-#include "../lib/SteeringManager/SteeringManager.h"  
-#include "../lib/WifiHelper/WifiHelper.h"
+#include "SteeringManager.h"  
+#include "WifiHelper.h"
 #include "drivetrain.h"
-#include "../lib/GlobalConstants.h"
+#include "../GlobalConstants.h"
 
 void driveTrain(void *parameter) {
 
     //----------------------------SETUP----------------------------//
-    DCMotor left = DCMotor(22,19,1,2,12); 
-    DCMotor right = DCMotor(20,21,3,4,12);    
-
+    DCMotor left = DCMotor(LEFT_MOTOR_PIN_A,LEFT_MOTOR_PIN_B,LEFT_MOTOR_PWM_CHANNEL_A,LEFT_MOTOR_PWM_CHANNEL_B,12); 
+    DCMotor right = DCMotor(RIGHT_MOTOR_PIN_A,RIGHT_MOTOR_PIN_B,RIGHT_MOTOR_PWM_CHANNEL_A,RIGHT_MOTOR_PWM_CHANNEL_B,12);    
     SteeringManager steer(&left,&right);
 
-    double kp = 170.0;
+    double kp = 220.0;
     double kd = 0;
-    int baseSpeed = 800;
+    int baseSpeed = 1050;
 
     left.begin();
     right.begin();
 
-    steer.begin(35,34,36,39); // put IR pins here -> left to right
+    steer.begin(OUTER_LEFT_PIN,INNER_LEFT_PIN,INNER_RIGHT_PIN,OUTER_RIGHT_PIN); // put IR pins here -> left to right
 
     Serial.begin(115200);
 
@@ -52,8 +51,8 @@ void driveTrain(void *parameter) {
     // // After ramp -- lower speed
     // steer.lineFollow(700);
     while (true) {
-        steer.lineFollow(600);
-        delay(1000);
+        steer.lineFollow(1000);
+        delay(2000);
         // steer.lineFollow(600);
         // delay(1000);
         // steer.lineFollow(1000);

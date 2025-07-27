@@ -41,6 +41,7 @@ void SteeringManager::forward(int duty) {
     while (drive) {
         leftMotor->drivePWM(duty);
         rightMotor->drivePWM(duty);
+        delay(10);
     }
     this->stop();
 }
@@ -142,8 +143,8 @@ void SteeringManager::lineFollow(int baseSpeed) {
             pidController.Compute();
             lastComputeTime = millis();
             // drive motors
-            leftMotor->drivePWM(baseSpeed+output);
-            rightMotor->drivePWM(baseSpeed-output);
+            leftMotor->drivePWM(baseSpeed-output);
+            rightMotor->drivePWM(baseSpeed+output);
             
         }
         // update IR data every cycle so that error is accurate
@@ -152,6 +153,7 @@ void SteeringManager::lineFollow(int baseSpeed) {
         array.showState();
         Serial.printf(" -- %lf\n", output);
         this->array.update();
+        delay(5);
     }
     this->stop();
 }

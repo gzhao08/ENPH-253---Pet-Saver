@@ -47,8 +47,10 @@ void SteeringManager::lineFollow(int baseSpeed) {
             leftMotor->drivePWM(baseSpeed-output);
             rightMotor->drivePWM(baseSpeed+output);
         }
-        this->array.update();
         this->array.takeReading(false);
         input = this->array.getError();
+        this->array.showState();
+        // Serial.print("\n");
+        this->array.update();
     }
 }

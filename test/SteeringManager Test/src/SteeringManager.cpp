@@ -138,8 +138,8 @@ void SteeringManager::lineFollow(int baseSpeed) {
             pidController.Compute();
             lastComputeTime = millis();
             // drive motors
-            leftMotor->drivePWM(baseSpeed+output);
-            rightMotor->drivePWM(baseSpeed-output);
+            leftMotor->drivePWM(baseSpeed-output);
+            rightMotor->drivePWM(baseSpeed+output);
             
         }
         // update IR data every cycle so that error is accurate

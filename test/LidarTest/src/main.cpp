@@ -28,10 +28,11 @@ void loop() {
   lox.rangingTest(&measure, false); // pass in 'true' to get debug data
 
   if (measure.RangeStatus != 4 && measure.RangeMilliMeter !=8191) {  // 4 means out of range
-    if(abs(measure.RangeMilliMeter-lastmeasure)>50){
-      lastmeasure = measure.RangeMilliMeter;
-      Serial.print("Distance (mm): "); Serial.println(measure.RangeMilliMeter);
-    }
+    // if(abs(measure.RangeMilliMeter-lastmeasure)>50){
+    //   lastmeasure = measure.RangeMilliMeter;
+    //   Serial.print("Distance (mm): "); Serial.println(measure.RangeMilliMeter);
+    // }
+    Serial.print("Distance (mm): "); Serial.println(measure.RangeMilliMeter);
   } else {
     Serial.println("Out of range");
   }

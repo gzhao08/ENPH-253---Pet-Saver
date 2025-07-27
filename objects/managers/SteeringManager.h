@@ -5,6 +5,7 @@
 #include <PID_v1.h>
 #include "DCMotor.h"  
 
+extern portMUX_TYPE mux;
 extern volatile boolean drive; // boolean indicating when to stop driving ; should be global and changed via interrupts
  
 class SteeringManager {
@@ -36,6 +37,7 @@ class SteeringManager {
         void forward(int duty);
         void backward(int duty);
         void stop();
+        void turnAround(int duty, boolean clockwise);
         void lineFollow(int baseSpeed);
 
         // Tune PID

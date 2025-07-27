@@ -2,11 +2,6 @@
 
 #include <Arduino.h>
 
-#define ERR_4 7
-#define ERR_3 5
-#define ERR_2 3
-#define ERR_1 1
-
 class IRArray {
     private:
     
@@ -24,5 +19,7 @@ class IRArray {
         void showState();
         int getError();
         void update();
+        boolean isOnLine();
+        boolean isCentered();
         
 };

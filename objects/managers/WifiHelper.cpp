@@ -1,5 +1,7 @@
 #include "WifiHelper.h"
 #include <Arduino.h>
+#include "esp_wifi.h"
+#include "esp_bt.h"
 
 WifiHelper::WifiHelper() {
     AP_ssid = "ESP32_Group9";
@@ -76,6 +78,7 @@ void WifiHelper::startTune(double* kp, double* kd, int* baseSpeed) {
                             break;
                     }   
                 }
+                delay(50);
             }
         }
         delay(200);
@@ -83,6 +86,20 @@ void WifiHelper::startTune(double* kp, double* kd, int* baseSpeed) {
     Serial.printf("kp: %lf - kd: %lf\n", *kp, *kd);
     client.stop();
     Serial.println("Client disconnected");
-    delay(1000);
+    server.stopAll();
+    Serial.println("Server stopped");
+    //delay(500);
 }
 
+/**
+ * End the WiFi helper by stopping the server and disconnecting the AP
+ * This will also turn off the WiFi mode
+ */
+void WifiHelper::end() {
+    WiFi.softAPdisconnect(true);  // Disconnect AP
+    WiFi.mode(WIFI_OFF);          // Turn off WiFi mode
+
+    esp_wifi_stop();              // Stop WiFi task
+    esp_wifi_deinit();            // Deinit WiFi driver
+    delay(500);           
+}
