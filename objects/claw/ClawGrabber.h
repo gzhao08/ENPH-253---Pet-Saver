@@ -12,9 +12,9 @@ class ClawGrabber {
         MyServo motor;
         
     public: 
-        float OPEN = 11.9;     
-        float CLOSE = 9.4;
-        float PET_CLOSE = 9.4;
+        float OPEN = 11;     
+        float CLOSE = 8;
+        float PET_CLOSE = 8;
         float PARALLEL = 11;
 
         ClawGrabber(int motorPin, int pwmChannel);

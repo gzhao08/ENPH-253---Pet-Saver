@@ -20,22 +20,24 @@ Adafruit_LIS3MDL lis3mdl;
 int muxPin = 8;
 WireManager wireManager(muxPin); 
 
-int armMotorPin1 = 2;
-int armMotorPin2 = 12;
+
+DelayManager positionDelayManager(4000);
+
+
+int armMotorPin1 = 22;
+int armMotorPin2 = 19;
 int armPwmChannel1 = 2; //motor pin 1 goes to B
 int armPwmChannel2 = 3; 
 int armMuxLine = 1; 
 bool armEncoderOnTerminalSide = true; //false for arm, 
 int armSwitchPin = 37; 
 bool armNormallyOpen = true; 
-
-DelayManager positionDelayManager(4000);
 //muxLine: 1 is 1, 0 is 2, -1 is not muxing
 ClawArm arm(armMotorPin1, armMotorPin2, armPwmChannel1, armPwmChannel2, armMuxLine, armEncoderOnTerminalSide, 
   armSwitchPin, armNormallyOpen); 
 
-int verticalStageMotorPin1 = 33;
-int verticalStageMotorPin2 = 32;
+int verticalStageMotorPin1 = 20;
+int verticalStageMotorPin2 = 21;
 int verticalStagePwmChannel1 = 4; //motor pin 1 goes to B
 int verticalStagePwmChannel2 = 5; 
 int verticalStageMuxLine = 0; 
@@ -45,6 +47,7 @@ bool verticalStageNormallyOpen = true;
 
 ClawVerticalStage verticalStage(verticalStageMotorPin1, verticalStageMotorPin2, verticalStagePwmChannel1, verticalStagePwmChannel2, verticalStageMuxLine, verticalStageEncoderOnTerminalSide,
   verticalStageSwitchPin, verticalStageNormallyOpen);
+
 
 DelayManager printDelayManager(2000);
 DelayManager moveDelayManager(1000);
@@ -59,7 +62,7 @@ void setup() {
   Serial.begin(115200);
 
   // 1. Initialize Wire (I2C-SDA, I2C_SCL) -- clock next to dot then data
-  Wire.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
+  Wire.begin(5, 7);
   // 2. Begin wire manager
   wireManager.begin(&Wire);
   // 3. Begin servo

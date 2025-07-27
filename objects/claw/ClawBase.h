@@ -17,8 +17,8 @@ class ClawBase {
         const float ENCODER_TO_BASE_ANGLE_CONVERSION = -0.4; // Calibrated from 6/15
         const float BASE_TO_ENCODER_ANGLE_CONVERSION = 1 / ENCODER_TO_BASE_ANGLE_CONVERSION; // 1mm corresponds to 1/0.42 degrees
 
-        const int MIN_BASE_ANGLE_POSITION = -120;
-        const int MAX_BASE_ANGLE_POSITION = 120;
+        const int MIN_BASE_ANGLE_POSITION = -80;
+        const int MAX_BASE_ANGLE_POSITION = 80;
 
     public: 
         ContinuousServo motorBase;
