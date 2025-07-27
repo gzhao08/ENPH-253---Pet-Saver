@@ -23,7 +23,7 @@ class ContinuousServo {
         MagneticEncoder encoder;
 
         // PID Controls
-        float targetAngle;
+        float targetAngle; // Target angle for PID
         PID* pidController;
         double Pk = 110;
         double Ik = 0;
@@ -56,15 +56,20 @@ class ContinuousServo {
         void begin(WireManager* wireManager); // Call in setup
         void moveBy(float degrees);
         void moveTo(float degrees);
-        void testSequence();
         bool reachedTarget();
         void setAsHome();
         float getAngle();
+
+        // PID Stuff
         void setPIDTuningMode(bool mode);
         void setPIDTuningPins(int P_Pin, int D_Pin);
-        void setMaxVoltage(int voltage); // Set the voltage of the motor, which will update the max duty cycle
         void setPDTuning(float Kp, float Kd); // Set the PD tuning values
+
+        void setMaxVoltage(int voltage); // Set the voltage of the motor, which will update the max duty cycle
         // Call in loop
         void loop();
+
+        void testSequence();
+
         
 };

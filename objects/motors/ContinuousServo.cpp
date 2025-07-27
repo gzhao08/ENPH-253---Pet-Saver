@@ -6,15 +6,12 @@
  * Initializes encoder, motor, and PID controller
  */
 ContinuousServo::ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int maxVoltage) 
-: encoder(muxLine), motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, maxVoltage), pidTuningDelayManager(1000)
+:   encoder(muxLine), 
+    motor(motorPin1, motorPin2, pwmChannel1, pwmChannel2, maxVoltage), 
+    pidTuningDelayManager(1000)
  {
     /**
-     * Working:
-     * - Encoder increases when magnet is rotated counter-clockwise
-     * - When looking at the side of the motor with the terminals, driving IN1 HIGH will rotate the motor clockwise.
-     * - Motor driven with PID output. PID output is + when want to increase the encoder output
-     * - When encoder is on the terminal side, IN1 high will decrease the encoder output
-     * - Therefore we need to multiply the PID output by -1 when the encoder is on the terminal side
+     * Trial and error (check when using!)
      */
     if (encoderOnTerminalSide) {
         this->DIRECTION_MULTIPLIER = 1;
@@ -31,6 +28,8 @@ void ContinuousServo::begin(WireManager* wireManager) {
     motor.begin();
 
     // Encoder setup
+    // Note that here encoder home is 0 by default. 
+    // Therefore targetAngle should be set to relAngle so it doesn't go to 0
     this->encoder.begin(wireManager);
     this->targetAngle = this->encoder.getRelAngle();
 
@@ -41,11 +40,13 @@ void ContinuousServo::begin(WireManager* wireManager) {
     this->pidController->SetSampleTime(this->PIDSampleTime);
 }
 
+/**
+ * Sets the max voltage of the Servo
+ */
 void ContinuousServo::setMaxVoltage(int voltage) {
     this->motor.setMaxVoltage(voltage);
     this->pidController->SetOutputLimits(-this->motor.getMaxDutyCycle(), this->motor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
 }
-
 
 /**
  * Move the servo by a certain number of degrees
@@ -54,7 +55,7 @@ void ContinuousServo::setMaxVoltage(int voltage) {
  */
 void ContinuousServo::moveBy(float degrees) {
     this->stableCounter = 0;
-    this->targetAngle = this->encoder.getRelAngle() + degrees;
+    this->targetAngle = this->getAngle() + degrees;
 }
 
 /**
@@ -73,38 +74,6 @@ void ContinuousServo::moveTo(float degrees) {
  */
 float ContinuousServo::getAngle() {
     return this->encoder.getRelAngle();
-}
-
-/**
- * PID Sequence uses relative encoder values
- */
-void ContinuousServo::PIDSequence(float targetAngle) {
-    float absAngle = this->encoder.readAngle();
-    float relAngle = this->encoder.getRelAngle();
-
-    // PID Feedback
-    float angleError = targetAngle - relAngle;
-    this->Input = angleError;
-    this->pidController->Compute();
-    this->motor.drivePWM(this->Output * this->DIRECTION_MULTIPLIER); // Divide by 3 to limit to 5V
-
-    // Log messages
-    if (this->logPIDOutput) {
-        if (millis() - this->lastPrint > 1000) {
-            Serial.print(relAngle, 2);
-            Serial.println(" deg (relativeAngle)");
-            Serial.print("Angle read: ");
-            Serial.println(absAngle);
-            Serial.print("Target angle: ");
-            Serial.println(targetAngle);
-            Serial.print("Angle error: ");
-            Serial.println(angleError);
-            Serial.print("PID Output: ");
-            Serial.println(Output);
-            Serial.println("-----");
-            this->lastPrint = millis();
-        }
-    }
 }
 
 /**
@@ -127,10 +96,43 @@ bool ContinuousServo::reachedTarget() {
 }
 
 /**
+ * PID Sequence uses relative encoder values
+ */
+void ContinuousServo::PIDSequence(float targetAngle) {
+    float absAngle = this->encoder.readAngle();
+    float relAngle = this->encoder.getRelAngle();
+
+    // PID Feedback
+    float angleError = targetAngle - relAngle;
+    this->Input = angleError;
+    this->pidController->Compute();
+    this->motor.drivePWM(this->Output * this->DIRECTION_MULTIPLIER);
+
+    // Log messages
+    if (this->logPIDOutput) {
+        if (millis() - this->lastPrint > 1000) {
+            Serial.print(relAngle, 2);
+            Serial.println(" deg (relativeAngle)");
+            Serial.print("Angle read: ");
+            Serial.println(absAngle);
+            Serial.print("Target angle: ");
+            Serial.println(targetAngle);
+            Serial.print("Angle error: ");
+            Serial.println(angleError);
+            Serial.print("PID Output: ");
+            Serial.println(Output);
+            Serial.println("-----");
+            this->lastPrint = millis();
+        }
+    }
+}
+
+/**
  * Run this inside void loop to enable servo feedback
  */
 void ContinuousServo::loop() {
     unsigned long currentTime = millis();
+
     if (currentTime - this->lastPIDTime > this->PIDSampleTime) {
         this->PIDSequence(this->targetAngle);
         this->lastPIDTime = currentTime;
@@ -253,6 +255,9 @@ void ContinuousServo::tunePID() {
     this->pidController->SetTunings(newKp, 0, newKd);
 }
 
+/**
+ * Set PD Tuning parameteres
+ */
 void ContinuousServo::setPDTuning(float Kp, float Kd) {
     this->pidController->SetTunings(Kp, 0, Kd);
 }

@@ -128,8 +128,10 @@ float MagneticEncoder::angleDifference(float toAngle, float fromAngle) {
  */
 float MagneticEncoder::getRelAngle() {
     float readAngleResult = this->readAngle(); // Ensure the relative angle is updated
-    if (readAngleResult < 0) {
+    if (readAngleResult < 0) { // This is the absolute reading, not relative angle
         Serial.println("MagneticEncoder: Failed to read angle in getRelAngle()");
+        // I am not handling relative angle errors! I just let rel angle to be the save, in hopes connection
+        // Comes back within one rotation
     }
     return this->relAngle;
 }
