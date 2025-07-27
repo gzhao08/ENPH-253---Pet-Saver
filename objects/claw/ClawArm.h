@@ -7,39 +7,28 @@
 // Local Libraries:
 #include "../motors/ContinuousServo.h"
 #include "../sensors/Microswitch.h"
+#include "../claw/ClawPart.h"
 
-class ClawArm {
+class ClawArm : public ClawPart {
     private:
-        Microswitch mswitchArm;
+        String _partName = "Claw Arm";
 
-        const float ANGLE_TO_MM_CONVERSION = -0.42; // Calibrated from 151/360
-        const float MM_TO_ANGLE_CONVERSION = 1 / ANGLE_TO_MM_CONVERSION; // 1mm corresponds to 1/0.42 degrees
-        const int ABS_POS_LIMIT = 227;
+        const float _ENCODER_TO_POS_CONVERSION = -0.42; // Calibrated from 151/360
+        const float _POS_TO_ENCODER_CONVERSION = 1 / _ENCODER_TO_POS_CONVERSION; // 1mm corresponds to 1/0.42 degrees
+        const int _ABS_POS_LIMIT = 227;
+        const int _MIN_POSITION = 0;
+        const int _MAX_POSITION = 200;
 
         // PID Parameters
-        const float Pk = 55;
-        const float Dk = 0.77;
-        
+        const float _Pk = 55;
+        const float _Dk = 0.77;
+
+        // Servo parameters
+        const int _servoMaxVoltage = 6;
+        const int _servoTolerance = 6; // How much can angle deviate from target
     public: 
-        ContinuousServo motorArm;
+        ClawArm(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
+            int switchPin, bool normallyOpen);
 
-        const int MIN_POSITION = 0;
-        const int MAX_POSITION = 200;
-        ClawArm(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen);
-
-        // Call in setup
-        void begin(WireManager* wireManager);
-
-        void setAsHome();
-        void homingSequence();
-        float reachedTarget();
-
-        float getPosition();
-        void setPosition(float distance);
         void testSequence();
-
-        void setPIDTuningMode(bool mode);
-        void setPIDTuningPins(int P_Pin, int D_Pin);
-        void loop();
-
 };

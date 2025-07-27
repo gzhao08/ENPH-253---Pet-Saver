@@ -15,6 +15,7 @@ class ClawVerticalStage {
         const float ANGLE_TO_MM_CONVERSION = -0.022; // Calibrating from 2mm pitch * 4 starts / 360 degrees
         const float MM_TO_ANGLE_CONVERSION = 1 / ANGLE_TO_MM_CONVERSION;
 
+        const int ABS_POS_LIMIT = 120;
         const int MIN_HEIGHT = 0;
         const int MAX_HEIGHT = 100;
         const int IDLE_HEIGHT = 50;
@@ -23,8 +24,15 @@ class ClawVerticalStage {
         const int HIGH_PET_HEIGHT = 90;
         const int LOW_PET_SENSING_HEIGHT = 20;
         const int HIGH_PET_SENSING_HEIGHT = 80;
-        const int PID_P = 55;
-        const int PID_D = 0.7;
+
+        // PID Parameters
+        const int Pk = 55;
+        const int Dk = 0.7;
+
+        // Servo parameters
+        const int servoMaxVoltage = 8;
+        const int servoTolerance = 10; // Angle tolerance for motor stability
+
 
     public: 
         ContinuousServo motorVertical;

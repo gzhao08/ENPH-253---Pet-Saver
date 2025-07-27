@@ -8,18 +8,20 @@ motorVertical(motorPin1, motorPin2, pwmChannel1, pwmChannel2, muxLine, encoderOn
 mswitchVertical(switchPin, normallyOpen) {}
 
 /**
- * Sets up magnetic encoder
- * @param motorVertical Continuous servo object related to vertical stage
- * @param mswitchVertical microswitch object related to vertical stage
+ * Sets up 
  */
 void ClawVerticalStage::begin(WireManager* wireManager) {
     motorVertical.begin(wireManager);
+    motorVertical.setPDTuning(this->Pk, this->Dk);
+    motorVertical.setMaxVoltage(this->servoMaxVoltage); 
+    motorVertical.tolerance = this->servoTolerance;
+
     mswitchVertical.begin();
-    motorVertical.setPDTuning(this->PID_P, this->PID_D);
-    motorVertical.setMaxVoltage(8); // My max duty cycle is 0.8 * duty cycle mapping
-    // Serial.println("motorVertical max duty cycle: " + String(motorVertical.getMaxDutyCycle()));
 }
 
+/**
+ * Sets current position as home
+ */
 void ClawVerticalStage::setAsHome() {
     this->motorVertical.setAsHome();
 }
@@ -29,6 +31,7 @@ void ClawVerticalStage::setAsHome() {
  * This will set the home position of the claw vertical stage
  */
 void ClawVerticalStage::homingSequence() {
+    int overshootAngle = -this->ABS_POS_LIMIT * MM_TO_ANGLE_CONVERSION * 1.2;
     this->motorVertical.moveBy(18000); // Move down to ensure we are not at the top
     while (!this->mswitchVertical.isPressed()) {
         this->loop();
@@ -40,7 +43,6 @@ void ClawVerticalStage::homingSequence() {
 float ClawVerticalStage::getPosition() {
     float angle = this->motorVertical.getAngle(); 
     return angle * this->ANGLE_TO_MM_CONVERSION; // convert to mm
-
 }
 
 /**
