@@ -39,7 +39,6 @@ class ContinuousServo {
         int D_Pin; // Pin for tuning D
 
         // Stability check
-        const float tolerance = 6;
         const int stableThreshold = 20;
         int stableCounter = 0;
 
@@ -51,6 +50,9 @@ class ContinuousServo {
         // PID Variables (needs to be public because referenced in PID controller)
         double Setpoint = 0, Input = 0, Output = 1;
         bool logPIDOutput = false;
+
+        // Angle tolerance (how much can deviate from target angle)
+        float tolerance = 6;
 
         ContinuousServo(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int maxVoltage = 5);
 

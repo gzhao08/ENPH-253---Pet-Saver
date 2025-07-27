@@ -199,9 +199,9 @@ void ContinuousServo::setPDTuning(float Kp, float Kd) {
  */
 void ContinuousServo::testSequence() {
     DelayManager sequenceDelay(3000);
-    sequenceDelay.reset();
     
     this->moveTo(60);
+    sequenceDelay.reset();
     while (true) {
         this->loop();
 
@@ -218,6 +218,7 @@ void ContinuousServo::testSequence() {
     delay(500);
 
     this->moveTo(360);
+    sequenceDelay.reset();
     while (true) {
         this->loop();
         if (this->reachedTarget()) {
@@ -233,6 +234,7 @@ void ContinuousServo::testSequence() {
     delay(500);
 
     this->moveBy(540);
+    sequenceDelay.reset();
     while (true) {
         this->loop();
         if (this->reachedTarget()) {
@@ -249,15 +251,17 @@ void ContinuousServo::testSequence() {
     Serial.println("Multiple rotation sequence: ");
     for (int i = 0; i < 3; i++) {
         this->moveBy(360);
-        this->loop();
+        sequenceDelay.reset();
         while (!this->reachedTarget()) {
             this->loop();
-
+            if (sequenceDelay.checkAndReset()) {
+                Serial.println("Multiple target " + String(i) + " timed out. Moving on...");
+            }
         }
         Serial.print("Reached Target: ");
         Serial.println(i);
         Serial.println(this->encoder.getRelAngle());
 
-        delay(100);
+        delay(300);
     }
 }
