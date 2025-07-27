@@ -25,6 +25,7 @@ class ContinuousServo {
         // PID Controls
         float targetAngle; // Target angle for PID
         PID* pidController;
+        // Default PID Values
         double Pk = 110;
         double Ik = 0;
         double Dk = 2.5;

@@ -12,9 +12,13 @@ class ClawArm {
     private:
         Microswitch mswitchArm;
 
-        const int HORIZONTAL_GEAR_CIRCUMFERENCE = 151; // mm
         const float ANGLE_TO_MM_CONVERSION = -0.42; // Calibrated from 151/360
         const float MM_TO_ANGLE_CONVERSION = 1 / ANGLE_TO_MM_CONVERSION; // 1mm corresponds to 1/0.42 degrees
+        const int ABS_POS_LIMIT = 227;
+
+        // PID Parameters
+        const float Pk = 55;
+        const float Dk = 0.77;
         
     public: 
         ContinuousServo motorArm;

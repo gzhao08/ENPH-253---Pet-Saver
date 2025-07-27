@@ -145,6 +145,56 @@ void ContinuousServo::loop() {
 }
 
 /**
+ * Set the current position as home
+ * This also makes the servo want to stay at the current angle
+ * This is useful for homing the servo to a known position
+ */
+void ContinuousServo::setAsHome() {
+    this->encoder.setAsHome();
+    this->moveTo(0);
+}
+
+/**
+ * Set the PID tuning mode
+ */
+void ContinuousServo::setPIDTuningMode(bool mode) {
+    this->PIDTuningMode = mode;
+}
+
+/**
+ * Set the PD tuning pins
+ */
+void ContinuousServo::setPIDTuningPins(int P_Pin, int D_Pin) {
+    this->P_Pin = P_Pin;
+    this->D_Pin = D_Pin;
+}
+
+/**
+ * Tune the PID controller using the analog pins
+ */
+void ContinuousServo::tunePID() {
+    // PID Tuning
+    double newKp = map(analogRead(this->P_Pin), 0, BIT_12_LIMIT, 0, 1000);
+    double newKd = ((double) map(analogRead(this->D_Pin), 0, BIT_12_LIMIT, 0, 1000)) / 30;
+
+    if (pidTuningDelayManager.checkAndReset()) {
+        Serial.print("Kp: ");
+        Serial.println(newKp);
+        Serial.print("Kd: ");
+        Serial.println(newKd);
+    }
+
+    this->pidController->SetTunings(newKp, 0, newKd);
+}
+
+/**
+ * Set PD Tuning parameteres
+ */
+void ContinuousServo::setPDTuning(float Kp, float Kd) {
+    this->pidController->SetTunings(Kp, 0, Kd);
+}
+
+/**
  * Sequence to test if the servo is working or not
  */
 void ContinuousServo::testSequence() {
@@ -210,54 +260,4 @@ void ContinuousServo::testSequence() {
 
         delay(100);
     }
-}
-
-/**
- * Set the current position as home
- * This also makes the servo want to stay at the current angle
- * This is useful for homing the servo to a known position
- */
-void ContinuousServo::setAsHome() {
-    this->encoder.setAsHome();
-    this->moveTo(0);
-}
-
-/**
- * Set the PID tuning mode
- */
-void ContinuousServo::setPIDTuningMode(bool mode) {
-    this->PIDTuningMode = mode;
-}
-
-/**
- * Set the PD tuning pins
- */
-void ContinuousServo::setPIDTuningPins(int P_Pin, int D_Pin) {
-    this->P_Pin = P_Pin;
-    this->D_Pin = D_Pin;
-}
-
-/**
- * Tune the PID controller using the analog pins
- */
-void ContinuousServo::tunePID() {
-    // PID Tuning
-    double newKp = map(analogRead(this->P_Pin), 0, BIT_12_LIMIT, 0, 1000);
-    double newKd = ((double) map(analogRead(this->D_Pin), 0, BIT_12_LIMIT, 0, 1000)) / 30;
-
-    if (pidTuningDelayManager.checkAndReset()) {
-        Serial.print("Kp: ");
-        Serial.println(newKp);
-        Serial.print("Kd: ");
-        Serial.println(newKd);
-    }
-
-    this->pidController->SetTunings(newKp, 0, newKd);
-}
-
-/**
- * Set PD Tuning parameteres
- */
-void ContinuousServo::setPDTuning(float Kp, float Kd) {
-    this->pidController->SetTunings(Kp, 0, Kd);
 }
