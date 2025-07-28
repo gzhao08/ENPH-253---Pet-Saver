@@ -13,8 +13,8 @@
 #include "sensors/Microswitch.h"
 #include "GlobalConstants.h"
 
-// MyServo servoMotor(22, 1);
-ClawGrabber grab(22, 1);
+MyServo servo(22, 1);
+// ClawGrabber grab(22, 1);
 
 int muxPin = 8;
 WireManager wireManager(muxPin); 
@@ -53,7 +53,7 @@ int baseMotorPin2 = 27;
 int basePwmChannel1 = 6; //motor pin 1 goes to B
 int basePwmChannel2 = 7; 
 int baseMuxLine = -1; 
-bool baseEncoderOnTerminalSide = true; //false for arm, 
+bool baseEncoderOnTerminalSide = false; //false for arm, 
 int baseSwitchPin = 9; 
 bool baseNormallyOpen = true; 
 
@@ -73,17 +73,19 @@ void setup() {
   verticalStage.begin(&wireManager);
   base.begin(&wireManager2);
 
+  base.continuousServo.logPIDOutput = true;
   Serial.println("JESUS PLS WORK");
   // positionDelayManager.reset();
 
+  servo.begin();
 
   // grab.begin();
   
-  // arm.homingSequence();
+  arm.homingSequence();
   // arm.testSequence();
 
-  // base.homingSequence();
-  // verticalStage.homingSequence();
+  verticalStage.homingSequence();
+  base.homingSequence();
 
 }
 
@@ -93,26 +95,26 @@ bool ten = true;
 void loop() {
   // Serial.println(arm.getPosition());
   // Serial.println(verticalStage.getPosition());
-  if (ten) {
-      arm.setPosition(10);
-      verticalStage.setPosition(10);
+  // if (ten) {
+  //     arm.setPosition(10);
+  //     verticalStage.setPosition(10);
 
-  } else {
-      arm.setPosition(50);
-      verticalStage.setPosition(50);
-  }
+  // } else {
+  //     arm.setPosition(50);
+  //     verticalStage.setPosition(50);
+  // }
 
   // arm.loop();
   // verticalStage.loop();
   // Serial.println(base.getPosition());
-  base.loop();
-  if (positionDelayManager.checkAndReset()) {
-    if (ten) {
-      ten = false;
-    } else {
-      ten = true;
-    }
-  }
+  // base.loop();
+  // if (positionDelayManager.checkAndReset()) {
+  //   if (ten) {
+  //     ten = false;
+  //   } else {
+  //     ten = true;
+  //   }
+  // }
 
  
   // arm.setPosition(20);
@@ -151,40 +153,20 @@ void loop() {
   
 // test servo
   // servo.writePosition(0);
-  // delay(500);
-  // servo.writePosition(10);
-  // delay(500);
-  // servo.writePosition(20);
-  // delay(500);
-  // servo.writePosition(30);
-  // delay(500);
+  // delay(2000);
   // servo.writePosition(40);
-  // delay(500);
-  // servo.writePosition(50);
   // delay(500);
   // servo.writePosition(60);
   // delay(500);
-  // servo.writePosition(70);
-  // delay(500);
   // servo.writePosition(80);
-  // delay(500);
-  // servo.writePosition(90);
   // delay(500);
   // servo.writePosition(100);
   // delay(500);
-  // servo.writePosition(110);
-  // delay(500);
   // servo.writePosition(120);
   // delay(500); 
-  // servo.writePosition(130);
-  // delay(500);
   // servo.writePosition(140);
   // delay(500);
-  // servo.writePosition(150);
-  // delay(500);
   // servo.writePosition(160);
-  // delay(500);
-  // servo.writePosition(170);
   // delay(500);
   // servo.writePosition(180);
   // delay(500);

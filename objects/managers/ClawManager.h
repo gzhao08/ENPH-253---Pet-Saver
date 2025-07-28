@@ -1,14 +1,13 @@
 #pragma once
 
-#include "ClawBase.h"
-#include "ClawArm.h"
-#include "ClawVerticalStage.h"
-#include "ClawGrabber.h"
-#include "Basket.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include "driver/ledc.h"
 
+#include "../claw/ClawBase.h"
+#include "../claw/ClawArm.h"
+#include "../claw/ClawVerticalStage.h"
+#include "../claw/ClawGrabber.h"
 
 class ClawManager {
     private:
@@ -16,7 +15,6 @@ class ClawManager {
         ClawVerticalStage* vertical;
         ClawArm* arm;
         ClawGrabber* grab;
-        Basket* basket;
 
         //position in degrees
         float basePos = -1;
@@ -32,7 +30,7 @@ class ClawManager {
         ClawManager();
 
         // Call in setup
-        void begin(ClawBase* base, ClawVerticalStage* vertical, ClawArm* arm, ClawGrabber* grab, Basket* basket);
+        void begin(ClawBase* base, ClawVerticalStage* vertical, ClawArm* arm, ClawGrabber* grab);
 
         void reset();
         void depositLeft();

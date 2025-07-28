@@ -28,13 +28,13 @@ void MyServo::begin() {
  */
 void MyServo::writePosition(int angle) {
     // convert angle to PWM frequency out of 4096 (12 bits)
-    int position = angle * this->RANGE_POS / this->RANGE_DEG + this->MIN_POSITION;
-    Serial.println(angle);
-    Serial.println(position);
-    if (this->MIN_POSITION <= position && this->MAX_POSITION >= position) {
+    int position = angle * this->RANGE_POS / this->RANGE_DEG + this->MIN_POSITION_PWM;
+    Serial.println("Angle: " + String(angle));
+    Serial.println("Position: " + String(position));
+    if (this->MIN_POSITION_PWM <= position && this->MAX_POSITION_PWM >= position) {
         ledcWrite(this->pwmChannel, position);
         this->positionDegrees = angle; 
-        this->dutyCycle = int(angle * this->RANGE_DUTY / this->RANGE_DEG + this->MIN_POSITION);
+        this->dutyCycle = int(angle * this->RANGE_DUTY / this->RANGE_DEG + this->MIN_POSITION_PWM);
     }
 }
 

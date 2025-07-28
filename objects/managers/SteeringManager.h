@@ -1,9 +1,9 @@
 #pragma once
 
 #include <Arduino.h>
-#include "IRArray.h"
+#include "../sensors/IRArray.h"
 #include <PID_v1.h>
-#include "DCMotor.h"  
+#include "../motors/DCMotor.h"  
 
 extern portMUX_TYPE mux;
 extern volatile boolean drive; // boolean indicating when to stop driving ; should be global and changed via interrupts

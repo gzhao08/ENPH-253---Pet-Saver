@@ -11,6 +11,7 @@ class MyServo {
         int pwmChannel;
         int servoFreq = 50; 
 
+
         int dutyCycle = -1; 
         int positionDegrees = -1;
 
@@ -18,12 +19,19 @@ class MyServo {
         int MIN_PERCENT = 3; 
         int MAX_PERCENT = 13; 
 
-        int RANGE_DEG = 180;
-        int RANGE_POS = 410; // pwm
-        int RANGE_DUTY = 10;
 
-        int MIN_POSITION = 122; //0 degrees
-        int MAX_POSITION = 533; //180 degrees   
+        // Calibrated for MG966R
+        const float SERVO_PERIOD_MS = 1000 / servoFreq;
+        const float MIN_POSITION_PULSE_MS = 0.500;
+        const float MAX_POSITION_PULSE_MS = 2.500;
+
+        // PWM
+        int MIN_POSITION_PWM = MIN_POSITION_PULSE_MS / SERVO_PERIOD_MS * 4096; //0 degrees
+        int MAX_POSITION_PWM = MAX_POSITION_PULSE_MS / SERVO_PERIOD_MS * 4096; //180 degrees   
+
+        int RANGE_DEG = 180;
+        int RANGE_POS = MAX_POSITION_PWM - MIN_POSITION_PWM; // pwm
+        int RANGE_DUTY = 10;
         
     public:
         MyServo(int motorPin, int pwmChannel);
