@@ -27,6 +27,12 @@ class ClawPart {
         int servoMaxVoltage;
         int servoTolerance; // How much can angle deviate from target
 
+        // Speed stuff
+        float lastPosition;
+        unsigned long lastPositionTime;
+        float speed;
+
+        void updateSpeed();
     public:
         Microswitch microswitch;
         ContinuousServo continuousServo;
@@ -40,6 +46,7 @@ class ClawPart {
         float getPosition();
         void setPosition(float position);
         bool reachedTarget();
+        float getSpeed();
 
         void homingSequence();
         void setAsHome();

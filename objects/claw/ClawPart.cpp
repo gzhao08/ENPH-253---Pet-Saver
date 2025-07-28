@@ -18,6 +18,10 @@ void ClawPart::begin(WireManager* wireManager) {
     this->continuousServo.tolerance = this->servoTolerance;
 
     this->microswitch.begin();
+
+    this->speed = 0;
+    this->lastPosition = this->getPosition();
+    this->lastPositionTime = millis();
 }
 
 /**
@@ -48,6 +52,13 @@ void ClawPart::homingSequence() {
 
     this->setAsHome();
     Serial.println("Current position of " + this->partName + " is set as home");
+
+    this->setPosition(this->MIN_POSITION + (this->MAX_POSITION-this->MIN_POSITION) * 0.05);
+    while (!this->reachedTarget()) {
+        this->loop();
+    }
+
+    Serial.println("Homing sequence done");
 }
 
 /**
@@ -76,6 +87,24 @@ void ClawPart::setPosition(float position) {
 }
 
 /**
+ * Updates the speed value of the claw part
+ */
+void ClawPart::updateSpeed() {
+    unsigned long currentTime = millis();
+    float currentPosition = this->getPosition();
+    this->speed = (currentPosition - this->lastPosition) / (currentTime - this->lastPositionTime);
+    this->lastPositionTime = currentTime;
+    this->lastPosition = currentPosition;
+}
+
+/**
+ * Get speed in mm/s
+ */
+float ClawPart::getSpeed() {
+    return this->speed;
+}
+
+/**
  * Set PID tuning mode to true or false
  */
 void ClawPart::setPIDTuningMode(bool mode) {
@@ -94,4 +123,5 @@ void ClawPart::setPIDTuningPins(int P_Pin, int D_Pin) {
  */
 void ClawPart::loop() {
     this->continuousServo.loop();
+    this->updateSpeed();
 }

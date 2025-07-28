@@ -25,7 +25,7 @@ class ClawArm : public ClawPart {
 
         // Servo parameters
         const int _servoMaxVoltage = 6;
-        const int _servoTolerance = 6; // How much can angle deviate from target
+        const int _servoTolerance = 10; // How much can angle deviate from target
     public: 
         ClawArm(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
             int switchPin, bool normallyOpen);
