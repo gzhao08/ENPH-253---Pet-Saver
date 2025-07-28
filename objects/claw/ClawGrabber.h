@@ -8,17 +8,19 @@
 #include "../motors/Servo.h"
 
 class ClawGrabber {
-    private:
-        MyServo motor;
-        
     public: 
-        float OPEN = 11;     
-        float CLOSE = 8;
-        float PET_CLOSE = 8;
-        float PARALLEL = 11;
+        MyServo motor;
 
-        float OPEN_DEG = 0;
-        float CLOSE_DEG = 100;
+        // Calibrated with duty cycle
+        float OPEN_DUTY = 11;     
+        float CLOSE_DUTY = 8;
+        float PET_CLOSE_DUTY = 8;
+        float PARALLEL_DUTY = 11;
+
+        // Calibrated with angular position
+        const int OPEN_DEG = 0;
+        const int PARALLEL_DEG = 50;
+        const int CLOSE_DEG = 100;
 
         ClawGrabber(int motorPin, int pwmChannel);
 
@@ -31,5 +33,9 @@ class ClawGrabber {
         void setPositionDutyCycle(float cycle);
         void setParallel();
         void testSequence();
+
+        void close();
+        void open();
+        void parallel();
     
 };

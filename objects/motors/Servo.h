@@ -36,7 +36,7 @@ class MyServo {
         int RANGE_DUTY = MAX_PERCENT - MIN_PERCENT;
         
     public:
-        bool logMessages = false;
+        bool logOutput = false; // Enable serial print
         MyServo(int motorPin, int pwmChannel);
         void begin();
         void writePosition(int angle);

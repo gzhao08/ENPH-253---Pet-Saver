@@ -6,8 +6,7 @@
 ClawGrabber::ClawGrabber(int motorPin, int pwmChannel) : motor(motorPin, pwmChannel) {}
 
 /**
- * Sets up magnetic encoder
- * @param motor servo object related to claw grabber
+ * Grabber setup
  */
 void ClawGrabber::begin() {
     this->motor.begin();
@@ -47,11 +46,33 @@ void ClawGrabber::setPositionDutyCycle(float cycle) {
  * sets claw arms to be parallel to one another
  */
 void ClawGrabber::setParallel() {
-    this->motor.writeDutyCycle(this->PARALLEL);
+    this->motor.writeDutyCycle(this->PARALLEL_DUTY);
+}
+
+void ClawGrabber::close() {
+    this->motor.writePosition(this->CLOSE_DEG);
+}
+
+void ClawGrabber::open() {
+    this->motor.writePosition(this->OPEN_DEG);
+}
+
+void ClawGrabber::parallel() {
+    this->motor.writePosition(this->PARALLEL_DEG);
 }
 
 void ClawGrabber::testSequence() {
+    this->close();
 
+    delay(2000);
+
+    this->parallel();
+
+    delay(2000);
+
+    this->open();
+
+    delay(2000);
 }
     
 
