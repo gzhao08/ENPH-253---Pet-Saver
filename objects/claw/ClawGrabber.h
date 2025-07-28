@@ -17,6 +17,9 @@ class ClawGrabber {
         float PET_CLOSE = 8;
         float PARALLEL = 11;
 
+        float OPEN_DEG = 0;
+        float CLOSE_DEG = 100;
+
         ClawGrabber(int motorPin, int pwmChannel);
 
         // Call in setup

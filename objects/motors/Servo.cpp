@@ -23,19 +23,23 @@ void MyServo::begin() {
 }
 
 /**
- * moves servo to given position
+ * Moves servo to given position
+ * Angle is constrained between MIN and MAX position
  * @param angle position in degrees to move servo to
  */
 void MyServo::writePosition(int angle) {
+    int constrainedAngle = constrain(angle, this->MIN_POSITION_DEG, this->MAX_POSITION_DEG);
     // convert angle to PWM frequency out of 4096 (12 bits)
-    int position = angle * this->RANGE_POS / this->RANGE_DEG + this->MIN_POSITION_PWM;
-    Serial.println("Angle: " + String(angle));
-    Serial.println("Position: " + String(position));
-    if (this->MIN_POSITION_PWM <= position && this->MAX_POSITION_PWM >= position) {
-        ledcWrite(this->pwmChannel, position);
-        this->positionDegrees = angle; 
-        this->dutyCycle = int(angle * this->RANGE_DUTY / this->RANGE_DEG + this->MIN_POSITION_PWM);
+    int position = (angle - this->MIN_POSITION_DEG) / this->RANGE_DEG * this->RANGE_POS + this->MIN_POSITION_PWM;
+
+    if (logOutput) {
+        Serial.println("Angle: " + String(angle));
+        Serial.println("Position: " + String(position));
     }
+
+    ledcWrite(this->pwmChannel, position);
+    this->positionDegrees = constrainedAngle; 
+    this->dutyCycle = int(constrainedAngle * this->RANGE_DUTY / this->RANGE_DEG + this->MIN_POSITION_PWM);
 }
 
 /**
