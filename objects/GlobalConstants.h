@@ -19,8 +19,8 @@
 #define SECTION_1_SPEED 500   // After doorway, curve before ramp
 #define SECTION_2_SPEED 1100  // Ramp
 
-#define DOORWAY_THRESH 80
-#define RAMP_THRESH 100
+#define DOORWAY_THRESH 180
+#define RAMP_THRESH 200
 
 // IR Pins:
 // Left to right: 35,34,36,39

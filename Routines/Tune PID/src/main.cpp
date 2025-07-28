@@ -4,6 +4,8 @@
 #include "WifiHelper.h" 
 #include "../GlobalConstants.h"
 
+volatile boolean drive = false;
+portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     
 DCMotor left = DCMotor(LEFT_MOTOR_PIN_A,LEFT_MOTOR_PIN_B,LEFT_MOTOR_PWM_CHANNEL_A,LEFT_MOTOR_PWM_CHANNEL_B,12); 
 DCMotor right = DCMotor(RIGHT_MOTOR_PIN_A,RIGHT_MOTOR_PIN_B,RIGHT_MOTOR_PWM_CHANNEL_A,RIGHT_MOTOR_PWM_CHANNEL_B,12);    
@@ -13,6 +15,7 @@ SteeringManager steer(&left,&right);
 double kp = 0;
 double kd = 0;
 int baseSpeed = 800;
+
 
 
 void setup() {
@@ -29,6 +32,7 @@ void setup() {
   wifi.startTune(&kp, &kd, &baseSpeed); // try kp = 210, baseSpeed = 875
   baseSpeed = constrain(baseSpeed,0,1500);
   steer.setPID(kp,kd); 
+  drive = true;
   delay(2000);
   
 }

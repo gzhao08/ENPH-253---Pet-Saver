@@ -1,0 +1,15 @@
+To do:
+- create full routine up to end of ramp capable of doorway, pet, and ramp detection
+- create a clear explanation of what the robot is looking for at each section
+
+Section 0 (before doorway):
+- robot is looking for the doorway
+
+Section 1.5:
+- robot is looking for pet?
+
+Section 1 (after doorway before ramp):
+- robot is looking for the ramp
+
+Section 0 (during ramp):
+- robot is looking for the end of ramp

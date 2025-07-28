@@ -27,6 +27,7 @@ class SteeringManager {
         DCMotor* rightMotor; 
         
     public:
+        volatile bool drive;
         IRArray array; 
 
         SteeringManager(DCMotor* left, DCMotor* right); 

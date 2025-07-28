@@ -5,7 +5,6 @@
 #include "../GlobalConstants.h"
 
 void driveTrain(void *parameter) {
-
     //----------------------------SETUP----------------------------//
     DCMotor left = DCMotor(LEFT_MOTOR_PIN_A,LEFT_MOTOR_PIN_B,LEFT_MOTOR_PWM_CHANNEL_A,LEFT_MOTOR_PWM_CHANNEL_B,12); 
     DCMotor right = DCMotor(RIGHT_MOTOR_PIN_A,RIGHT_MOTOR_PIN_B,RIGHT_MOTOR_PWM_CHANNEL_A,RIGHT_MOTOR_PWM_CHANNEL_B,12);    
@@ -51,12 +50,17 @@ void driveTrain(void *parameter) {
     // // After ramp -- lower speed
     // steer.lineFollow(700);
     while (true) {
-        steer.lineFollow(1000);
-        delay(2000);
-        // steer.lineFollow(600);
-        // delay(1000);
-        // steer.lineFollow(1000);
-        // delay(1000);
+        // Before doorway: SECTION 1
+        steer.lineFollow(SECTION_0_SPEED);
+        // After doorway -- sense pet and turn
+        delay(3000);
+        steer.lineFollow(SECTION_1_SPEED);
+        // After turn -- ramp
+        delay(1000);
+        steer.lineFollow(SECTION_2_SPEED);
+        delay(1000);
+        // After ramp -- lower speed
+        steer.lineFollow(700);
     }
     
     
