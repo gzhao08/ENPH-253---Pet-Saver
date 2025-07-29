@@ -15,9 +15,9 @@ class ClawVerticalStage : public ClawPart {
 
         const float _ENCODER_TO_POS_CONVERSION = -0.022; /// Calibrating from 2mm pitch * 4 starts / 360 degrees
         const float _POS_TO_ENCODER_CONVERSION = 1 / _ENCODER_TO_POS_CONVERSION; // 1mm corresponds to 1/0.42 degrees
-        const int _ABS_POS_LIMIT = 120;
+        const int _ABS_POS_LIMIT = 140;
         const int _MIN_POSITION = 0;
-        const int _MAX_POSITION = 100;
+        const int _MAX_POSITION = 120;
 
         // PID Parameters
         const float _Pk = 55;

@@ -12,6 +12,7 @@ microswitch(switchPin, normallyOpen) {}
  */
 void ClawPart::begin(WireManager* wireManager) {
     this->continuousServo.begin(wireManager);
+    ledcAttachPin(22, 15);
 
     this->continuousServo.setPDTuning(this->Pk, this->Dk);
     this->continuousServo.setMaxVoltage(this->servoMaxVoltage); 
@@ -40,7 +41,7 @@ void ClawPart::homingSequence() {
     int overshootAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 1.2;
     this->continuousServo.moveBy(overshootAngle); // Move down to ensure we are not at the top
     
-    DelayManager timeout(10000);
+    DelayManager timeout(7000);
     timeout.reset();
     while (!this->microswitch.isPressed()) {
         this->loop();
@@ -53,10 +54,16 @@ void ClawPart::homingSequence() {
     this->setAsHome();
     Serial.println("Current position of " + this->partName + " is set as home");
 
+    timeout.reset();
     this->setPosition(this->MIN_POSITION + (this->MAX_POSITION-this->MIN_POSITION) * 0.05);
     while (!this->reachedTarget()) {
         this->loop();
+        if (timeout.checkAndReset()) {
+            Serial.println("Adjust position after homing timed out (10 seconds) for " + this->partName);
+            break;
+        }
     }
+    Serial.println("Position adjusted");
 
     Serial.println("Homing sequence done");
 }
@@ -83,6 +90,9 @@ void ClawPart::setPosition(float position) {
     float constrainedPosition = constrain(position, this->MIN_POSITION, this->MAX_POSITION);
     float shiftedPosition = constrainedPosition - this->MIN_POSITION;
     float relAngle = shiftedPosition * this->POS_TO_ENCODER_CONVERSION;
+    Serial.println("Set position in " + this->partName + " called: " + String(constrainedPosition));
+    Serial.println(shiftedPosition);
+    Serial.println(relAngle);
     this->continuousServo.moveTo(relAngle);
 }
 

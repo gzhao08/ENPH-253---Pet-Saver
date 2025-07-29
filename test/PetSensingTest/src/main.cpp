@@ -94,7 +94,7 @@ void setup() {
   Serial.println("HOME!");
   arm.setPosition(100);
 
-  verticalStage.motorVertical.logPIDOutput = true;
+  verticalStage.continuousServo.logPIDOutput = true;
 
   // verticalStage.setPIDTuningMode(true);
   // verticalStage.setPIDTuningPins(34,35); // P and D pins for tuning
