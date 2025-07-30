@@ -60,7 +60,8 @@ bool baseNormallyOpen = true;
 ClawBase base(baseMotorPin1, baseMotorPin2, basePwmChannel1, basePwmChannel2, baseMuxLine, baseEncoderOnTerminalSide, baseSwitchPin, baseNormallyOpen);
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(115200);\
+  Serial.setTimeout(3000);
   // 1. Initialize Wire (I2C-SDA, I2C_SCL) -- clock next to dot then data
   Wire.begin(5, 7);
   Wire1.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
@@ -74,15 +75,11 @@ void setup() {
   servo.begin();
   grabber.begin();
 
-  base.continuousServo.logPIDOutput = true;
+  // base.continuousServo.logPIDOutput = true;
   // positionDelayManager.reset();
 
-  arm.continuousServo.logPIDOutput = true;
+  // arm.continuousServo.logPIDOutput = true;
   arm.setPosition(100);
-
-  // ledcAttachPin(22, 15);
-
-  // ledcWrite(15, 2000);
 
 }
 
@@ -97,7 +94,7 @@ void loop() {
     switch (intCode) {
       case 1: // Check arm
         while (true) {
-          // Serial.println("Arm position: " + String(arm.getPosition()));
+          Serial.println("Arm position: " + String(arm.getPosition()));
           arm.loop();
 
           if (Serial.available()) {
@@ -138,27 +135,34 @@ void loop() {
 
       
       case 4:
+        Serial.println("Command: Arm homing");
         arm.homingSequence();
         arm.setPosition(100);
         break;
       case 5:
+        Serial.println("Command: Vertical homing");
         verticalStage.homingSequence();
         break;
       case 6:
+        Serial.println("Command: Base homing");
         base.homingSequence();
         break;
 
       case 7:
+        Serial.println("Command: Arm test sequence");
         arm.testSequence();
         break;
       case 8:
+        Serial.println("Command: Vertical test sequence");
         verticalStage.testSequence();
         break;
       case 9:
+        Serial.println("Command: Base test sequence");
         base.testSequence();
         break;
       
       case 10:
+        Serial.println("Command: Arm set position");
         while (true) {
           arm.loop();
           if (Serial.available()) {
@@ -174,6 +178,7 @@ void loop() {
         }
         break;
       case 11:
+        Serial.println("Command: Vertical set position");
         while (true) {
           verticalStage.loop();
           if (Serial.available()) {
@@ -188,6 +193,7 @@ void loop() {
         }
         break;
       case 12:
+        Serial.println("Command: Base set position");
         while (true) {
           base.loop();
           if (Serial.available()) {
@@ -203,24 +209,143 @@ void loop() {
         break;
       
       case 13:
+        Serial.println("Command: Grabber close");
         grabber.close();
         break;
       case 14:
+        Serial.println("Command: Grabber open");
         grabber.open();
         break;
       case 15:
+        Serial.println("Command: Grabber parallel");
         grabber.parallel();
         break;
       case 16:
-        while (!Serial.available()) {
+        Serial.println("Command: Grabber set position");
+        while (true) {
+          if (Serial.available()) {
+            String pos = Serial.readStringUntil('\n');
+            if (pos.toInt() != -1) {
+              grabber.setPositionDegrees(pos.toInt());
+              Serial.println("Set position of grabber to: " + String(pos.toInt()));
+            } else {
+              break;
+            }
+          }
+      case 17:
+      {
+        Serial.println("Command: PID Tuning arm");
+        DelayManager positionDelay(2000);
+        positionDelay.reset();
+        const int posArm1 = 50;
+        const int posArm2 = 150;
+        int posArm = posArm1;
+        while (true) {
+          if (Serial.available()) {
+            String Pks = Serial.readStringUntil('\n');
+            float Pk = Pks.toFloat();
+            String Dks = Serial.readStringUntil('\n');
+            float Dk = Dks.toFloat();
+            if (Dk == -1 || Pk == -1) {
+              Serial.println("Quit");
+              break;
+            } else {
+              Serial.printf("Set to Pk = %.3f and Dk = %.3f\n", Pk, Dk);
+              arm.continuousServo.setPDTuning(Pk, Dk);
+            }
+          }
+
+          arm.loop();
+
+          if(positionDelay.checkAndReset()) {
+            if (posArm == posArm1) {
+              posArm = posArm2;
+            } else {
+              posArm = posArm1;
+            }
+            Serial.printf("Arm position: %.3f\n", arm.getPosition());
+            arm.setPosition(posArm);
+          }
+
         }
-        String pos = Serial.readStringUntil('\n');
-        grabber.setPositionDegrees(pos.toInt());
-        Serial.println("Set grabber position to " + String(pos.toInt()));
         break;
+      }
+      case 18:
+      {
+        Serial.println("Command: PID Tuning vertical");        DelayManager positionDelay(2000);
+        positionDelay.reset();
+        const int posVert1 = 30;
+        const int posVert2 = 70;
+        int posVert = posVert1;
+        while (true) {
+          if (Serial.available()) {
+            String Pks = Serial.readStringUntil('\n');
+            float Pk = Pks.toFloat();
+            String Dks = Serial.readStringUntil('\n');
+            float Dk = Dks.toFloat();
+            if (Dk == -1 || Pk == -1) {
+              Serial.println("Quit");
+              break;
+            } else {
+              Serial.printf("Set to Pk = %.3f and Dk = %.3f\n", Pk, Dk);
+              verticalStage.continuousServo.setPDTuning(Pk, Dk);
+            }
+          }
+
+          verticalStage.loop();
+
+          if(positionDelay.checkAndReset()) {
+            if (posVert == posVert1) {
+              posVert = posVert2;
+            } else {
+              posVert = posVert1;
+            }
+            Serial.printf("Vertical position: %.3f\n", verticalStage.getPosition());
+            verticalStage.setPosition(posVert);
+          }
+        }
+        break;
+      }
+      case 19:
+      {
+        Serial.println("Command: PID Tuning base");
+        DelayManager positionDelay(2000);
+        positionDelay.reset();
+        const int posBase1 = -30;
+        const int posBase2 = 30;
+        int posBase = posBase1;
+        while (true) {
+          if (Serial.available()) {
+            String Pks = Serial.readStringUntil('\n');
+            float Pk = Pks.toFloat();
+            String Dks = Serial.readStringUntil('\n');
+            float Dk = Dks.toFloat();
+            if (Dk == -1 || Pk == -1) {
+              Serial.println("Quit");
+              break;
+            } else {
+              Serial.printf("Set to Pk = %.3f and Dk = %.3f\n", Pk, Dk);
+              base.continuousServo.setPDTuning(Pk, Dk);
+            }
+          }
+
+          base.loop();
+
+          if(positionDelay.checkAndReset()) {
+            if (posBase == posBase1) {
+              posBase = posBase2;
+            } else {
+              posBase = posBase1;
+            }
+            Serial.printf("Base position: %.3f\n", base.getPosition());
+            base.setPosition(posBase);
+          }
+        }
+        break;
+      }
     }
   }
-
+}
 
 // test grabber 
   // grab.setPositionDutyCycle(grab.PET_CLOSE);
