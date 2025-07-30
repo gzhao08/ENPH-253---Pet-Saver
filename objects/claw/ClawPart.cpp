@@ -90,12 +90,16 @@ void ClawPart::setPosition(float position) {
     float constrainedPosition = constrain(position, this->MIN_POSITION, this->MAX_POSITION);
     float shiftedPosition = constrainedPosition - this->MIN_POSITION;
     float relAngle = shiftedPosition * this->POS_TO_ENCODER_CONVERSION;
-    Serial.println("Set position in " + this->partName + " called: " + String(constrainedPosition));
-    Serial.println(shiftedPosition);
-    Serial.println(relAngle);
+    // Serial.println("Set position in " + this->partName + " called: " + String(constrainedPosition));
+    // Serial.println(shiftedPosition);
+    // Serial.println(relAngle);
     this->continuousServo.moveTo(relAngle);
 }
 
+void ClawPart::moveBy(float movement) {
+    float currentPosition = this->getPosition();
+    this->setPosition(currentPosition+movement);
+}
 /**
  * Updates the speed value of the claw part
  */
