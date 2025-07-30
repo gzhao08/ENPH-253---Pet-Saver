@@ -24,7 +24,7 @@ class ClawVerticalStage : public ClawPart {
         const float _Dk = 0.77;
 
         // Servo parameters
-        const int _servoMaxVoltage = 8;
+        const int _servoMaxVoltage = 6;
         const int _servoTolerance = 20; // How much can angle deviate from target
 
         const int IDLE_HEIGHT = 50;
