@@ -11,6 +11,8 @@
 #include "claw/ClawGrabber.h"
 #include "claw/ClawArm.h"
 #include "claw/ClawVerticalStage.h"
+#include "claw/ClawBase.h"
+
 #include "sensors/Microswitch.h"
 
 float last_reading = 0.0;
@@ -19,15 +21,17 @@ Adafruit_LIS3MDL lis3mdl;
 
 int muxPin = 8;
 WireManager wireManager(muxPin); 
+WireManager wireManager2(-1); 
 
 
 DelayManager positionDelayManager(4000);
 
 
+
 int armMotorPin1 = 22;
 int armMotorPin2 = 19;
-int armPwmChannel1 = 2; //motor pin 1 goes to B
-int armPwmChannel2 = 3; 
+int armPwmChannel1 = 15; //motor pin 1 goes to B
+int armPwmChannel2 = 14; 
 int armMuxLine = 1; 
 bool armEncoderOnTerminalSide = true; //false for arm, 
 int armSwitchPin = 37; 
@@ -48,9 +52,20 @@ bool verticalStageNormallyOpen = true;
 ClawVerticalStage verticalStage(verticalStageMotorPin1, verticalStageMotorPin2, verticalStagePwmChannel1, verticalStagePwmChannel2, verticalStageMuxLine, verticalStageEncoderOnTerminalSide,
   verticalStageSwitchPin, verticalStageNormallyOpen);
 
+int baseMotorPin1 = 14;
+int baseMotorPin2 = 27;
+int basePwmChannel1 = 6; //motor pin 1 goes to B
+int basePwmChannel2 = 7; 
+int baseMuxLine = -1; 
+bool baseEncoderOnTerminalSide = false; //false for arm, 
+int baseSwitchPin = 9; 
+bool baseNormallyOpen = true; 
+
+ClawBase base(baseMotorPin1, baseMotorPin2, basePwmChannel1, basePwmChannel2, baseMuxLine, baseEncoderOnTerminalSide, baseSwitchPin, baseNormallyOpen);
+
 
 DelayManager printDelayManager(2000);
-DelayManager moveDelayManager(1000);
+DelayManager moveDelayManager(200);
 
 float bestPosition = 0;
 float bestReading = 0;
@@ -58,16 +73,24 @@ float bestReading = 0;
 
 bool directionForward = true;
 
+float getMagnetReadingMagSq();
+void sensePet();
+
+
 void setup() {
   Serial.begin(115200);
 
   // 1. Initialize Wire (I2C-SDA, I2C_SCL) -- clock next to dot then data
   Wire.begin(5, 7);
+  Wire1.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
   // 2. Begin wire manager
   wireManager.begin(&Wire);
+  wireManager2.begin(&Wire1);
   // 3. Begin servo
   arm.begin(&wireManager); 
   verticalStage.begin(&wireManager);
+  base.begin(&wireManager2);
+
   positionDelayManager.reset();
   printDelayManager.reset();
   
@@ -87,90 +110,157 @@ void setup() {
   lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ);
   lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
   Serial.println("ready set go");
+    // base.homingSequence();
+    base.setAsHome();
+
     arm.homingSequence();
 
   verticalStage.homingSequence();
-  verticalStage.setPosition(200);
+  verticalStage.setPosition(100);
   Serial.println("HOME!");
-  arm.setPosition(100);
+  // arm.setPosition(100);
+  // base.setPosition(60);
 
   verticalStage.continuousServo.logPIDOutput = true;
 
-  // verticalStage.setPIDTuningMode(true);
-  // verticalStage.setPIDTuningPins(34,35); // P and D pins for tuning
+  sensePet();
 }
 
 void loop() {
-  // MAGNETOMETER STUFF
-  while (millis() < 7000) {
-    verticalStage.loop();
-    Serial.println("Waiting for vertical stage to reach target position...");
-  }
+  // // MAGNETOMETER STUFF
+  // while (millis() < 7000) {
+  //   verticalStage.loop();
+  //   base.loop();
+  //   Serial.println("Waiting for vertical stage to reach target position...");
+  // }
 
+  // float x_tot = 0;
+  // float y_tot = 0;
+  // float z_tot = 0;
+  // sensors_event_t event;
+  // for (int i = 0; i < NUM_TRIALS; i++) {
+  //   lis3mdl.getEvent(&event);
+  //   x_tot += event.magnetic.x;
+  //   y_tot += event.magnetic.y;
+  //   z_tot += event.magnetic.z;
+  // }
+  // x_tot /= NUM_TRIALS;
+  // y_tot /= NUM_TRIALS;
+  // z_tot /= NUM_TRIALS;
+  // float magnitude = sqrt(x_tot*x_tot+y_tot*y_tot+z_tot*z_tot);
+
+  // if (printDelayManager.checkAndReset()) {
+  //   Serial.print("X: "); Serial.print(event.magnetic.x); Serial.print(" uT, ");
+  //   Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print(" uT, ");
+  //   Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.println(" uT");
+  // }
+
+  // //Serial.printf("%f,%f,%f,%f\n", x_tot, y_tot, z_tot,magnitude);
+  // // if (abs(last_reading - z_tot) > THRESH) {
+  // //   Serial.println("unstable Reading, no field detected");
+  // // }
+  // // else {
+  // //       Serial.printf("%f\n",z_tot);
+
+  // // }
+  
+
+  // // CLAW STUFF
+  // if (directionForward) {
+  //   Serial.println("Moving forward");
+  //   if (moveDelayManager.checkAndReset()) {
+  //     Serial.println("Moving arm");
+
+  //     if (magnitude > bestReading) {
+  //       bestPosition = arm.getPosition();
+  //       bestReading = magnitude;
+  //       Serial.println("Better position ");
+  //     } else {
+  //       Serial.println("Worse position ");
+  //     }
+
+  //     // Move the arm to a new position
+  //     int increment = 10;
+  //     if (!directionForward) {
+  //       increment = -increment;
+  //     }
+  //     float newPosition = arm.getPosition() + increment;
+  //     if (abs(arm.MAX_POSITION - newPosition) < 10 || abs(newPosition - arm.MIN_POSITION) < 5) {
+  //       Serial.println("CHANGED DIRECTION");
+  //       directionForward = !directionForward; // Cap at max height
+  //     }
+  //     arm.setPosition(newPosition);
+  //     Serial.print("Arm Position: ");
+  //     Serial.println(newPosition);
+  //   }
+  // } else {
+  //   Serial.println("DIRECTION NOT FORWARD");
+  //   arm.setPosition(bestPosition-80);
+  //   verticalStage.setPosition(verticalStage.getPosition() - 150);
+  // }
+
+  // arm.loop();
+  // verticalStage.loop();
+}
+
+float getMagnetReadingMagSq() {
+  // Remember to benchmark
+  int sampleSize = 50;
   float x_tot = 0;
   float y_tot = 0;
   float z_tot = 0;
   sensors_event_t event;
-  for (int i = 0; i < NUM_TRIALS; i++) {
+  for (int i = 0; i < sampleSize; i++) {
     lis3mdl.getEvent(&event);
     x_tot += event.magnetic.x;
     y_tot += event.magnetic.y;
     z_tot += event.magnetic.z;
   }
-  x_tot /= NUM_TRIALS;
-  y_tot /= NUM_TRIALS;
-  z_tot /= NUM_TRIALS;
-  float magnitude = sqrt(x_tot*x_tot+y_tot*y_tot+z_tot*z_tot);
+  x_tot /= sampleSize;
+  y_tot /= sampleSize;
+  z_tot /= sampleSize;
+  return x_tot*x_tot + y_tot*y_tot + z_tot*z_tot;
+}
 
-  if (printDelayManager.checkAndReset()) {
-    Serial.print("X: "); Serial.print(event.magnetic.x); Serial.print(" uT, ");
-    Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print(" uT, ");
-    Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.println(" uT");
+void sensePet() {
+  int baseInit = 0;
+  verticalStage.setPosition(80);
+  arm.setPosition(70);
+  base.setPosition(baseInit);
+
+
+  while (!arm.reachedTarget() || !verticalStage.reachedTarget() || !base.reachedTarget()) {
+    arm.loop();
+    verticalStage.loop();
+    base.loop();
   }
 
-  //Serial.printf("%f,%f,%f,%f\n", x_tot, y_tot, z_tot,magnitude);
-  // if (abs(last_reading - z_tot) > THRESH) {
-  //   Serial.println("unstable Reading, no field detected");
-  // }
-  // else {
-  //       Serial.printf("%f\n",z_tot);
-
-  // }
-  
-
-  // CLAW STUFF
-  if (directionForward) {
-    Serial.println("Moving forward");
-    if (moveDelayManager.checkAndReset()) {
-      Serial.println("Moving arm");
-
-      if (magnitude > bestReading) {
-        bestPosition = arm.getPosition();
-        bestReading = magnitude;
-        Serial.println("Better position ");
-      } else {
-        Serial.println("Worse position ");
-      }
-
-      // Move the arm to a new position
-      int increment = 20;
-      if (!directionForward) {
-        increment = -increment;
-      }
-      float newPosition = arm.getPosition() + increment;
-      if (abs(arm.MAX_POSITION - newPosition) < 30 || abs(newPosition - arm.MIN_POSITION) < 10) {
-        Serial.println("CHANGED DIRECTION");
-        directionForward = !directionForward; // Cap at max height
-      }
-      arm.setPosition(newPosition);
-      Serial.print("Arm Position: ");
-      Serial.println(newPosition);
+  // Try find best base
+  int sweepAngle = 15; // one side from initial position (so movement 2x sweepangle)
+  base.setPosition(baseInit + sweepAngle);
+  int maxMagnetReading = 0;
+  int maxMagnetReadingPos = 0;
+  while (!base.reachedTarget()) {
+    base.loop();
+    float currentReading = getMagnetReadingMagSq();
+    if (maxMagnetReading < currentReading) {
+      maxMagnetReading = currentReading;
+      maxMagnetReadingPos = base.getPosition();
     }
-  } else {
-    arm.setPosition(bestPosition-80);
-    verticalStage.setPosition(verticalStage.getPosition() - 150);
+  }
+  base.setPosition(baseInit-sweepAngle);
+  while (!base.reachedTarget()) {
+    base.loop();
+    float currentReading = getMagnetReadingMagSq();
+    if (maxMagnetReading < currentReading) {
+      maxMagnetReading = currentReading;
+      maxMagnetReadingPos = base.getPosition();
+    }
   }
 
-  arm.loop();
-  verticalStage.loop();
+  base.setPosition(maxMagnetReadingPos);
+  while (!base.reachedTarget()) {
+    base.loop();
+  }
+
 }
