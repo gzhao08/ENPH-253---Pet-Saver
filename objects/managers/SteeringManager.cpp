@@ -1,5 +1,6 @@
 #include "SteeringManager.h"
 #include "../GlobalConstants.h"
+#include "esp_task_wdt.h"
 
 //volatile boolean drive = false; // Global variable to control driving state
 
@@ -131,9 +132,8 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
  */
 void SteeringManager::lineFollow(int baseSpeed) {
     // Serial.println()
-    portENTER_CRITICAL(&mux);
-    drive = true;
-    portEXIT_CRITICAL(&mux);
+    Serial.printf("drive address (steeringManager): %p\n", (void*)&drive);
+
     this->array.takeReading(false);
     input = this->array.getError();
     unsigned long lastComputeTime = millis();
@@ -152,10 +152,12 @@ void SteeringManager::lineFollow(int baseSpeed) {
         // update IR data every cycle so that error is accurate
         this->array.takeReading(false);
         input = this->array.getError();
-        // array.showState();
-        // Serial.printf(" -- %lf\n", output);
+        array.showState();
+        Serial.printf(" -- %lf\n", output);
         this->array.update();
         delay(1);
+        // esp_task_wdt_reset();
+        // vTaskDelay(10);
     }
     this->stop();
 }

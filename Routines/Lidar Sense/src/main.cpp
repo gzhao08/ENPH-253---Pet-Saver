@@ -8,7 +8,7 @@
 #include "lidar.h"
 #include "drivetrain.h"
 
-volatile boolean drive = false;
+volatile boolean drive = true;
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 volatile boolean startRead = false; // used to start reading the lidar data (no need to use locking)

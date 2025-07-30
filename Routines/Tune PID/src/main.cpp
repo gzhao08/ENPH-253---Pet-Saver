@@ -25,15 +25,18 @@ void setup() {
   steer.begin(OUTER_LEFT_PIN,INNER_LEFT_PIN,INNER_RIGHT_PIN,OUTER_RIGHT_PIN); // put IR pins here -> left to right vp: 36 vn: 39
 
   Serial.begin(115200);
+  Serial.println("Serial Started");
 
   WifiHelper wifi = WifiHelper();
   wifi.begin();
   Serial.println("Wifi Server Started");
   wifi.startTune(&kp, &kd, &baseSpeed); // try kp = 210, baseSpeed = 875
   baseSpeed = constrain(baseSpeed,0,1500);
+  // kp = 150;
+  // baseSpeed = 850;
   steer.setPID(kp,kd); 
   drive = true;
-  delay(2000);
+  delay(1000);
   
 }
 

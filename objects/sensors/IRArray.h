@@ -16,10 +16,12 @@ class IRArray {
 
         void takeReading(boolean show);
         void showReading();
+        void getReadings(char* readings);
         void showState();
         int getError();
         void update();
         boolean isOnLine();
         boolean isCentered();
+
         
 };

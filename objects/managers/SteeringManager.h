@@ -5,7 +5,6 @@
 #include <PID_v1.h>
 #include "../motors/DCMotor.h"  
 
-extern portMUX_TYPE mux;
 extern volatile boolean drive; // boolean indicating when to stop driving ; should be global and changed via interrupts
  
 class SteeringManager {
@@ -27,7 +26,6 @@ class SteeringManager {
         DCMotor* rightMotor; 
         
     public:
-        volatile bool drive;
         IRArray array; 
 
         SteeringManager(DCMotor* left, DCMotor* right); 

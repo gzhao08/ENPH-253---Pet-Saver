@@ -4,13 +4,15 @@
 #include "../GlobalConstants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include "SectionManager.h"
 
 // OLED display settings
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET    -1
 
-
+void stopDrive();
+void startDrive();
 
 void objectDetected(void *parameter) {
 
@@ -34,10 +36,7 @@ void objectDetected(void *parameter) {
 
   // LIDAR
   Adafruit_VL53L0X lox = Adafruit_VL53L0X();
-  int lastmeasure = 0;
-  int section = 0;
-  int num_consecutive = 0; // number of consecutive measurements below threshold
-  int thresholds[2] = {DOORWAY_THRESH, RAMP_THRESH}; // thresholds for each section
+  VL53L0X_RangingMeasurementData_t measure;
 
   Serial.begin(115200);
   while (!Serial);
@@ -57,112 +56,117 @@ void objectDetected(void *parameter) {
 
   display.clearDisplay();
   display.setTextSize(3);
-  display.print("Test");
-  display.display();
-  delay(2000);
-  display.clearDisplay();
+
+  SectionManager sectionManager;
 
   while (!startRead) {
     Serial.println("Waiting for startRead to be true");
     delay(200); // wait for the drivetrain to set startRead to true (done PID tuning)
   }
 
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println();
+  display.print(0);
+
+  drive = true; // start driving
+
   while (true){
     while (startRead) {
       
-      VL53L0X_RangingMeasurementData_t measure;
-
       // unsigned long currentMillis = millis();
       lox.rangingTest(&measure, false); // pass in 'true' to get debug data
       // Serial.println("Benchmark: " + String(millis() - currentMillis) + " ms");
       display.clearDisplay();
       display.setCursor(0, 0);
       display.println();
+   
 
-      if (measure.RangeStatus == 0 && measure.RangeMilliMeter !=8191) {  // 4 means out of range
+      if (measure.RangeStatus == 0) {  // 0 means valid measurement
 
-        switch (section) {
+        switch (sectionManager.getCurrentSection()) {
 
           case 0: {
             // Before doorway
-            if(measure.RangeMilliMeter<=DOORWAY_THRESH){
-              num_consecutive++;
-              if (num_consecutive >= 5) { // require 5 measurements for doorway detection
-                portENTER_CRITICAL(&mux);
-                drive = false;
-                portEXIT_CRITICAL(&mux);
-                ++section %= 4;
-                num_consecutive = 0;
+            if (sectionManager.detectDoorway(measure.RangeMilliMeter)) {
+              display.print(sectionManager.getCurrentSection());
+              display.display();
+              stopDrive(); // stop the drive train
+              delay(1000); // wait for the drive train to stop
+              startDrive(); // start the drive train again
+              while (!sectionManager.detectOutOfRange(measure.RangeMilliMeter)) {
+                lox.rangingTest(&measure, false);
+                delay(10);
               }
-              
             }
-            else {
-              num_consecutive = 0;
-            }
+            
             break;
 
           }
           case 1: {
-            // Before ramp
-            if(measure.RangeMilliMeter<=RAMP_THRESH){
-              num_consecutive++;
-              if (num_consecutive >= 5) { // if we have 3 consecutive measurements below the threshold
-                portENTER_CRITICAL(&mux);
-                drive = false;
-                portEXIT_CRITICAL(&mux);
-                ++section %= 4;
-                num_consecutive = 0;
+            // First pet
+            if (sectionManager.detectFirstPet(measure.RangeMilliMeter)) {
+              display.print(sectionManager.getCurrentSection());
+              // display.setCursor(50, 24);
+              // display.print(measure.RangeMilliMeter);
+              display.display();
+              stopDrive(); // stop the drive train
+              delay(1000); // wait for the drive train to stop
+              startDrive(); // start the drive train again
+              while (!sectionManager.detectOutOfRange(measure.RangeMilliMeter)) {
+                lox.rangingTest(&measure, false);
+                delay(10);
               }
             }
-            else {
-              num_consecutive = 0;
-            } 
             break;
           }
           case 2: {
             // after sensing beginning of ramp; while on ramp
-            if(measure.RangeMilliMeter>RAMP_THRESH){
-              num_consecutive++;
-              if (num_consecutive >= 10) { // require 10 consecutive measurements to be on ramp
-                portENTER_CRITICAL(&mux);
-                drive = false;
-                portEXIT_CRITICAL(&mux);
-                ++section %= 4;
-                num_consecutive = 0;
-              }
+            if (sectionManager.detectRamp(measure.RangeMilliMeter)) {
+              display.print(sectionManager.getCurrentSection());
+              // display.setCursor(50, 24);
+              // display.print(measure.RangeMilliMeter);
+              display.display();
+              stopDrive(); // stop the drive train
+              delay(1000); // wait for the drive train to stop
+              startDrive(); // start the drive train again
             }
-            else {
-              num_consecutive = 0;
-            } 
             break;
           }
           
           case 3: {
             // after ramp
-            if(measure.RangeMilliMeter>RAMP_THRESH){
-              num_consecutive++;
-              if (num_consecutive >= 10) { // require 10 consecutive measurements to be off ramp
-                portENTER_CRITICAL(&mux);
-                drive = false;
-                portEXIT_CRITICAL(&mux);
-                ++section %= 4;
-                num_consecutive = 0;
-              }
+            if (sectionManager.detectEndOfRamp(measure.RangeMilliMeter)) {
+              display.print("End");
+              display.display();
+              stopDrive(); // stop the drive train
+              delay(3000); // wait for the drive train to stop
             }
-            else {
-              num_consecutive = 0;
-            } 
             break;
           }
         }
       }
-      display.print(section);
+      display.print(sectionManager.getCurrentSection());
+      display.setCursor(50, 24);
+      display.print(measure.RangeMilliMeter);
       display.display();
-      Serial.println(measure.RangeMilliMeter);
+      // Serial.printf("%d , %d\n", measure.RangeMilliMeter, drive);
       
     }
     Serial.println("Waiting for startRead to be true");
     delay(100);
     
   }
+}
+
+void stopDrive() {
+    // portENTER_CRITICAL(&mux);
+    drive = false;
+    // portEXIT_CRITICAL(&mux);
+}
+
+void startDrive() {
+    // portENTER_CRITICAL(&mux);
+    drive = true;
+    // portEXIT_CRITICAL(&mux);
 }
