@@ -1,21 +1,22 @@
 #include "SectionManager.h"
 #include "../GlobalConstants.h"
 
-#define CONSECUTIVE_THRESH 7 // number of consecutive measurements to consider a section change
+#define CONSECUTIVE_THRESH 3 // number of consecutive measurements to consider a section change
 
 SectionManager::SectionManager() : currentSection(0), numConsecutive(0) {}
 
 boolean SectionManager::detectDoorway(int distance) {
-    if (distance < DOORWAY_THRESH) {
+    if (distance <= DOORWAY_THRESH) {
         numConsecutive++;
-        if (numConsecutive >= CONSECUTIVE_THRESH) { // require 10 consecutive measurements to be a doorway
+        if (numConsecutive >= 5) { // require 10 consecutive measurements to be a doorway
             currentSection = 1; // set to doorway section
             numConsecutive = 0;
             return true;
         }
-    } else {
-        numConsecutive = 0; // reset if not in doorway
-    }
+    } 
+    // else {
+    //     numConsecutive = 0; // reset if not in doorway
+    // }
     return false;
 }
 
@@ -62,9 +63,42 @@ boolean SectionManager::detectEndOfRamp(int distance) {
 }
 
 boolean SectionManager::detectOutOfRange(int distance) {
-    if (distance >= 8190) { // assuming 8191 is the out-of-range value for the sensor
+    if (distance >= 600) { // assuming 8191 is the out-of-range value for the sensor
         return true;
     }
 
     return false;
+}
+
+boolean SectionManager::detect(int distance, int threshold, bool senseDir) {
+    
+    if (senseDir) {
+        if (distance <= threshold) {
+            numConsecutive++;
+            if (numConsecutive >= CONSECUTIVE_THRESH) {
+                numConsecutive = 0; // reset after detection
+                currentSection++;
+                return true;
+            }
+        }
+        else {
+            numConsecutive = 0; // reset if not detecting
+        }
+        return false; 
+    }
+
+    else {
+        if (distance >= threshold) {
+            numConsecutive++;
+            if (numConsecutive >= CONSECUTIVE_THRESH) {
+                numConsecutive = 0; // reset after detection
+                currentSection++;
+                return true;
+            }
+        }
+        else {
+            numConsecutive = 0; // reset if not detecting
+        }
+        return false; 
+    }
 }

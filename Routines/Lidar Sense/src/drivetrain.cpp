@@ -52,49 +52,73 @@ void driveTrain(void *parameter) {
     // // After ramp -- lower speed
     // steer.lineFollow(700);
     while (true) {
-        // Before doorway: SECTION 1
+     //    // Before doorway: SECTION 1
+     //    while(!drive) {
+     //        //Serial.println("Waiting for drive to be true");
+     //        vTaskDelay(10);
+     //    }
+
+     //    steer.lineFollow(750);
+
+     //    while(!drive) {
+     //         vTaskDelay(10);
+     //    }                   
+     //    // After doorway, before first pet
+        
+     //    steer.lineFollow(700);
+     //    while(!drive) {
+     //         vTaskDelay(10);
+     //    }
+     //    // after first pet, before ramp
+     //    steer.lineFollow(700);
+     //    while(!drive) {
+     //         vTaskDelay(10);
+     //    }
+     //    // after finding ramp
+     //    steer.lineFollow(1100);
+     //    while(!drive) {
+     //         vTaskDelay(10);
+     //    }
+
+
+
+     // Before doorway: SECTION 1
         while(!drive) {
-            Serial.println("Waiting for drive to be true");
+            //Serial.println("Waiting for drive to be true");
             vTaskDelay(10);
         }
-        //Serial.println(drive);
-        Serial.printf("drive address (drivetrain): %p\n", (void*)&drive);
 
-
-        steer.lineFollow(900);
-
+        steer.lineFollow(600);
         while(!drive) {
              vTaskDelay(10);
-        }
-        // After doorway, before first pet
+        }                   
         
         steer.lineFollow(700);
         while(!drive) {
              vTaskDelay(10);
         }
-        // after first pet, before ramp
+
+        steer.lineFollow(800);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+        
+        steer.lineFollow(650);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+
         steer.lineFollow(700);
         while(!drive) {
              vTaskDelay(10);
         }
-        // after finding ramp
-        steer.lineFollow(1100);
+
+        steer.lineFollow(1200);
         while(!drive) {
              vTaskDelay(10);
         }
 
 
-
-        // steer.lineFollow(800);
-        // // After doorway -- sense pet and turn
-        // delay(3000);
-        // steer.lineFollow(800);
-        // // After turn -- ramp
-        // delay(1000);
-        // steer.lineFollow(800);
-        // delay(1000);
-        // // After ramp -- lower speed
-        // steer.lineFollow(700);
     }
     
     

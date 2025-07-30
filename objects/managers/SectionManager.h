@@ -18,6 +18,7 @@ class SectionManager {
         boolean detectRamp(int distance);
         boolean detectEndOfRamp(int distance);
         boolean detectOutOfRange(int distance);
+        boolean detect(int distance, int threshold, bool senseDir);
 };
 
 

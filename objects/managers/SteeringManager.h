@@ -27,7 +27,7 @@ class SteeringManager {
         
     public:
         IRArray array; 
-
+        
         SteeringManager(DCMotor* left, DCMotor* right); 
 
         void begin(int outerLeftPin, int innerLeftPin, int innerRightPin, int outerRightPin);

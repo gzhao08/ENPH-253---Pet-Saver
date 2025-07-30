@@ -70,6 +70,8 @@ void objectDetected(void *parameter) {
   display.print(0);
 
   drive = true; // start driving
+  int doorwayCounter = 0;
+  int thresholds[3] = {DOORWAY_THRESH, FIRST_PET_THRESH, RAMP_THRESH};  
 
   while (true){
     while (startRead) {
@@ -82,74 +84,119 @@ void objectDetected(void *parameter) {
       display.println();
    
 
-      if (measure.RangeStatus == 0) {  // 0 means valid measurement
+      if (measure.RangeStatus != 4) {  // 0 means valid measurement
 
-        switch (sectionManager.getCurrentSection()) {
+        // switch (sectionManager.getCurrentSection()) {
 
-          case 0: {
-            // Before doorway
-            if (sectionManager.detectDoorway(measure.RangeMilliMeter)) {
-              display.print(sectionManager.getCurrentSection());
-              display.display();
-              stopDrive(); // stop the drive train
-              delay(1000); // wait for the drive train to stop
-              startDrive(); // start the drive train again
-              while (!sectionManager.detectOutOfRange(measure.RangeMilliMeter)) {
-                lox.rangingTest(&measure, false);
-                delay(10);
-              }
-            }
+        //   case 0: {
+        //     // Before doorway
+        //     if (sectionManager.detectDoorway(measure.RangeMilliMeter)) {
+              
+        //       if (doorwayCounter == 0) {
+        //         doorwayCounter++;
+        //         while (!sectionManager.detectOutOfRange(measure.RangeMilliMeter)) {
+        //           lox.rangingTest(&measure, false);
+        //           delay(10);
+        //         }
+        //       }
+
+        //       if (doorwayCounter == 1) {
+        //         display.print(sectionManager.getCurrentSection());
+        //         display.display();
+        //         stopDrive(); // stop the drive train
+        //         delay(1000); // wait for the drive train to stop
+        //         startDrive(); // start the drive train again
+        //         while (!sectionManager.detectOutOfRange(measure.RangeMilliMeter)) {
+        //           lox.rangingTest(&measure, false);
+        //           delay(10);
+        //         }
+        //       }
+              
+        //     }
             
-            break;
+        //     break;
 
-          }
-          case 1: {
-            // First pet
-            if (sectionManager.detectFirstPet(measure.RangeMilliMeter)) {
-              display.print(sectionManager.getCurrentSection());
-              // display.setCursor(50, 24);
-              // display.print(measure.RangeMilliMeter);
-              display.display();
-              stopDrive(); // stop the drive train
-              delay(1000); // wait for the drive train to stop
-              startDrive(); // start the drive train again
-              while (!sectionManager.detectOutOfRange(measure.RangeMilliMeter)) {
-                lox.rangingTest(&measure, false);
-                delay(10);
-              }
+        //   }
+        //   case 1: {
+        //     // First pet
+        //     if (sectionManager.detectFirstPet(measure.RangeMilliMeter)) {
+        //       display.print(sectionManager.getCurrentSection());
+        //       // display.setCursor(50, 24);
+        //       // display.print(measure.RangeMilliMeter);
+        //       display.display();
+        //       stopDrive(); // stop the drive train
+        //       delay(1000); // wait for the drive train to stop
+        //       startDrive(); // start the drive train again
+        //       while (!sectionManager.detectOutOfRange(measure.RangeMilliMeter)) {
+        //         lox.rangingTest(&measure, false);
+        //         delay(10);
+        //       }
+        //     }
+        //     break;
+        //   }
+        //   case 2: {
+        //     // after sensing beginning of ramp; while on ramp
+        //     if (sectionManager.detectRamp(measure.RangeMilliMeter)) {
+        //       display.print(sectionManager.getCurrentSection());
+        //       // display.setCursor(50, 24);
+        //       // display.print(measure.RangeMilliMeter);
+        //       display.display();
+        //       stopDrive(); // stop the drive train
+        //       delay(1000); // wait for the drive train to stop
+        //       startDrive(); // start the drive train again
+        //     }
+        //     break;
+        //   }
+          
+        //   case 3: {
+        //     // after ramp
+        //     if (sectionManager.detectEndOfRamp(measure.RangeMilliMeter)) {
+        //       display.print("End");
+        //       display.display();
+        //       stopDrive(); // stop the drive train
+        //       delay(3000); // wait for the drive train to stop
+        //     }
+        //     break;
+        //   }
+        // }
+
+
+
+        int threshold = 250;
+        if (sectionManager.getCurrentSection() == 3) {
+          threshold = 350;
+        } else if (sectionManager.getCurrentSection() == 4 || sectionManager.getCurrentSection() == 5) {
+          threshold = 325;
+        }
+        bool onRamp = sectionManager.getCurrentSection() == 5;
+
+
+        if (sectionManager.detect(measure.RangeMilliMeter, threshold, !onRamp)) {
+          stopDrive();
+          display.clearDisplay();
+          display.setTextSize(2);
+          display.setCursor(35, 16);
+          display.print("STOPPED");
+          display.display();
+          display.clearDisplay();
+          display.setTextSize(3);
+          delay(2000);
+          startDrive();
+          if (sectionManager.getCurrentSection() != 5) {
+            while (!sectionManager.detectOutOfRange(measure.RangeMilliMeter)) {
+              lox.rangingTest(&measure, false);
+              delay(10);
             }
-            break;
-          }
-          case 2: {
-            // after sensing beginning of ramp; while on ramp
-            if (sectionManager.detectRamp(measure.RangeMilliMeter)) {
-              display.print(sectionManager.getCurrentSection());
-              // display.setCursor(50, 24);
-              // display.print(measure.RangeMilliMeter);
-              display.display();
-              stopDrive(); // stop the drive train
-              delay(1000); // wait for the drive train to stop
-              startDrive(); // start the drive train again
-            }
-            break;
           }
           
-          case 3: {
-            // after ramp
-            if (sectionManager.detectEndOfRamp(measure.RangeMilliMeter)) {
-              display.print("End");
-              display.display();
-              stopDrive(); // stop the drive train
-              delay(3000); // wait for the drive train to stop
-            }
-            break;
-          }
         }
+        display.print(sectionManager.getCurrentSection());
+        display.setCursor(50, 24);
+        display.print(measure.RangeMilliMeter);
+        display.display();
+      
       }
-      display.print(sectionManager.getCurrentSection());
-      display.setCursor(50, 24);
-      display.print(measure.RangeMilliMeter);
-      display.display();
+      
       // Serial.printf("%d , %d\n", measure.RangeMilliMeter, drive);
       
     }
