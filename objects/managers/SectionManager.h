@@ -17,18 +17,17 @@ class SectionManager {
         VL53L0X_RangingMeasurementData_t leftMeasure;
         Adafruit_SSD1306 display;
 
-
     public:
-        SectionManager(boolean useDisplay);
+        SectionManager();
 
-        void begin();
+        void begin(boolean useDisplay);
 
-        int currentSection() {
-            return getCurrentSection;
+        int getCurrentSection() {
+            return currentSection;
         }
 
-        boolean detectOutOfRange(int distance);
-        boolean detect(int distance, int threshold, bool senseDir, int consecutiveCount);
+        boolean detectOutOfRange(bool useRight);
+        boolean detect(bool useRight, int threshold, bool senseDir, int consecutiveCount);
 };
 
 
