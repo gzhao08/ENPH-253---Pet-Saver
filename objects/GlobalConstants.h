@@ -21,7 +21,7 @@
 #define SECTION_1_SPEED 500   // After doorway, curve before ramp
 #define SECTION_2_SPEED 1100  // Ramp
 
-#define DOORWAY_THRESH 250
+#define DOORWAY_THRESH 120
 #define FIRST_PET_THRESH 200
 #define RAMP_THRESH 240
 

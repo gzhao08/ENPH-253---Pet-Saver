@@ -44,7 +44,7 @@ void objectDetected(void *parameter) {
     // sectionManager.show("STOP");
     // delay(2000);
     // sectionManager.detectOutOfRange(useRightLidar[0]);
-
+    
     startDrive();
     switch(sectionManager.getCurrentSection()) {
       case SectionManager::DOORWAY: {

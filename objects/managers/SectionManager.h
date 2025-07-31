@@ -13,6 +13,7 @@ class SectionManager {
         int objectCount;
         bool useDisplay;
         int numConsecutive;
+        unsigned long detectionTime;
 
         VL53L0X rightLidar;
         VL53L0X leftLidar;
@@ -26,7 +27,8 @@ class SectionManager {
             DOORWAY,
             PET_1,
             RAMP,
-            RAMP_END
+            RAMP_END,
+            SECTION_END
         };
 
         SectionManager();

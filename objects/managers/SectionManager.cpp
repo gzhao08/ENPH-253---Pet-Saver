@@ -15,6 +15,7 @@ SectionManager::SectionManager()
   : currentSection(0),
     objectCount(0),
     numConsecutive(0),
+    detectionTime(0),
     useDisplay(false),
     rightLidar(),
     leftLidar(),
@@ -82,16 +83,6 @@ boolean SectionManager::detectOutOfRange(bool useRight) {
 }
 
 boolean SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCount) {
-
-    // if (useDisplay) {
-    //     display.clearDisplay();
-    //     display.setCursor(0, 0);
-    //     display.setTextSize(2);
-    //     display.println("Detecting");
-    //     display.print(useRight ? "Right" : "Left");
-    //     display.display();
-    // }
-
     
     int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
     if (useDisplay) {
@@ -159,3 +150,4 @@ boolean SectionManager::show(String message) {
     }
     return false;
 }
+
