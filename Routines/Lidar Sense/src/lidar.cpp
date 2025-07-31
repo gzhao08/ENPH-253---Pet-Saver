@@ -61,7 +61,7 @@ void objectDetected(void *parameter) {
   Serial.println("Right VL53L0X Initialized!");
 
   Serial.println("Initializing Left VL53L0X...");
-  while (leftLidar.begin((uint8_t) 41U, false, &Wire1, Adafruit_VL53L0X::VL53L0X_SENSE_DEFAULT)) {
+  while (!leftLidar.begin((uint8_t) 41U, false, &Wire1, Adafruit_VL53L0X::VL53L0X_SENSE_DEFAULT)) {
     Serial.println("Failed to boot Left VL53L0X, retrying...");
     delay(100);
   }
