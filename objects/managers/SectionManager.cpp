@@ -7,6 +7,7 @@
 SectionManager::SectionManager()
   : currentSection(0),
     objectCount(0),
+    useDisplay(false),
     rightLidar(),
     leftLidar(),
     display(128, 64, &Wire, -1) {}
@@ -14,6 +15,7 @@ SectionManager::SectionManager()
 void SectionManager::begin(boolean useDisplay) {
 
     if (useDisplay) {
+        this->useDisplay = true;
         while (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
             Serial.println("SSD1306 allocation failed");
             delay(100);
@@ -67,41 +69,87 @@ boolean SectionManager::detectOutOfRange(bool useRight) {
     }
 }
 
-boolean SectionManager::detect(bool useRight, int threshold, bool senseDir, int consecutiveCount) {
+boolean SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCount) {
     int numConsecutive = 0;
     int distance;
 
-    if (senseDir) {
-        while (true) {
-            useRight ? rightLidar.rangingTest(&rightMeasure, false) : leftLidar.rangingTest(&leftMeasure, false);
-            distance = useRight ? rightMeasure.RangeMilliMeter : leftMeasure.RangeMilliMeter;
-            if (distance <= threshold) {
-                numConsecutive++;
-                if (numConsecutive >= consecutiveCount) {
-                    return true;
-                }
-            }
-            else {
-                numConsecutive = 0; // reset if not detecting
-            }
-        }
+    if (useDisplay) {
+        display.clearDisplay();
+        display.setCursor(0, 0);
+        display.setTextSize(2);
+        display.println("Detecting");
+        display.print(useRight ? "Right" : "Left");
+        display.display();
     }
 
-    else {
-        while (true) {
-            useRight ? rightLidar.rangingTest(&rightMeasure, false) : leftLidar.rangingTest(&leftMeasure, false);
-            distance = useRight ? rightMeasure.RangeMilliMeter : leftMeasure.RangeMilliMeter;
-            if (distance >= threshold) {
-                numConsecutive++;
-                if (numConsecutive >= consecutiveCount) {
-                    return true;
-                }
-            }
-            else {
-                numConsecutive = 0; // reset if not detecting
+    while (true) {
+        useRight ? rightLidar.rangingTest(&rightMeasure, false) : leftLidar.rangingTest(&leftMeasure, false);
+        distance = useRight ? rightMeasure.RangeMilliMeter : leftMeasure.RangeMilliMeter;
+        if (useDisplay) {
+            display.clearDisplay();
+            display.setCursor(50, 25);
+            display.setTextSize(3);
+            display.println(distance);
+            display.display();
+        }
+        if (distance <= threshold) {
+            numConsecutive++;
+            if (numConsecutive >= consecutiveCount) {
+                return true;
             }
         }
+        else {
+            numConsecutive = 0; // reset if not detecting
+        }
+        
     }
-    
-    
+    return false;
+}
+
+boolean SectionManager::detectFurther(bool useRight, int threshold, int consecutiveCount) {
+    int numConsecutive = 0;
+    int distance;
+
+    if (useDisplay) {
+        display.clearDisplay();
+        display.setCursor(0, 0);
+        display.setTextSize(2);
+        display.print(useRight ? "Detecting Right..." : "Detecting Left...");
+        display.display();
+    }
+
+    while (true) {
+        useRight ? rightLidar.rangingTest(&rightMeasure, false) : leftLidar.rangingTest(&leftMeasure, false);
+        distance = useRight ? rightMeasure.RangeMilliMeter : leftMeasure.RangeMilliMeter;
+        if (useDisplay) {
+            display.clearDisplay();
+            display.setCursor(50, 25);
+            display.setTextSize(3);
+            display.println(distance);
+            display.display();
+        }
+        if (distance >= threshold) {
+            numConsecutive++;
+            if (numConsecutive >= consecutiveCount) {
+                return true;
+            }
+        }
+        else {
+            numConsecutive = 0; // reset if not detecting
+        }
+        
+    }
+    return false;
+}
+
+boolean SectionManager::show(String message) {
+    if (useDisplay) {
+        display.clearDisplay();
+        display.setCursor(0, 0);
+        display.setTextSize(2);
+        display.println(message);
+        display.display();
+        return true;
+    }
+    return false;
 }

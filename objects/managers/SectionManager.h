@@ -8,8 +8,9 @@
 
 class SectionManager {
     private:
-        int currentSection; // 0, 1, or 2
+        int currentSection;
         int objectCount;
+        bool useDisplay;
 
         Adafruit_VL53L0X rightLidar;
         Adafruit_VL53L0X leftLidar;
@@ -26,8 +27,14 @@ class SectionManager {
             return currentSection;
         }
 
+        void incrementObjectCount() {
+            objectCount++;
+        }
+
         boolean detectOutOfRange(bool useRight);
-        boolean detect(bool useRight, int threshold, bool senseDir, int consecutiveCount);
+        boolean detectCloser(bool useRight, int threshold, int consecutiveCount);
+        boolean detectFurther(bool useRight, int threshold, int consecutiveCount);
+        boolean show(String message);
 };
 
 
