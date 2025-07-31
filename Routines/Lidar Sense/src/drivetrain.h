@@ -1,3 +1,4 @@
 #pragma once
-extern volatile boolean startRead;
+#include "SharedState.h"
+
 void driveTrain(void *parameter);

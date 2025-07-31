@@ -4,6 +4,7 @@
 #include "WifiHelper.h"
 #include "drivetrain.h"
 #include "../GlobalConstants.h"
+#include "SharedState.h"
 
 void driveTrain(void *parameter) {
     esp_task_wdt_delete(NULL);
@@ -88,30 +89,42 @@ void driveTrain(void *parameter) {
             vTaskDelay(10);
         }
 
-        steer.lineFollow(600);
-        while(!drive) {
-             vTaskDelay(10);
-        }                   
-        
-        steer.lineFollow(700);
-        while(!drive) {
-             vTaskDelay(10);
-        }
+        // 0
 
         steer.lineFollow(800);
         while(!drive) {
              vTaskDelay(10);
         }
         
+        // 1
+        
         steer.lineFollow(650);
         while(!drive) {
              vTaskDelay(10);
         }
 
+        // 2
+
+        steer.lineFollow(1000);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+
+        // 3
+        
         steer.lineFollow(700);
         while(!drive) {
              vTaskDelay(10);
         }
+
+        // 4
+
+        steer.lineFollow(850);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+
+        // 5
 
         steer.lineFollow(1200);
         while(!drive) {

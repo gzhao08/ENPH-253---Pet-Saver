@@ -5,6 +5,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "SectionManager.h"
+#include "SharedState.h"
 
 // OLED display settings
 #define SCREEN_WIDTH 128
@@ -55,8 +56,7 @@ void objectDetected(void *parameter) {
     Serial.println("Failed to boot Right VL53L0X, retrying...");
     delay(100);
   }
-//   rightLidar.setAddress(0x30);
-//   Wire.endTransmission();
+
   Serial.println("Right VL53L0X Initialized!");
 
   Serial.println("Initializing Left VL53L0X...");
@@ -64,7 +64,7 @@ void objectDetected(void *parameter) {
     Serial.println("Failed to boot Left VL53L0X, retrying...");
     delay(100);
   }
-//   Wire1.endTransmission();
+
   Serial.println("Left VL53L0X Initialized!");
 
   Serial.println("Both VL53L0X ready!");
@@ -77,59 +77,35 @@ void objectDetected(void *parameter) {
     delay(200); // wait for the drivetrain to set startRead to true (done PID tuning)
   }
 
-
   SectionManager sectionManager;
   
   drive = true; // start driving
   int doorwayCounter = 0;
-  int thresholds[6] = {250, 250, 250, 350, 325, 325}; // thresholds for sections 0-5
+  int thresholds[6] = {250, 250, 250, 350, 325, 350}; // thresholds for sections 0-5
+  int stops[6] = {false, false, true, true, true, true};
+  int useRightLidar[6] = {true, true, true, true, true, false};
+  int consecutiveCount[] = {2, 2, 2, 2, 15, 2}; // number of consecutive measurements to consider a section change
+  int objectCount = 0;
 
   while (true){
     while (startRead) {
-        Serial.println("Taking measurements");
-        // Wire.beginTransmission(0x30);
+        // take measurements
         rightLidar.rangingTest(&rightMeasure, false);
-        // Wire.endTransmission();
-        // Wire1.beginTransmission(0x29);
         leftLidar.rangingTest(&leftMeasure, false);
-        // Wire.endTransmission();
-        // Wire.beginTransmission(0x3C);
 
+        // setup display
         display.clearDisplay();
         display.setCursor(0, 0);
         display.println();
-   
-
-        if (rightMeasure.RangeStatus != 4) {  // 4 means invalid measurement
         
         bool onRamp = sectionManager.getCurrentSection() == 5;
 
-        if (sectionManager.detect(rightMeasure.RangeMilliMeter, thresholds[sectionManager.getCurrentSection()], !onRamp)) {
-          stopDrive();
-          display.clearDisplay();
-          display.setTextSize(2);
-          display.setCursor(35, 16);
-          display.print("STOPPED");
-          display.display();
-          display.clearDisplay();
-          display.setTextSize(3);
-          display.setCursor(0, 0);
-          delay(2000);
-          startDrive();
-          if (sectionManager.getCurrentSection() != 5) {
-            while (!sectionManager.detectOutOfRange(rightMeasure.RangeMilliMeter)) {
-              rightLidar.rangingTest(&rightMeasure, false);
-              delay(10);
-            }
-          }
-          
-        }
-        display.setTextSize(2);
-        display.setCursor(80, 24);
-        display.print(rightMeasure.RangeMilliMeter);
-        // display.display();
-        Serial.printf("Right: %d\n", rightMeasure.RangeMilliMeter);
-      
+        if (rightMeasure.RangeStatus != 4) {  // 4 means invalid measurement
+            display.setTextSize(2);
+            display.setCursor(80, 24);
+            display.print(rightMeasure.RangeMilliMeter);
+            // display.display();
+            Serial.printf("Right: %d\n", rightMeasure.RangeMilliMeter);
       }
       
         if (leftMeasure.RangeStatus != 4) {  // 4 means invalid measurement
@@ -139,11 +115,40 @@ void objectDetected(void *parameter) {
             Serial.printf("Left: %d\n", leftMeasure.RangeMilliMeter);
         }
 
+        if ((useRightLidar[objectCount] ? rightMeasure.RangeStatus != 4 : leftMeasure.RangeStatus != 4) && sectionManager.detect((useRightLidar[objectCount] ? rightMeasure.RangeMilliMeter : leftMeasure.RangeMilliMeter), thresholds[objectCount], true, consecutiveCount[objectCount])) {
+            stopDrive();
+            if (stops[objectCount]) {
+                display.clearDisplay();
+                display.setTextSize(2);
+                display.setCursor(35, 16);
+                display.print("STOPPED");
+                display.display();
+                display.clearDisplay();
+                display.setTextSize(3);
+                display.setCursor(0, 0);
+                delay(2000);
+            }
+            startDrive();
+
+            // sense break
+            if (useRightLidar[objectCount]) {
+                while (!sectionManager.detectOutOfRange(rightMeasure.RangeMilliMeter)) {
+                    rightLidar.rangingTest(&rightMeasure, false);
+                    delay(10);
+                }
+            }
+            else {
+                while (!sectionManager.detectOutOfRange(leftMeasure.RangeMilliMeter)) {
+                    leftLidar.rangingTest(&leftMeasure, false);
+                    delay(10);
+                }
+            }
+            objectCount++;
+        }
+
         display.setCursor(0, 0);
-        display.print(sectionManager.getCurrentSection());
-        // Wire.beginTransmission(0x3C);
+        display.print(objectCount);
         display.display();
-      
     }
     Serial.println("Waiting for startRead to be true");
     delay(100);

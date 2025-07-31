@@ -3,64 +3,17 @@
 
 #define CONSECUTIVE_THRESH 3 // number of consecutive measurements to consider a section change
 
-SectionManager::SectionManager() : currentSection(0), numConsecutive(0) {}
-
-boolean SectionManager::detectDoorway(int distance) {
-    if (distance <= DOORWAY_THRESH) {
-        numConsecutive++;
-        if (numConsecutive >= 5) { // require 10 consecutive measurements to be a doorway
-            currentSection = 1; // set to doorway section
-            numConsecutive = 0;
-            return true;
-        }
-    } 
-    // else {
-    //     numConsecutive = 0; // reset if not in doorway
-    // }
-    return false;
-}
-
-boolean SectionManager::detectFirstPet(int distance) {
-    if (distance < FIRST_PET_THRESH) {
-        numConsecutive++;
-        if (numConsecutive >= CONSECUTIVE_THRESH) { // require 10 consecutive measurements to detect first pet
-            currentSection = 2; // set to first pet section
-            numConsecutive = 0;
-            return true;
-        }
-    } else {
-        numConsecutive = 0; // reset if not detecting first pet
+SectionManager::SectionManager(boolean useDisplay) {
+    currentSection = 0; // Start at section 0
+    objectCount = 0; // Initialize object count
+    rightLidar = Adafruit_VL53L0X();
+    leftLidar = Adafruit_VL53L0X();
+    if (useDisplay) {
+        display = Adafruit_SSD1306(128, 64, &Wire, -1);
     }
-    return false;
 }
 
-boolean SectionManager::detectRamp(int distance) {
-    if (distance < RAMP_THRESH) {
-        numConsecutive++;
-        if (numConsecutive >= CONSECUTIVE_THRESH) { // require 10 consecutive measurements to detect ramp
-            currentSection = 3; // set to ramp section
-            numConsecutive = 0;
-            return true;
-        }
-    } else {
-        numConsecutive = 0; // reset if not detecting ramp
-    }
-    return false;
-}
 
-boolean SectionManager::detectEndOfRamp(int distance) {
-    if (distance > RAMP_THRESH) {
-        numConsecutive++;
-        if (numConsecutive >= CONSECUTIVE_THRESH) { // require 10 consecutive measurements to detect end of ramp
-            currentSection = 0; // reset to initial section
-            numConsecutive = 0;
-            return true;
-        }
-    } else {
-        numConsecutive = 0; // reset if not detecting end of ramp
-    }
-    return false;
-}
 
 boolean SectionManager::detectOutOfRange(int distance) {
     if (distance >= 600) { // assuming 8191 is the out-of-range value for the sensor
@@ -70,12 +23,12 @@ boolean SectionManager::detectOutOfRange(int distance) {
     return false;
 }
 
-boolean SectionManager::detect(int distance, int threshold, bool senseDir) {
+boolean SectionManager::detect(int distance, int threshold, bool senseDir, int consecutiveCount) {
     
     if (senseDir) {
         if (distance <= threshold) {
             numConsecutive++;
-            if (numConsecutive >= CONSECUTIVE_THRESH) {
+            if (numConsecutive >= consecutiveCount) {
                 numConsecutive = 0; // reset after detection
                 currentSection++;
                 return true;
@@ -90,7 +43,7 @@ boolean SectionManager::detect(int distance, int threshold, bool senseDir) {
     else {
         if (distance >= threshold) {
             numConsecutive++;
-            if (numConsecutive >= CONSECUTIVE_THRESH) {
+            if (numConsecutive >= consecutiveCount) {
                 numConsecutive = 0; // reset after detection
                 currentSection++;
                 return true;
