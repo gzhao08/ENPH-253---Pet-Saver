@@ -5,8 +5,8 @@
 #include "freertos/queue.h"
 #include "esp_task_wdt.h"
 
-#include "lidar.h"
-#include "drivetrain.h"
+#include "LidarTest.h"
+#include "DriveTrainTest.h"
 #include "SharedState.h"
 
 void setup() {
@@ -16,7 +16,7 @@ void setup() {
     xTaskCreatePinnedToCore(driveTrain, "MotorTask", 4096, NULL, 5, NULL, 0);
     
     // Create task for core 1
-    xTaskCreatePinnedToCore(objectDetected, "LidarTask", 4096, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(readLidar, "LidarTask", 4096, NULL, 5, NULL, 1);
 }
 
 void loop() {};

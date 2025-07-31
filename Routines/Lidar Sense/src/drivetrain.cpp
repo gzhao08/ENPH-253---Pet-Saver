@@ -1,16 +1,19 @@
 #include <Arduino.h>
 #include "SteeringManager.h"  
+#include "esp_task_wdt.h"
 #include "WifiHelper.h"
 #include "drivetrain.h"
 #include "../GlobalConstants.h"
+#include "SharedState.h"
 
 void driveTrain(void *parameter) {
+    esp_task_wdt_delete(NULL);
     //----------------------------SETUP----------------------------//
     DCMotor left = DCMotor(LEFT_MOTOR_PIN_A,LEFT_MOTOR_PIN_B,LEFT_MOTOR_PWM_CHANNEL_A,LEFT_MOTOR_PWM_CHANNEL_B,12); 
     DCMotor right = DCMotor(RIGHT_MOTOR_PIN_A,RIGHT_MOTOR_PIN_B,RIGHT_MOTOR_PWM_CHANNEL_A,RIGHT_MOTOR_PWM_CHANNEL_B,12);    
     SteeringManager steer(&left,&right);
 
-    double kp = 220.0;
+    double kp = 160.0;
     double kd = 0;
     int baseSpeed = 1050;
 
@@ -50,17 +53,85 @@ void driveTrain(void *parameter) {
     // // After ramp -- lower speed
     // steer.lineFollow(700);
     while (true) {
-        // Before doorway: SECTION 1
-        steer.lineFollow(SECTION_0_SPEED);
-        // After doorway -- sense pet and turn
-        delay(3000);
-        steer.lineFollow(SECTION_1_SPEED);
-        // After turn -- ramp
-        delay(1000);
-        steer.lineFollow(SECTION_2_SPEED);
-        delay(1000);
-        // After ramp -- lower speed
+     //    // Before doorway: SECTION 1
+     //    while(!drive) {
+     //        //Serial.println("Waiting for drive to be true");
+     //        vTaskDelay(10);
+     //    }
+
+     //    steer.lineFollow(750);
+
+     //    while(!drive) {
+     //         vTaskDelay(10);
+     //    }                   
+     //    // After doorway, before first pet
+        
+     //    steer.lineFollow(700);
+     //    while(!drive) {
+     //         vTaskDelay(10);
+     //    }
+     //    // after first pet, before ramp
+     //    steer.lineFollow(700);
+     //    while(!drive) {
+     //         vTaskDelay(10);
+     //    }
+     //    // after finding ramp
+     //    steer.lineFollow(1100);
+     //    while(!drive) {
+     //         vTaskDelay(10);
+     //    }
+
+
+
+     // Before doorway: SECTION 1
+        while(!drive) {
+            //Serial.println("Waiting for drive to be true");
+            vTaskDelay(10);
+        }
+
+        // 0
+
+        steer.lineFollow(800);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+        
+        // 1
+        
+        steer.lineFollow(650);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+
+        // 2
+
+        steer.lineFollow(1000);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+
+        // 3
+        
         steer.lineFollow(700);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+
+        // 4
+
+        steer.lineFollow(850);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+
+        // 5
+
+        steer.lineFollow(1200);
+        while(!drive) {
+             vTaskDelay(10);
+        }
+
+
     }
     
     

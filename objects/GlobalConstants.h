@@ -19,21 +19,22 @@
 #define SECTION_1_SPEED 500   // After doorway, curve before ramp
 #define SECTION_2_SPEED 1100  // Ramp
 
-#define DOORWAY_THRESH 180
-#define RAMP_THRESH 200
+#define DOORWAY_THRESH 250
+#define FIRST_PET_THRESH 200
+#define RAMP_THRESH 240
 
 // IR Pins:
 // Left to right: 35,34,36,39
 #define OUTER_RIGHT_PIN 39 
 #define INNER_RIGHT_PIN 36
-#define INNER_LEFT_PIN 34
-#define OUTER_LEFT_PIN 35
+#define INNER_LEFT_PIN 35
+#define OUTER_LEFT_PIN 34
 
 // Drive Motors Pins
-#define LEFT_MOTOR_PIN_A 32 // 26
-#define LEFT_MOTOR_PIN_B 33 // 25
-#define RIGHT_MOTOR_PIN_A 25 // 32
-#define RIGHT_MOTOR_PIN_B 26 // 33
+#define LEFT_MOTOR_PIN_A 19 // 26
+#define LEFT_MOTOR_PIN_B 22 // 25
+#define RIGHT_MOTOR_PIN_A 20 // 32
+#define RIGHT_MOTOR_PIN_B 21 // 33
 
 // Claw Motors Pins
 #define ARM_MOTOR_PIN_1 22
