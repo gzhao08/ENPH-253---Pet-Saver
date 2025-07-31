@@ -132,7 +132,7 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
  */
 void SteeringManager::lineFollow(int baseSpeed) {
     // Serial.println()
-    Serial.printf("drive address (steeringManager): %p\n", (void*)&drive);
+    // Serial.printf("drive address (steeringManager): %p\n", (void*)&drive);
 
     this->array.takeReading(false);
     input = this->array.getError();
@@ -152,8 +152,8 @@ void SteeringManager::lineFollow(int baseSpeed) {
         // update IR data every cycle so that error is accurate
         this->array.takeReading(false);
         input = this->array.getError();
-        array.showState();
-        Serial.printf(" -- %lf\n", output);
+        // array.showState();
+        // Serial.printf(" -- %lf\n", output);
         this->array.update();
         delay(1);
         // esp_task_wdt_reset();
