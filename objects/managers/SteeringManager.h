@@ -13,18 +13,19 @@ class SteeringManager {
         int PIDSampleTime = 10;
         double setpoint = 0;   
         double input = 0;      
-        double output;     
+        double output = 0;     
 
         // 2) Choose your initial tuning constants
         double Kp = 0.0;
         double Ki = 0.0;
         double Kd = 0.0;
 
+        
+        
+    public:
         // Motor
         DCMotor leftMotor; 
         DCMotor rightMotor; 
-        
-    public:
         IRArray array; 
         
         SteeringManager(); 

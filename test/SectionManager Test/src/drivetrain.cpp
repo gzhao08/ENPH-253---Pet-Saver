@@ -11,17 +11,19 @@ void driveTrain(void *parameter) {
     //----------------------------SETUP----------------------------// 
     SteeringManager steer;
 
-    double kp = 160.0;
-    double kd = 0;
-    int baseSpeed = 1050;
+    // double kp = 160.0;
+    // double kd = 0;
+    // int baseSpeed = 1050;
 
     steer.begin(); // put IR pins here -> left to right
 
     Serial.begin(115200);
-    steer.setPID(kp,kd);
+    steer.setPID(KP_DEFAULT,0);
     delay(2000);
 
     startRead = true; // start reading the lidar data
+
+    int speed = 600;
 
     //----------------------------LOOP----------------------------//
     while (true) {
@@ -30,9 +32,17 @@ void driveTrain(void *parameter) {
             //Serial.println("Waiting for drive to be true");
             vTaskDelay(10);
         }
-        steer.lineFollow(1300);
-        // steer.backward(1000);
-        delay(1000);
+        steer.lineFollow(1300); // up to doorway
+        steer.lineFollow(700);  // up to pet 1
+        steer.quickStop();      // stop at pet 1
+        delay(10000);
+
+
+        // steer.leftMotor.drivePWM(speed%1500);
+        // speed += 100;
+        // delay(1000);
+        // steer.leftMotor.stop();
+        // delay(500);
     }
     
     

@@ -52,19 +52,22 @@ void objectDetected(void *parameter) {
         if (sectionManager.detectCloser(false, 120, 1)) {
           sectionManager.incrementSection();
           stopDrive();
-          sectionManager.show("STOP");
-          delay(1000);
         }
         break;
       }
 
       case SectionManager::PET_1: {
-        if (sectionManager.detectCloser(true, 200, 3)) {
+        if (sectionManager.detectCloser(true, 250, 3)) {
           sectionManager.incrementSection();
           stopDrive();
           sectionManager.show("STOP");
-          delay(1000);
+          delay(2000);
         }
+        break;
+      }
+
+      case SectionManager::RAMP: {
+        delay(10000);
         break;
       }
     }

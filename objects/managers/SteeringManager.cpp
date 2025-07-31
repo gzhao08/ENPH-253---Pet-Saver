@@ -7,7 +7,7 @@
 SteeringManager::SteeringManager()
     : leftMotor(LEFT_MOTOR_PIN_A,LEFT_MOTOR_PIN_B,LEFT_MOTOR_PWM_CHANNEL_A,LEFT_MOTOR_PWM_CHANNEL_B,12), 
       rightMotor(RIGHT_MOTOR_PIN_A,RIGHT_MOTOR_PIN_B,RIGHT_MOTOR_PWM_CHANNEL_A,RIGHT_MOTOR_PWM_CHANNEL_B,12),
-      pidController(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT)
+      pidController(&input, &output, &setpoint, KP_DEFAULT, Ki, Kd, DIRECT)
 {
 
 }
@@ -21,14 +21,16 @@ SteeringManager::SteeringManager()
  * @param outerRightPin Pin for the outer right IR sensor
  */
 void SteeringManager::begin() {
+    // Motor
+    leftMotor.begin();
+    rightMotor.begin();
     // PID
     this->pidController.SetMode(AUTOMATIC);
     this->pidController.SetOutputLimits(-leftMotor.getMaxDutyCycle(), leftMotor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
     this->pidController.SetSampleTime(this->PIDSampleTime);
+    this->pidController.SetTunings(KP_DEFAULT, 0, 0);
 
-    // Motor
-    leftMotor.begin();
-    rightMotor.begin();
+    
 
     // IR
     this->array.begin(OUTER_LEFT_PIN,INNER_LEFT_PIN,INNER_RIGHT_PIN,OUTER_RIGHT_PIN);
@@ -164,6 +166,7 @@ void SteeringManager::lineFollow(int baseSpeed) {
     input = this->array.getError();
     unsigned long lastComputeTime = millis();
     this->array.update();
+    Serial.printf("Kp: %lf", this->pidController.GetKp());
     while (drive) {
         // only poll and calculate PID at PID sample rate
         if (millis() - lastComputeTime >= this->PIDSampleTime) {
@@ -178,8 +181,8 @@ void SteeringManager::lineFollow(int baseSpeed) {
         // update IR data every cycle so that error is accurate
         this->array.takeReading(false);
         input = this->array.getError();
-        // array.showState();
-        // Serial.printf(" -- %lf\n", output);
+        array.showState();
+        Serial.printf(" -- %lf\n", output);
         this->array.update();
         delay(1);
         // esp_task_wdt_reset();
