@@ -3,9 +3,8 @@
 #include <Arduino.h>
 #include "../sensors/IRArray.h"
 #include <PID_v1.h>
-#include "../motors/DCMotor.h"  
-
-extern volatile boolean drive; // boolean indicating when to stop driving ; should be global and changed via interrupts
+#include "../motors/DCMotor.h" 
+#include "SharedState.h" 
  
 class SteeringManager {
     private: 
