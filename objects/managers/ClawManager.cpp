@@ -1,27 +1,48 @@
-// #include "ClawManager.h"
+#include "ClawManager.h"
 
-// /**
-//  * ClawManager object, consists of a claw base, vertical stage, arm, grabber and basket
-//  * 0 is left, 1 is right
-//  * 0 is low, 1 is high
-//  */
-// ClawManager::ClawManager(){}
+/**
+ * ClawManager object, consists of a claw base, vertical stage, arm, grabber and basket
+ * 0 is left, 1 is right
+ * 0 is low, 1 is high
+ */
+ClawManager::ClawManager() :
+arm(this->armMotorPin1, this->armMotorPin2, this->armPwmChannel1, this->armPwmChannel2, this->armMuxLine, this->armEncoderOnTerminalSide, 
+        this->armSwitchPin, this->armNormallyOpen),
+vertical(this->verticalStageMotorPin1, this->verticalStageMotorPin2, this->verticalStagePwmChannel1, this->verticalStagePwmChannel2, this->verticalStageMuxLine, this->verticalStageEncoderOnTerminalSide,
+         this->verticalStageSwitchPin, this->verticalStageNormallyOpen),
+base(this->baseMotorPin1, this->baseMotorPin2, this->basePwmChannel1, this->basePwmChannel2, this->baseMuxLine, this->baseEncoderOnTerminalSide, 
+         this->baseSwitchPin, this->baseNormallyOpen),
+grabber(this->grabberMotorPin, this->grabberPwmChannel),
+wireManager1(8),
+wireManager2(-1)
+{
 
-// /**
-//  * Sets up claw manager
-//  * @param base ClawBase object related to claw
-//  * @param vertical ClawVerticalStage object related to claw
-//  * @param arm ClawArm object related to claw
-//  * @param grab ClawGrabber object related to claw
-//  * @param basket Basket object related to claw
-//  */
-// void ClawManager::begin(ClawBase* base, ClawVerticalStage* vertical, ClawArm* arm, ClawGrabber* grab) {
-//     this->base = base;
-//     this->vertical = vertical;
-//     this->arm = arm;
-//     this->grab = grab;
-// }
+}
 
+
+/**
+ * Sets up claw manager
+ */
+void ClawManager::begin() {
+    this->wireManager1.begin(&Wire);
+    this->wireManager2.begin(&Wire1);
+    this->arm.begin(&wireManager1);
+    this->vertical.begin(&wireManager1);
+    this->base.begin(&wireManager2);
+    this->grabber.begin();
+}
+
+void ClawManager::loop() {
+    this->arm.loop();
+    this->vertical.loop();
+    this->base.loop();
+}
+
+void ClawManager::homingSequence() {
+    this->arm.homingSequence();
+    this->vertical.homingSequence();
+    this->base.homingSequence();
+}
 // /**
 //  * Sets all degrees of freedom to home position: 
 //  * base position = 0 (forward)

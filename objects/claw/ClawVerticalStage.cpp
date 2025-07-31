@@ -34,41 +34,41 @@ void ClawVerticalStage::testSequence() {
     }
     Serial.println("Reached target position 0");
     delay(1000);
-    this->setPosition(50);
+    this->setPosition(20);
     while (!this->reachedTarget()) {
         this->loop();
     }
-    Serial.println("Reached target position 50");
+    Serial.println("Reached target position 20");
     delay(1000);
-    this->setPosition(100);
+    this->setPosition(40);
     while (!this->reachedTarget()) {
         this->loop();
     }
-    Serial.println("Reached target position 100");
+    Serial.println("Reached target position 40");
     delay(1000);
-    this->setPosition(150);
+    this->setPosition(60);
     while (!this->reachedTarget()) {
         this->loop();
     }
-    Serial.println("Reached target position 150");
+    Serial.println("Reached target position 60");
     delay(1000);
-    this->setPosition(200);
+    this->setPosition(80);
     while (!this->reachedTarget()) {
         this->loop();
     }
-    Serial.println("Reached target position 200");
+    Serial.println("Reached target position 80");
+    // delay(1000);
+    // this->setPosition(100);
+    // while (!this->reachedTarget()) {
+    //     this->loop();
+    // }
+    // Serial.println("Reached target position 100");
     delay(1000);
     this->setPosition(50);
     while (!this->reachedTarget()) {
         this->loop();
     }
     Serial.println("Reached target position 50 again");
-    delay(1000);
-    this->setPosition(0);
-    while (!this->reachedTarget()) {
-        this->loop();
-    }
-    Serial.println("Reached target position 0 again");
     Serial.println("Claw Arm test sequence done");
 }
 

@@ -15,9 +15,6 @@ class ClawPart {
         // Conversion and positions
         float ENCODER_TO_POS_CONVERSION;
         float POS_TO_ENCODER_CONVERSION;
-        int ABS_POS_LIMIT; // Position limit (for homing purposes)
-        int MIN_POSITION;
-        int MAX_POSITION;
 
         // PID Parameters
         float Pk;
@@ -34,6 +31,10 @@ class ClawPart {
 
         void updateSpeed();
     public:
+        int ABS_POS_LIMIT; // Position limit (for homing purposes)
+        int MIN_POSITION;
+        int MAX_POSITION;
+
         Microswitch microswitch;
         ContinuousServo continuousServo;
 
@@ -45,6 +46,7 @@ class ClawPart {
 
         float getPosition();
         void setPosition(float position);
+        void moveBy(float movement);
         bool reachedTarget();
         float getSpeed();
 
