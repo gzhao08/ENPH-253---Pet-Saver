@@ -11,6 +11,7 @@ class SectionManager {
         int currentSection;
         int objectCount;
         bool useDisplay;
+        int numConsecutive;
 
         Adafruit_VL53L0X rightLidar;
         Adafruit_VL53L0X leftLidar;
@@ -31,6 +32,10 @@ class SectionManager {
 
         void incrementObjectCount() {
             objectCount++;
+        }
+
+        void incrementSection() {
+            currentSection++;
         }
 
         boolean detectOutOfRange(bool useRight);
