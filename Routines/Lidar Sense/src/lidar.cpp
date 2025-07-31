@@ -46,7 +46,6 @@ void objectDetected(void *parameter) {
   Adafruit_VL53L0X leftLidar = Adafruit_VL53L0X();
   VL53L0X_RangingMeasurementData_t rightMeasure;
   VL53L0X_RangingMeasurementData_t leftMeasure;
-
   
 
   Serial.println("VL53L0X test");
@@ -56,16 +55,16 @@ void objectDetected(void *parameter) {
     Serial.println("Failed to boot Right VL53L0X, retrying...");
     delay(100);
   }
-  rightLidar.setAddress(0x30);
-  Wire.endTransmission();
+//   rightLidar.setAddress(0x30);
+//   Wire.endTransmission();
   Serial.println("Right VL53L0X Initialized!");
 
   Serial.println("Initializing Left VL53L0X...");
-  while (leftLidar.begin((uint8_t) 41U, false, &Wire1, Adafruit_VL53L0X::VL53L0X_SENSE_DEFAULT)) {
+  while (!leftLidar.begin((uint8_t) 41U, false, &Wire1, Adafruit_VL53L0X::VL53L0X_SENSE_DEFAULT)) {
     Serial.println("Failed to boot Left VL53L0X, retrying...");
     delay(100);
   }
-  Wire1.endTransmission();
+//   Wire1.endTransmission();
   Serial.println("Left VL53L0X Initialized!");
 
   Serial.println("Both VL53L0X ready!");
@@ -88,12 +87,13 @@ void objectDetected(void *parameter) {
   while (true){
     while (startRead) {
         Serial.println("Taking measurements");
-        Wire.beginTransmission(0x30);
+        // Wire.beginTransmission(0x30);
         rightLidar.rangingTest(&rightMeasure, false);
-        Wire.endTransmission();
-        Wire1.beginTransmission(0x29);
+        // Wire.endTransmission();
+        // Wire1.beginTransmission(0x29);
         leftLidar.rangingTest(&leftMeasure, false);
-        Wire.endTransmission();
+        // Wire.endTransmission();
+        // Wire.beginTransmission(0x3C);
 
         display.clearDisplay();
         display.setCursor(0, 0);
