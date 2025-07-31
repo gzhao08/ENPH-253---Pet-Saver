@@ -11,3 +11,7 @@ void stopDrive() {
 void startDrive() {
     drive = true;
 }
+
+void changeSpeed(int newSpeed) {
+    currentSpeed = constrain(newSpeed,0,4096);
+}

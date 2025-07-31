@@ -35,7 +35,8 @@ void driveTrain(void *parameter) {
             //Serial.println("Waiting for drive to be true");
             vTaskDelay(10);
         }
-        steer.forward(baseSpeed);
+        steer.forward(currentSpeed);
+        Serial.println("Driving at speed: " + String(currentSpeed));
     }
     
     

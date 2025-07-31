@@ -16,9 +16,11 @@ class SectionManager {
         Adafruit_VL53L0X leftLidar;
         VL53L0X_RangingMeasurementData_t rightMeasure;
         VL53L0X_RangingMeasurementData_t leftMeasure;
-        Adafruit_SSD1306 display;
+        
 
     public:
+        Adafruit_SSD1306 display;
+
         SectionManager();
 
         void begin(boolean useDisplay);
