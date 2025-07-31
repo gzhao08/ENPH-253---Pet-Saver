@@ -30,9 +30,9 @@ void MyServo::begin() {
 void MyServo::writePosition(int angle) {
     int constrainedAngle = constrain(angle, this->MIN_POSITION_DEG, this->MAX_POSITION_DEG);
     // convert angle to PWM frequency out of 4096 (12 bits)
-    int position = (angle - this->MIN_POSITION_DEG) / this->RANGE_DEG * this->RANGE_POS + this->MIN_POSITION_PWM;
+    int position = ((float)(angle - this->MIN_POSITION_DEG)) / this->RANGE_DEG * this->RANGE_POS + this->MIN_POSITION_PWM;
 
-    if (logOutput) {
+    if (true) {
         Serial.println("Angle: " + String(angle));
         Serial.println("Position: " + String(position));
     }

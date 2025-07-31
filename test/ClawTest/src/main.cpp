@@ -13,7 +13,7 @@
 #include "sensors/Microswitch.h"
 #include "GlobalConstants.h"
 
-MyServo servo(12, 1);
+// MyServo servo(12, 1);
 ClawGrabber grabber(12, 1);
 
 int muxPin = 8;
@@ -72,7 +72,7 @@ void setup() {
   arm.begin(&wireManager); 
   verticalStage.begin(&wireManager);
   base.begin(&wireManager2);
-  servo.begin();
+  // servo.begin();
   grabber.begin();
 
   // base.continuousServo.logPIDOutput = true;
@@ -167,6 +167,7 @@ void loop() {
           arm.loop();
           if (Serial.available()) {
             String pos = Serial.readStringUntil('\n');
+            Serial.println(pos);
             if (pos.toInt() != -1) {
               arm.setPosition(pos.toInt());
               Serial.println("Set position  of arm to: " + String(pos.toInt()));
@@ -232,6 +233,8 @@ void loop() {
               break;
             }
           }
+        }
+        break;
       case 17:
       {
         Serial.println("Command: PID Tuning arm");
@@ -342,7 +345,7 @@ void loop() {
           }
         }
         break;
-      }
+      
     }
   }
 }
