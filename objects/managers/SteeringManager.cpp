@@ -4,8 +4,9 @@
 
 //volatile boolean drive = false; // Global variable to control driving state
 
-SteeringManager::SteeringManager(DCMotor* left, DCMotor* right)
-    : leftMotor(left), rightMotor(right),
+SteeringManager::SteeringManager()
+    : leftMotor(LEFT_MOTOR_PIN_A,LEFT_MOTOR_PIN_B,LEFT_MOTOR_PWM_CHANNEL_A,LEFT_MOTOR_PWM_CHANNEL_B,12), 
+      rightMotor(RIGHT_MOTOR_PIN_A,RIGHT_MOTOR_PIN_B,RIGHT_MOTOR_PWM_CHANNEL_A,RIGHT_MOTOR_PWM_CHANNEL_B,12),
       pidController(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT)
 {
 
@@ -19,18 +20,18 @@ SteeringManager::SteeringManager(DCMotor* left, DCMotor* right)
  * @param innerRightPin Pin for the inner right IR sensor
  * @param outerRightPin Pin for the outer right IR sensor
  */
-void SteeringManager::begin(int outerLeftPin, int innerLeftPin, int innerRightPin, int outerRightPin) {
+void SteeringManager::begin() {
     // PID
     this->pidController.SetMode(AUTOMATIC);
-    this->pidController.SetOutputLimits(-leftMotor->getMaxDutyCycle(), leftMotor->getMaxDutyCycle()); // Set output limits to motor max duty cycle
+    this->pidController.SetOutputLimits(-leftMotor.getMaxDutyCycle(), leftMotor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
     this->pidController.SetSampleTime(this->PIDSampleTime);
 
     // Motor
-    leftMotor->begin();
-    rightMotor->begin();
+    leftMotor.begin();
+    rightMotor.begin();
 
     // IR
-    this->array.begin(outerLeftPin, innerLeftPin, innerRightPin, outerRightPin);
+    this->array.begin(OUTER_LEFT_PIN,INNER_LEFT_PIN,INNER_RIGHT_PIN,OUTER_RIGHT_PIN);
 }
 
 /**
@@ -42,8 +43,8 @@ void SteeringManager::forward(int duty) {
     drive = true;
     // portEXIT_CRITICAL(&mux);
     while (drive) {
-        leftMotor->drivePWM(duty);
-        rightMotor->drivePWM(duty);
+        leftMotor.drivePWM(duty);
+        rightMotor.drivePWM(duty);
         delay(10);
     }
     this->stop();
@@ -58,8 +59,8 @@ void SteeringManager::backward(int duty) {
     drive = true;
     // portEXIT_CRITICAL(&mux);
     while (drive) {
-        leftMotor->drivePWM(-duty);
-        rightMotor->drivePWM(-duty);
+        leftMotor.drivePWM(-duty);
+        rightMotor.drivePWM(-duty);
     }
     this->stop();
 }
@@ -72,8 +73,8 @@ void SteeringManager::backward(int duty, int timeInMS) {
     unsigned long startTime = millis();
     unsigned long currentTime = startTime;
     while (currentTime - startTime <= timeInMS) {
-        leftMotor->drivePWM(-duty);
-        rightMotor->drivePWM(-duty);
+        leftMotor.drivePWM(-duty);
+        rightMotor.drivePWM(-duty);
         currentTime = millis();
     }
     this->stop();
@@ -84,8 +85,8 @@ void SteeringManager::backward(int duty, int timeInMS) {
  * Sets the PWM channels to 0
  */
 void SteeringManager::stop() {
-    leftMotor->stop();
-    rightMotor->stop();
+    leftMotor.stop();
+    rightMotor.stop();
 }
 
 /**
@@ -94,8 +95,8 @@ void SteeringManager::stop() {
  */
 void SteeringManager::quickStop() {
     this->backward(1000,100);
-    leftMotor->stop();
-    rightMotor->stop();
+    leftMotor.stop();
+    rightMotor.stop();
 }
 
 /**
@@ -125,8 +126,8 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
         this->array.takeReading(true);
         this->array.getError();
         this->array.update();
-        leftMotor->drivePWM(-duty);
-        rightMotor->drivePWM(duty);
+        leftMotor.drivePWM(-duty);
+        rightMotor.drivePWM(duty);
     }
 
     Serial.println("Off line now");
@@ -134,8 +135,8 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
 
     while (!this->array.isCentered()) {
         // turn in place until back on line
-        leftMotor->drivePWM(-duty);
-        rightMotor->drivePWM(duty);
+        leftMotor.drivePWM(-duty);
+        rightMotor.drivePWM(duty);
         this->array.takeReading(true);
         this->array.getError();
         this->array.update();
@@ -170,8 +171,8 @@ void SteeringManager::lineFollow(int baseSpeed) {
             pidController.Compute();
             lastComputeTime = millis();
             // drive motors
-            leftMotor->drivePWM(baseSpeed-output);
-            rightMotor->drivePWM(baseSpeed+output);
+            leftMotor.drivePWM(baseSpeed-output);
+            rightMotor.drivePWM(baseSpeed+output);
             
         }
         // update IR data every cycle so that error is accurate
@@ -185,7 +186,7 @@ void SteeringManager::lineFollow(int baseSpeed) {
         // vTaskDelay(10);
     }
     // this->stop();
-    this->quickStop();
+    // this->quickStop();
 }
 
 /**

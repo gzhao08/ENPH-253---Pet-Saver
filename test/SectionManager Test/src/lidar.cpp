@@ -45,13 +45,30 @@ void objectDetected(void *parameter) {
     // delay(2000);
     // sectionManager.detectOutOfRange(useRightLidar[0]);
 
-    // drive and use lidar to change speed
     startDrive();
-    if (sectionManager.detectCloser(false, 120, 1)) {
-      stopDrive();
-      sectionManager.show("STOP");
-      delay(10000);
+    switch(sectionManager.getCurrentSection()) {
+      case SectionManager::DOORWAY: {
+        // looking for doorway
+        if (sectionManager.detectCloser(false, 120, 1)) {
+          sectionManager.incrementSection();
+          stopDrive();
+          sectionManager.show("STOP");
+          delay(1000);
+        }
+        break;
+      }
+
+      case SectionManager::PET_1: {
+        if (sectionManager.detectCloser(true, 200, 3)) {
+          sectionManager.incrementSection();
+          stopDrive();
+          sectionManager.show("STOP");
+          delay(1000);
+        }
+        break;
+      }
     }
+    
   }
   
 

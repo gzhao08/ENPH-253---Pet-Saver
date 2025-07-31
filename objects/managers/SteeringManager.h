@@ -21,15 +21,15 @@ class SteeringManager {
         double Kd = 0.0;
 
         // Motor
-        DCMotor* leftMotor; 
-        DCMotor* rightMotor; 
+        DCMotor leftMotor; 
+        DCMotor rightMotor; 
         
     public:
         IRArray array; 
         
-        SteeringManager(DCMotor* left, DCMotor* right); 
+        SteeringManager(); 
 
-        void begin(int outerLeftPin, int innerLeftPin, int innerRightPin, int outerRightPin);
+        void begin();
         
         // Movement
         void forward(int duty);

@@ -22,6 +22,13 @@ class SectionManager {
     public:
         Adafruit_SSD1306 display;
 
+        enum Section {
+            DOORWAY,
+            PET_1,
+            RAMP,
+            RAMP_END
+        };
+
         SectionManager();
 
         void begin(boolean useDisplay);
