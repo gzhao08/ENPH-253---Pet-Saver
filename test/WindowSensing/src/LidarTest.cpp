@@ -1,17 +1,15 @@
 #include <Wire.h>
 #include <Adafruit_VL53L0X.h>
-#include "SteeringManager.h"  
+#include "LidarTest.h"
+#include "SharedState.h"
 
-Adafruit_VL53L0X right = Adafruit_VL53L0X();
-Adafruit_VL53L0X left = Adafruit_VL53L0X();
-int lastmeasure = 0;
-
-void I2C_ScannerWire();
-void I2C_ScannerWire1();
-
-void setup() {
+void readLidar() {
   Serial.begin(115200);
   while (!Serial);
+
+  Adafruit_VL53L0X right = Adafruit_VL53L0X();
+  Adafruit_VL53L0X left = Adafruit_VL53L0X();
+  int lastmeasure = 0;
 
   Serial.println("VL53L0X test");
 
@@ -37,30 +35,32 @@ void setup() {
 
   Serial.println("VL53L0X ready!");
 
-  // I2C_ScannerWire();
-  // I2C_ScannerWire1();
+  while (!startRead) {
+    Serial.println("Waiting for startRead to be true");
+    delay(200); // wait for the drivetrain to set startRead to true (done PID tuning)
+  }
 
-}
+  
+  while(1){
+    VL53L0X_RangingMeasurementData_t rightMeasure;
+    VL53L0X_RangingMeasurementData_t leftMeasure;
 
-void loop() {
-  VL53L0X_RangingMeasurementData_t rightMeasure;
-  VL53L0X_RangingMeasurementData_t leftMeasure;
+    right.rangingTest(&rightMeasure, false); // pass in 'true' to get debug data
+    left.rangingTest(&leftMeasure, false); // pass in 'true' to get debug data
 
-  right.rangingTest(&rightMeasure, false); // pass in 'true' to get debug data
-  left.rangingTest(&leftMeasure, false); // pass in 'true' to get debug data
+    Wire1.beginTransmission(0x30);
+    if (rightMeasure.RangeStatus != 4) {  // 4 means out of range
+      Serial.println(rightMeasure.RangeMilliMeter);
+    } 
+    Wire1.endTransmission();
 
-  Wire1.beginTransmission(0x30);
-  if (rightMeasure.RangeStatus != 4) {  // 4 means out of range
-    Serial.println(rightMeasure.RangeMilliMeter);
-  } 
-  Wire1.endTransmission();
+    Wire.beginTransmission(0x29);
 
-  Wire.beginTransmission(0x29);
+    if (leftMeasure.RangeStatus != 4) {  // 4 means out of range
+      Serial.println(leftMeasure.RangeMilliMeter);
+    } 
+    Wire.endTransmission();
 
-  if (leftMeasure.RangeStatus != 4) {  // 4 means out of range
-    Serial.println(leftMeasure.RangeMilliMeter);
-  } 
-  Wire.endTransmission();
-
-  delay(100);
+    delay(100);
+  }
 }
