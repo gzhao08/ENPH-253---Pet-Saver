@@ -34,7 +34,9 @@ class SteeringManager {
         // Movement
         void forward(int duty);
         void backward(int duty);
+        void backward(int duty, int timeInMS);
         void stop();
+        void quickStop();
         void turnAround(int duty, boolean clockwise);
         void lineFollow(int baseSpeed);
 

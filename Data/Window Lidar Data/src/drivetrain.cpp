@@ -35,10 +35,6 @@ void driveTrain(void *parameter) {
             //Serial.println("Waiting for drive to be true");
             vTaskDelay(10);
         }
-        steer.lineFollow(1300);
-        // steer.backward(1000);
-        delay(1000);
+        steer.lineFollow(650);
     }
-    
-    
 }

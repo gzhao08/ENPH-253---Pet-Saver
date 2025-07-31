@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <lidar.h>
-#include <Adafruit_VL53L0X.h>
+// #include <Adafruit_VL53L0X.h>
+#include <VL53L0X.h>
 #include "../GlobalConstants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -45,13 +46,12 @@ void objectDetected(void *parameter) {
     // sectionManager.detectOutOfRange(useRightLidar[0]);
 
     // drive and use lidar to change speed
-    sectionManager.detectCloser(useRightLidar[0], thresholds[0], consecutiveCount[0]);
-    sectionManager.show(String(currentSpeed));
-    delay(1000);
-    currentSpeed += 100;
-    sectionManager.detectOutOfRange(useRightLidar[0]);
-
-
+    startDrive();
+    if (sectionManager.detectCloser(false, 120, 1)) {
+      stopDrive();
+      sectionManager.show("STOP");
+      delay(10000);
+    }
   }
   
 

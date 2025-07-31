@@ -65,10 +65,35 @@ void SteeringManager::backward(int duty) {
 }
 
 /**
+ * Drive both motors backward with the same duty cycle
+ * @param duty the positive duty cycle to drive the motors backwards with
+ */
+void SteeringManager::backward(int duty, int timeInMS) {
+    unsigned long startTime = millis();
+    unsigned long currentTime = startTime;
+    while (currentTime - startTime <= timeInMS) {
+        leftMotor->drivePWM(-duty);
+        rightMotor->drivePWM(-duty);
+        currentTime = millis();
+    }
+    this->stop();
+}
+
+/**
  * Stop both motors
  * Sets the PWM channels to 0
  */
 void SteeringManager::stop() {
+    leftMotor->stop();
+    rightMotor->stop();
+}
+
+/**
+ * Stop both motors
+ * Sets the PWM channels to 0
+ */
+void SteeringManager::quickStop() {
+    this->backward(1000,100);
     leftMotor->stop();
     rightMotor->stop();
 }
@@ -159,7 +184,8 @@ void SteeringManager::lineFollow(int baseSpeed) {
         // esp_task_wdt_reset();
         // vTaskDelay(10);
     }
-    this->stop();
+    // this->stop();
+    this->quickStop();
 }
 
 /**

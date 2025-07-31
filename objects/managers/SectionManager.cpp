@@ -37,8 +37,11 @@ void SectionManager::begin(boolean useDisplay) {
         display.display();
     }
 
+    rightLidar.setBus(&Wire);
+    leftLidar.setBus(&Wire1);
+
     Serial.println("Initializing Right VL53L0X...");
-    while (!rightLidar.begin( (uint8_t) 41U, false, &Wire, Adafruit_VL53L0X::VL53L0X_SENSE_DEFAULT)) {
+    while (!rightLidar.init()) {
         Serial.println("Failed to boot Right VL53L0X, retrying...");
         delay(100);
     }
@@ -46,7 +49,7 @@ void SectionManager::begin(boolean useDisplay) {
     Serial.println("Right VL53L0X Initialized!");
 
     Serial.println("Initializing Left VL53L0X...");
-    while (!leftLidar.begin((uint8_t) 41U, false, &Wire1, Adafruit_VL53L0X::VL53L0X_SENSE_DEFAULT)) {
+    while (!leftLidar.init()) {
         Serial.println("Failed to boot Left VL53L0X, retrying...");
         delay(100);
     }
@@ -54,6 +57,10 @@ void SectionManager::begin(boolean useDisplay) {
     Serial.println("Left VL53L0X Initialized!");
 
     Serial.println("Both VL53L0X ready!");
+
+    leftLidar.startContinuous();
+    rightLidar.startContinuous();
+    
 
     if (useDisplay) {
         display.clearDisplay();
@@ -67,9 +74,7 @@ void SectionManager::begin(boolean useDisplay) {
 }
 
 boolean SectionManager::detectOutOfRange(bool useRight) {
-    int distance;
-    useRight ? rightLidar.rangingTest(&rightMeasure, false) : leftLidar.rangingTest(&leftMeasure, false);
-    distance = useRight ? rightMeasure.RangeMilliMeter : leftMeasure.RangeMilliMeter;
+    int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
     if (distance >= 500) {
         return true;
     }
@@ -77,20 +82,18 @@ boolean SectionManager::detectOutOfRange(bool useRight) {
 }
 
 boolean SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCount) {
-    int distance;
 
-    if (useDisplay) {
-        display.clearDisplay();
-        display.setCursor(0, 0);
-        display.setTextSize(2);
-        display.println("Detecting");
-        display.print(useRight ? "Right" : "Left");
-        display.display();
-    }
+    // if (useDisplay) {
+    //     display.clearDisplay();
+    //     display.setCursor(0, 0);
+    //     display.setTextSize(2);
+    //     display.println("Detecting");
+    //     display.print(useRight ? "Right" : "Left");
+    //     display.display();
+    // }
 
     
-    useRight ? rightLidar.rangingTest(&rightMeasure, false) : leftLidar.rangingTest(&leftMeasure, false);
-    distance = useRight ? rightMeasure.RangeMilliMeter : leftMeasure.RangeMilliMeter;
+    int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
     if (useDisplay) {
         display.clearDisplay();
         display.setCursor(50, 25);
@@ -113,19 +116,17 @@ boolean SectionManager::detectCloser(bool useRight, int threshold, int consecuti
 
 boolean SectionManager::detectFurther(bool useRight, int threshold, int consecutiveCount) {
     int numConsecutive = 0;
-    int distance;
 
-    if (useDisplay) {
-        display.clearDisplay();
-        display.setCursor(0, 0);
-        display.setTextSize(2);
-        display.print(useRight ? "Detecting Right..." : "Detecting Left...");
-        display.display();
-    }
+    // if (useDisplay) {
+    //     display.clearDisplay();
+    //     display.setCursor(0, 0);
+    //     display.setTextSize(2);
+    //     display.print(useRight ? "Detecting Right..." : "Detecting Left...");
+    //     display.display();
+    // }
 
     
-    useRight ? rightLidar.rangingTest(&rightMeasure, false) : leftLidar.rangingTest(&leftMeasure, false);
-    distance = useRight ? rightMeasure.RangeMilliMeter : leftMeasure.RangeMilliMeter;
+    int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
     if (useDisplay) {
         display.clearDisplay();
         display.setCursor(50, 25);

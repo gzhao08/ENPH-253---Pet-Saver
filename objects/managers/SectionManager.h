@@ -1,10 +1,11 @@
 #pragma once
 #include <Arduino.h>
-#include <Adafruit_VL53L0X.h>
+// #include <Adafruit_VL53L0X.h>
 #include "../GlobalConstants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "SharedState.h"
+#include <VL53L0X.h>
 
 class SectionManager {
     private:
@@ -13,10 +14,9 @@ class SectionManager {
         bool useDisplay;
         int numConsecutive;
 
-        Adafruit_VL53L0X rightLidar;
-        Adafruit_VL53L0X leftLidar;
-        VL53L0X_RangingMeasurementData_t rightMeasure;
-        VL53L0X_RangingMeasurementData_t leftMeasure;
+        VL53L0X rightLidar;
+        VL53L0X leftLidar;
+
         
 
     public:
