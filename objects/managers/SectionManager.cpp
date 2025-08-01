@@ -153,28 +153,56 @@ boolean SectionManager::show(String message) {
 
 void SectionManager::getNextSection(){
     switch(getCurrentSection()) {
-      case SectionManager::DOORWAY: {
-        // looking for doorway
-        if (detectCloser(false, 120, 1)) {
-          incrementSection();
-          stopDrive();
-        }
-        break;
-      }
 
-      case SectionManager::PET_1: {
-        if (detectCloser(true, 250, 3)) {
-          incrementSection();
-          stopDrive();
-          show("STOP");
-          delay(2000);
+        case SectionManager::DOORWAY: {
+            // looking for doorway
+            if (detectCloser(false, 120, 1)) {
+                detectionTime = millis();
+                incrementSection();
+                stopDrive();
+            }
+            break;
         }
-        break;
-      }
+
+        case SectionManager::PET_1: {
+            if (millis() - detectionTime > 1000) {
+                if (detectCloser(true, 250, 2)) {
+                    detectionTime = millis();
+                    incrementSection();
+                    stopDrive();
+                    show("STOP");
+                    delay(2000);
+                }
+            }
+            
+            break;
+        }
 
       case SectionManager::RAMP: {
-        delay(10000);
+        if (millis() - detectionTime > 1000) {
+                if (detectCloser(true, 250, 3)) {
+                    detectionTime = millis();
+                    incrementSection();
+                    stopDrive();
+                    show("STOP");
+                    delay(2000);
+                }
+            }
         break;
       }
+
+      case SectionManager::RAMP_END: {
+        if (millis() - detectionTime > 1500) {
+                if (detectCloser(false, 250, 3)) {
+                    detectionTime = millis();
+                    incrementSection();
+                    stopDrive();
+                    show("STOP");
+                    delay(2000);
+                }
+            }
+        break;
+      }
+
     }
 }
