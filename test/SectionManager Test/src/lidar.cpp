@@ -46,36 +46,8 @@ void objectDetected(void *parameter) {
     // sectionManager.detectOutOfRange(useRightLidar[0]);
     
     startDrive();
-    switch(sectionManager.getCurrentSection()) {
-      case SectionManager::DOORWAY: {
-        // looking for doorway
-        if (sectionManager.detectCloser(false, 120, 1)) {
-          sectionManager.incrementSection();
-          stopDrive();
-        }
-        break;
-      }
-
-      case SectionManager::PET_1: {
-        if (sectionManager.detectCloser(true, 250, 3)) {
-          sectionManager.incrementSection();
-          stopDrive();
-          sectionManager.show("STOP");
-          delay(2000);
-        }
-        break;
-      }
-
-      case SectionManager::RAMP: {
-        delay(10000);
-        break;
-      }
-    }
-    
-  }
-  
-
-  
+    sectionManager.getNextSection();
+  }  
 }
 
 

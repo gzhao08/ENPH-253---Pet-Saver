@@ -35,6 +35,10 @@ void driveTrain(void *parameter) {
         steer.lineFollow(1300); // up to doorway
         steer.lineFollow(700);  // up to pet 1
         steer.quickStop();      // stop at pet 1
+        steer.lineFollow(800); //up to beginning of ramp
+        steer.quickStop();// stop at beginning of ramp
+        steer.lineFollow(1500);// up to end of ramp
+        steer.quickStop();// stop at end of ramp
         delay(10000);
 
 
