@@ -59,6 +59,8 @@ void SectionManager::begin(boolean useDisplay) {
 
     Serial.println("Both VL53L0X ready!");
 
+    Serial.printf("SectionManager -- drive : %p\n", &drive);
+
     leftLidar.startContinuous();
     rightLidar.startContinuous();
     
@@ -67,11 +69,19 @@ void SectionManager::begin(boolean useDisplay) {
         display.clearDisplay();
         display.setTextSize(3);
         display.setCursor(0, 0);
-        display.println("VL53L0X ready!");
+        display.println("VL53L0X");
+        display.println("Ready!");
         display.display();
         display.clearDisplay();
-        display.setTextSize(3);
+        delay(1000);
+        display.setCursor(30, 24);
+        display.setTextSize(2);
+        display.println("DOORWAY");
+        display.display();
     }
+    
+    
+
 }
 
 boolean SectionManager::detectOutOfRange(bool useRight) {
@@ -85,13 +95,13 @@ boolean SectionManager::detectOutOfRange(bool useRight) {
 boolean SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCount) {
     
     int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
-    if (useDisplay) {
-        display.clearDisplay();
-        display.setCursor(50, 25);
-        display.setTextSize(3);
-        display.println(distance);
-        display.display();
-    }
+    // if (useDisplay) {
+    //     display.clearDisplay();
+    //     display.setCursor(50, 25);
+    //     display.setTextSize(3);
+    //     display.println(distance);
+    //     display.display();
+    // }
     if (distance <= threshold) {
         numConsecutive++;
         if (numConsecutive >= consecutiveCount) {
@@ -157,21 +167,34 @@ void SectionManager::getNextSection(){
         case SectionManager::DOORWAY: {
             // looking for doorway
             if (detectCloser(false, 120, 1)) {
-                detectionTime = millis();
+                // detectionTime = millis();
                 incrementSection();
+                if (useDisplay) {
+                    display.clearDisplay();
+                    display.setCursor(30, 24);
+                    display.setTextSize(2);
+                    display.println("PET 1");
+                    display.display();
+                }
                 stopDrive();
             }
             break;
         }
 
         case SectionManager::PET_1: {
-            if (millis() - detectionTime > 1000) {
-                if (detectCloser(true, 250, 2)) {
-                    detectionTime = millis();
+            if (millis() - startMovementTime > 2000) {
+                if (detectCloser(true, 300, 1)) {
+                    // detectionTime = millis();
                     incrementSection();
+                    if (useDisplay) {
+                        display.clearDisplay();
+                        display.setCursor(30, 24);
+                        display.setTextSize(2);
+                        display.println("RAMP");
+                        display.display();
+                    }
                     stopDrive();
-                    show("STOP");
-                    delay(2000);
+                    Serial.println("SectionManager: Stopped Drive and Read");
                 }
             }
             
@@ -179,26 +202,37 @@ void SectionManager::getNextSection(){
         }
 
       case SectionManager::RAMP: {
-        if (millis() - detectionTime > 1000) {
-                if (detectCloser(true, 250, 3)) {
-                    detectionTime = millis();
+        if (millis() - startMovementTime > 1000) {
+                if (detectCloser(true, 350, 3)) {
+                    // detectionTime = millis();
                     incrementSection();
+                    if (useDisplay) {
+                        display.clearDisplay();
+                        display.setCursor(30, 24);
+                        display.setTextSize(2);
+                        display.println("RAMP END");
+                        display.display();
+                    }
                     stopDrive();
-                    show("STOP");
-                    delay(2000);
+                    Serial.println("SectionManager: Stopped Drive and Read");
                 }
             }
         break;
       }
 
       case SectionManager::RAMP_END: {
-        if (millis() - detectionTime > 1500) {
-                if (detectCloser(false, 250, 3)) {
-                    detectionTime = millis();
+        if (millis() - startMovementTime > 1000) {
+                if (detectCloser(false, 300, 3)) {
+                    // detectionTime = millis();
                     incrementSection();
+                    if (useDisplay) {
+                        display.clearDisplay();
+                        display.setCursor(30, 24);
+                        display.setTextSize(2);
+                        display.println("DONE");
+                        display.display();
+                    }
                     stopDrive();
-                    show("STOP");
-                    delay(2000);
                 }
             }
         break;
@@ -206,3 +240,8 @@ void SectionManager::getNextSection(){
 
     }
 }
+
+void SectionManager::setDetectionTime() {
+    detectionTime = millis();
+}
+

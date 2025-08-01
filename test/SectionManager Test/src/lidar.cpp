@@ -37,16 +37,15 @@ void objectDetected(void *parameter) {
   
   
   while(true) {
-    // drive and use lidar to stop
-    // startDrive();
-    // sectionManager.detectCloser(useRightLidar[0], thresholds[0], consecutiveCount[0]);
-    // stopDrive();
-    // sectionManager.show("STOP");
-    // delay(2000);
-    // sectionManager.detectOutOfRange(useRightLidar[0]);
-    
-    startDrive();
-    sectionManager.getNextSection();
+    if (startRead) {
+      sectionManager.getNextSection();
+    }
+
+    // if (sectionManager.getCurrentSection() == SectionManager::PET_1) {
+    //   put
+    // }
+
+
   }  
 }
 

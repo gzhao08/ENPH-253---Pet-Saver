@@ -159,14 +159,15 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
  * The PID controller will adjust the speed of the motors based on the error from the IR sensors
  */
 void SteeringManager::lineFollow(int baseSpeed) {
-    // Serial.println()
-    // Serial.printf("drive address (steeringManager): %p\n", (void*)&drive);
-
+    startDrive();
+    startReading();
+    recordStartTime();
+    Serial.println("lineFollow(): Reading Started");
     this->array.takeReading(false);
     input = this->array.getError();
     unsigned long lastComputeTime = millis();
     this->array.update();
-    Serial.printf("Kp: %lf", this->pidController.GetKp());
+    // Serial.printf("Kp: %lf", this->pidController.GetKp());
     while (drive) {
         // only poll and calculate PID at PID sample rate
         if (millis() - lastComputeTime >= this->PIDSampleTime) {
@@ -174,22 +175,21 @@ void SteeringManager::lineFollow(int baseSpeed) {
             pidController.Compute();
             lastComputeTime = millis();
             // drive motors
-            leftMotor.drivePWM(baseSpeed-output);
+            leftMotor.drivePWM(baseSpeed  -output);
             rightMotor.drivePWM(baseSpeed+output);
             
         }
         // update IR data every cycle so that error is accurate
         this->array.takeReading(false);
         input = this->array.getError();
-        array.showState();
-        Serial.printf(" -- %lf\n", output);
+        // array.showState();
+        // Serial.printf(" -- %lf\n", output);
         this->array.update();
         delay(1);
-        // esp_task_wdt_reset();
-        // vTaskDelay(10);
+        Serial.printf("lineFollow -- drive : %d\n", drive);
     }
-    // this->stop();
-    // this->quickStop();
+    stopReading();
+    Serial.println("lineFollow(): Reading Stopped");
 }
 
 /**

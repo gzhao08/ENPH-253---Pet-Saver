@@ -32,21 +32,19 @@ void driveTrain(void *parameter) {
             //Serial.println("Waiting for drive to be true");
             vTaskDelay(10);
         }
+        Serial.printf("drivetrain -- drive : %p\n", &drive);
         steer.lineFollow(1300); // up to doorway
-        steer.lineFollow(700);  // up to pet 1
-        steer.quickStop();      // stop at pet 1
-        steer.lineFollow(800); //up to beginning of ramp
-        steer.quickStop();// stop at beginning of ramp
+        Serial.println("drivetrain: Detected Doorway, now looking for pet");
+        steer.lineFollow(600);  // up to pet 1
+        steer.quickStop();
+        delay(2000);      // stop at pet 1
+        steer.lineFollow(900); //up to beginning of ramp
+        // steer.stop();// stop at beginning of ramp
+        // delay(2000);
         steer.lineFollow(1500);// up to end of ramp
         steer.quickStop();// stop at end of ramp
         delay(10000);
 
-
-        // steer.leftMotor.drivePWM(speed%1500);
-        // speed += 100;
-        // delay(1000);
-        // steer.leftMotor.stop();
-        // delay(500);
     }
     
     

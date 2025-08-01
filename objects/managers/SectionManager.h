@@ -28,7 +28,6 @@ class SectionManager {
             PET_1,
             RAMP,
             RAMP_END,
-            SECTION_END
         };
 
         SectionManager();
@@ -52,6 +51,7 @@ class SectionManager {
         boolean detectFurther(bool useRight, int threshold, int consecutiveCount);
         boolean show(String message);
         void getNextSection();
+        void setDetectionTime();
 };
 
 
