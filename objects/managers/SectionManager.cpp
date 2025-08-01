@@ -151,3 +151,30 @@ boolean SectionManager::show(String message) {
     return false;
 }
 
+void SectionManager::getNextSection(){
+    switch(getCurrentSection()) {
+      case SectionManager::DOORWAY: {
+        // looking for doorway
+        if (detectCloser(false, 120, 1)) {
+          incrementSection();
+          stopDrive();
+        }
+        break;
+      }
+
+      case SectionManager::PET_1: {
+        if (detectCloser(true, 250, 3)) {
+          incrementSection();
+          stopDrive();
+          show("STOP");
+          delay(2000);
+        }
+        break;
+      }
+
+      case SectionManager::RAMP: {
+        delay(10000);
+        break;
+      }
+    }
+}

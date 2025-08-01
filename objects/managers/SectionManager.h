@@ -51,6 +51,7 @@ class SectionManager {
         boolean detectCloser(bool useRight, int threshold, int consecutiveCount);
         boolean detectFurther(bool useRight, int threshold, int consecutiveCount);
         boolean show(String message);
+        void getNextSection();
 };
 
 
