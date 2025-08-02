@@ -41,15 +41,11 @@ void SteeringManager::begin() {
  * @param duty the positive duty cycle to drive the motors forwards with
  */
 void SteeringManager::forward(int duty) {
-    // portENTER_CRITICAL(&mux);
-    drive = true;
-    // portEXIT_CRITICAL(&mux);
-    while (drive) {
+    while (robotState == RobotState::FORWARD) {
         leftMotor.drivePWM(duty);
         rightMotor.drivePWM(duty);
-        delay(10);
+        delay(5);
     }
-    this->stop();
 }
 
 /**
@@ -89,6 +85,7 @@ void SteeringManager::backward(int duty, int timeInMS) {
 void SteeringManager::stop() {
     leftMotor.stop();
     rightMotor.stop();
+    robotState = RobotState::STOPPED;
 }
 
 /**
@@ -99,6 +96,7 @@ void SteeringManager::quickStop() {
     this->backward(1000,100);
     leftMotor.stop();
     rightMotor.stop();
+    robotState = RobotState::STOPPED;
 }
 
 /**
@@ -159,8 +157,11 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
  * The PID controller will adjust the speed of the motors based on the error from the IR sensors
  */
 void SteeringManager::lineFollow(int baseSpeed) {
-    startDrive();
-    startReading();
+    
+    while (!drive) {
+        Serial.println("lineFollow(): waiting for drive to be true");
+    }
+
     recordStartTime();
     Serial.println("lineFollow(): Reading Started");
     this->array.takeReading(false);
@@ -188,7 +189,39 @@ void SteeringManager::lineFollow(int baseSpeed) {
         delay(1);
         Serial.printf("lineFollow -- drive : %d\n", drive);
     }
-    stopReading();
+    Serial.println("lineFollow(): Reading Stopped");
+}
+
+
+void SteeringManager::lineFollow() {
+    
+    recordStartTime();
+    Serial.println("lineFollow(): Reading Started");
+    this->array.takeReading(false);
+    input = this->array.getError();
+    unsigned long lastComputeTime = millis();
+    this->array.update();
+    // Serial.printf("Kp: %lf", this->pidController.GetKp());
+    while (robotState == RobotState::LINE_FOLLOW) {
+        // only poll and calculate PID at PID sample rate
+        if (millis() - lastComputeTime >= this->PIDSampleTime) {
+            // compute PID
+            pidController.Compute();
+            lastComputeTime = millis();
+            // drive motors
+            leftMotor.drivePWM(currentSpeed - output);
+            rightMotor.drivePWM(currentSpeed + output);
+            
+        }
+        // update IR data every cycle so that error is accurate
+        this->array.takeReading(false);
+        input = this->array.getError();
+        // array.showState();
+        // Serial.printf(" -- %lf\n", output);
+        this->array.update();
+        delay(1);
+        Serial.printf("lineFollow -- drive : %d\n", drive);
+    }
     Serial.println("lineFollow(): Reading Stopped");
 }
 
