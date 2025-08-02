@@ -59,23 +59,51 @@ class ClawManager {
         WireManager wireManager1;
         WireManager wireManager2;
 
-        float LEFT_ANGLE; 
-        float RIGHT_ANGLE; 
+        //POSITIONS
+        //Base
+        float BASE_FORWARD = 0;
+        float BASE_LEFT_BASKET = 0;
+        float BASE_RIGHT_BASKET = 30;
+        float BASE_LEFT = -90; //left off ramp 
+        float BASE_RIGHT = 90; 
+        //Vertical
+        float VERTICAL_MIN = 0; 
+        float VERTICAL_PICKUP_LOW = -10;
+        float VERTICAL_DEBRIS_HEIGHT = 60; //use every time pet is picked up, 2.5"
+        float VERTICAL_PET_ABOVE_CHASSIS = 120; //CHECK
+        float VERTICAL_LOW_SCAN = 40; //CHECK
+        float VERTICAL_HIGH_SCAN = 80; //CHECk
+        float VERTICAL_MAX = 130; 
+        //Horizontal
+        float ARM_MIN = 0; 
+        float ARM_PICKUP_LOW = -10; 
+        float ARM_MAX = 227; 
+        float ARM_HIGH_GRAB = 10;
+        float ARM_OUTSIDE_CHASSIS = 60;
+        //Grabber
+        float GRABBER_CLOSE = 100;
+        float GRABBER_BASKET_OPEN = 80;
+        float GRABBER_CHUTE_OPEN = 80;
+        float GRABBER_OPEN = 0;
+
+        bool LEFT = 0; 
+        bool RIGHT = 1;
 
         ClawManager();
 
         // Call in setup
         void begin();
         void homingSequence();
-        void reset();
-        void depositLeft();
-        void depositRight();
-        void senseLeft(bool height);
-        void senseRight(bool height);
-        void retrieveLeft();
-        void retrieveRight();
-        void windowDrop(bool pos);
-        void basketRelease();  
+        void reset(); 
+
+        void seqDrivePosition(float height);
+        void seqPickUpLow();
+        void seqRetract();
+        void seqRampDrop();
+        void seqDeposit(bool direction);
+        void seqRetrieve(bool direction);
+        void seqPickUpHigh(bool chute);
+        void seqWindowDrop(bool direction);
         
         void loop();
 };
