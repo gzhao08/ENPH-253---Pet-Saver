@@ -13,15 +13,15 @@ class ClawArm : public ClawPart {
     private:
         String _partName = "Claw Arm";
 
-        const float _ENCODER_TO_POS_CONVERSION = -0.42; // Calibrated from 151/360
+        const float _ENCODER_TO_POS_CONVERSION = 0.42; // Calibrated from 151/360
         const float _POS_TO_ENCODER_CONVERSION = 1 / _ENCODER_TO_POS_CONVERSION; // 1mm corresponds to 1/0.42 degrees
-        const int _ABS_POS_LIMIT = 227;
+        const int _ABS_POS_LIMIT = 205;
         const int _MIN_POSITION = 0;
         const int _MAX_POSITION = 200;
 
         // PID Parameters
         const float _Pk = 50;
-        const float _Dk = 2;
+        const float _Dk = 2.5;
 
         // Servo parameters
         const int _servoMaxVoltage = 6;
