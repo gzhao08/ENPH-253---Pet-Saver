@@ -31,6 +31,7 @@ class SectionManager {
             WINDOW_FORWARD,
             PET_3,
             PET_4,
+            END_RAMP_BACKWARD,
             WINDOW_BACKWARD
         };
 
