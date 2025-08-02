@@ -5,20 +5,48 @@
  * 0 is left, 1 is right
  * 0 is low, 1 is high
  */
-ClawManager::ClawManager() :
-arm(this->armMotorPin1, this->armMotorPin2, this->armPwmChannel1, this->armPwmChannel2, this->armMuxLine, this->armEncoderOnTerminalSide, 
-        this->armSwitchPin, this->armNormallyOpen),
-vertical(this->verticalStageMotorPin1, this->verticalStageMotorPin2, this->verticalStagePwmChannel1, this->verticalStagePwmChannel2, this->verticalStageMuxLine, this->verticalStageEncoderOnTerminalSide,
-         this->verticalStageSwitchPin, this->verticalStageNormallyOpen),
-base(this->baseMotorPin1, this->baseMotorPin2, this->basePwmChannel1, this->basePwmChannel2, this->baseMuxLine, this->baseEncoderOnTerminalSide, 
-         this->baseSwitchPin, this->baseNormallyOpen),
-grabber(this->grabberMotorPin, this->grabberPwmChannel),
-wireManager1(8),
-wireManager2(-1)
-{
+
+// int armMotorPin1, int armMotorPin2, int armPwmChannel1, int armPwmChannel2, int armMuxLine, bool armEncoderOnTerminalSide,
+// int armSwitchPin, bool armNormallyOpen, int verticalStageMotorPin1, int verticalStageMotorPin2, int verticalStagePwmChannel1, int verticalStagePwmChannel2, int verticalStageMuxLine, bool verticalStageEncoderOnTerminalSide,
+// int verticalStageSwitchPin, bool verticalStageNormallyOpen, int baseMotorPin1, int baseMotorPin2, int basePwmChannel1, int basePwmChannel2, int baseMuxLine, bool baseEncoderOnTerminalSide, 
+// int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmChannel, int manager1, int manager2
+
+// this->armMotorPin1, this->armMotorPin2, this->armPwmChannel1, this->armPwmChannel2, this->armMuxLine, this->armEncoderOnTerminalSide, 
+// this->armSwitchPin, this->armNormallyOpen, this->verticalStageMotorPin1, this->verticalStageMotorPin2, this->verticalStagePwmChannel1, this->verticalStagePwmChannel2, this->verticalStageMuxLine, this->verticalStageEncoderOnTerminalSide,
+// this->verticalStageSwitchPin, this->verticalStageNormallyOpen, this->baseMotorPin1, this->baseMotorPin2, this->basePwmChannel1, this->basePwmChannel2, this->baseMuxLine, this->baseEncoderOnTerminalSide, 
+// this->baseSwitchPin, this->baseNormallyOpen, this->grabberMotorPin, this->grabberPwmChannel, 8, -1
+
+//   arm(this->armMotorPin1, this->armMotorPin2, this->armPwmChannel1, this->armPwmChannel2, this->armMuxLine, this->armEncoderOnTerminalSide, 
+//         this->armSwitchPin, this->armNormallyOpen),
+//     vertical(this->verticalStageMotorPin1, this->verticalStageMotorPin2, this->verticalStagePwmChannel1, this->verticalStagePwmChannel2, this->verticalStageMuxLine, this->verticalStageEncoderOnTerminalSide,
+//          this->verticalStageSwitchPin, this->verticalStageNormallyOpen),
+//     base(this->baseMotorPin1, this->baseMotorPin2, this->basePwmChannel1, this->basePwmChannel2, this->baseMuxLine, this->baseEncoderOnTerminalSide, 
+//          this->baseSwitchPin, this->baseNormallyOpen),
+//     grabber(this->grabberMotorPin, this->grabberPwmChannel),
+//     wireManager1(8),
+//     wireManager2(-1)
+
+// int armMotorPin1 = 0, int armMotorPin2 = 0, int armPwmChannel1 = 0, int armPwmChannel2 = 0, int armMuxLine = 0, bool armEncoderOnTerminalSide = 0,
+// int armSwitchPin = 0, bool armNormallyOpen = 0, int verticalStageMotorPin1 = 0, int verticalStageMotorPin2 = 0, int verticalStagePwmChannel1 = 0, int verticalStagePwmChannel2 = 0, int verticalStageMuxLine = 0, bool verticalStageEncoderOnTerminalSide = 0,
+// int verticalStageSwitchPin = 0, bool verticalStageNormallyOpen = 0, int baseMotorPin1 = 0, int baseMotorPin2 = 0, int basePwmChannel1 = 0, int basePwmChannel2 = 0, int baseMuxLine = 0, bool baseEncoderOnTerminalSide = 0, 
+// int baseSwitchPin = 0, bool baseNormallyOpen = 0, int grabberMotorPin = 0, int grabberPwmChannel = 0, int manager1 = 0, int manager2 = 0
+
+ClawManager::ClawManager(int armMotorPin1, int armMotorPin2, int armPwmChannel1, int armPwmChannel2, int armMuxLine, bool armEncoderOnTerminalSide,
+int armSwitchPin, bool armNormallyOpen, int verticalStageMotorPin1, int verticalStageMotorPin2, int verticalStagePwmChannel1, int verticalStagePwmChannel2, int verticalStageMuxLine, bool verticalStageEncoderOnTerminalSide,
+int verticalStageSwitchPin, bool verticalStageNormallyOpen, int baseMotorPin1, int baseMotorPin2, int basePwmChannel1, int basePwmChannel2, int baseMuxLine, bool baseEncoderOnTerminalSide, 
+int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmChannel, int manager1, int manager2) :
+    arm(armMotorPin1, armMotorPin2, armPwmChannel1, armPwmChannel2, armMuxLine, armEncoderOnTerminalSide, 
+        armSwitchPin, armNormallyOpen), 
+    vertical(verticalStageMotorPin1, verticalStageMotorPin2, verticalStagePwmChannel1, verticalStagePwmChannel2, verticalStageMuxLine, verticalStageEncoderOnTerminalSide,
+         verticalStageSwitchPin, verticalStageNormallyOpen),
+    base(baseMotorPin1, baseMotorPin2, basePwmChannel1, basePwmChannel2, baseMuxLine, baseEncoderOnTerminalSide, 
+          baseSwitchPin, baseNormallyOpen),
+    grabber(grabberMotorPin, grabberPwmChannel),
+    wireManager1(8),
+    wireManager2(-1)
+    {
 
 }
-
 
 /**
  * Sets up claw manager
@@ -64,21 +92,21 @@ void ClawManager::homingSequence() {
  * @param height position of vertical stage, set to VERTICAL_MIN for doorway
  */
 void ClawManager::seqDrivePosition(float height) {
-    this->arm.setPosition(this.ARM_MIN);
+    this->arm.setPosition(this->ARM_MIN);
     this->vertical.setPosition(height);
-    this->base.setPosition(this.BASE_FORWARD);
-    this->grabber.setPosition(this.GRABBER_CLOSE);
+    this->base.setPosition(this->BASE_FORWARD);
+    this->grabber.setPositionDegrees(this->GRABBER_CLOSE);
 }
 /*
  * Picks up pet assuming pet is directly below magnetometer 
  * Sequence: arm retracts, lower by VERTICAL_PICKUP, arm extends, grabber closes, raise to debris height
  */
 void ClawManager::seqPickUpLow() {
-    this->arm.moveBy(this.ARM_PICKUP_LOW); 
-    this->vertical.moveBy(this.VERTICAL_PICKUP_LOW);
-    this->arm.moveBy(-1 * this.ARM_PICKUP_LOW); 
-    this.grabber.setPosition(this.GRABBER_CLOSE);
-    this->vertical.moveBy(this.VERTICAL_PET_ABOVE_CHASSIS); 
+    this->arm.moveBy(this->ARM_PICKUP_LOW); 
+    this->vertical.moveBy(this->VERTICAL_PICKUP_LOW);
+    this->arm.moveBy(-1 * this->ARM_PICKUP_LOW); 
+    this->grabber.setPositionDegrees(this->GRABBER_CLOSE);
+    this->vertical.moveBy(this->VERTICAL_PET_ABOVE_CHASSIS); 
 }
 
 /*
@@ -86,8 +114,8 @@ void ClawManager::seqPickUpLow() {
  * Sequence: retract arm, rotate base
  */
 void ClawManager::seqRetract() { 
-    this->arm.setPosition(this.ARM_MIN); 
-    this->base.setPosition(this.BASE_FORWARD);
+    this->arm.setPosition(this->ARM_MIN); 
+    this->base.setPosition(this->BASE_FORWARD);
 }
 
 /*
@@ -95,12 +123,13 @@ void ClawManager::seqRetract() {
  * Sequence: rotate base left, extend arm, open grabber, close grabber, retract arm, rotate base forward 
  */
 void ClawManager::seqRampDrop() {
-    this->base.setPosition(this.BASE_LEFT);
-    this->arm.setPosition(this.ARM_MAX); 
-    this->grabber.setPosition(this.GRABBER_OPEN);
-    this->grabber.setPosition(this.GRABBER_CLOSE);
-    this->arm.setPosition(this.ARM_MIN); 
-    this->base.setPosition(this.BASE_FORWARD);
+    this->base.setPosition(this->BASE_LEFT);
+    this->arm.setPosition(this->ARM_MAX); 
+    this->grabber.setPositionDegrees(this->GRABBER_OPEN);
+    this->grabber.setPositionDegrees(this->GRABBER_CLOSE);
+    this->arm.setPosition(this->ARM_MIN); 
+    this->base.setPosition(this->BASE_FORWARD);
+}    
 
 /**
  * deposits pet in basket assuming it won't hit another pet on the way, and has not been retracted  
@@ -108,18 +137,18 @@ void ClawManager::seqRampDrop() {
  * @param direction left or right of basket; 0 is left, 1 is right 
  */    
 void ClawManager::seqDeposit(bool direction) {
-    this->arm.setPosition(this.ARM_MIN);
+    this->arm.setPosition(this->ARM_MIN);
 
     if (direction) {
-        this->base.setPosition(this.BASE_LEFT_BASKET);
+        this->base.setPosition(this->BASE_LEFT_BASKET);
     }
     else {
-        this->base.setPosition(this.BASE_RIGHT_BASKET);
+        this->base.setPosition(this->BASE_RIGHT_BASKET);
     }
 
-    this->vertical.setPosition(this.VERTICAL_MIN); 
-    this->grabber.setPosition(this.GRABBER_BASKET_OPEN); 
-    this->vertical.setPosition(this.VERTICAL_PET_ABOVE_CHASSIS);
+    this->vertical.setPosition(this->VERTICAL_MIN); 
+    this->grabber.setPositionDegrees(this->GRABBER_BASKET_OPEN); 
+    this->vertical.setPosition(this->VERTICAL_PET_ABOVE_CHASSIS);
 }
 
 /**
@@ -128,19 +157,19 @@ void ClawManager::seqDeposit(bool direction) {
  * @param direction left or right of basket; 0 is left, 1 is right
  */
 void ClawManager::seqRetrieve(bool direction) {
-    this->vertical.setPosition(this.VERTICAL_PET_ABOVE_CHASSIS);
+    this->vertical.setPosition(this->VERTICAL_PET_ABOVE_CHASSIS);
     
     if (direction) {
-        this->base.setPosition(this.BASE_LEFT_BASKET);
+        this->base.setPosition(this->BASE_LEFT_BASKET);
     }
     else {
-        this->base.setPosition(this.BASE_RIGHT_BASKET);
+        this->base.setPosition(this->BASE_RIGHT_BASKET);
     }
 
-    this->grabber.setPosition(this.GRABBER_BASKET_OPEN);
-    this->vertical.setPosition(this.VERTICAL_MIN);
-    this->grabber.setPosition(this.GRABBER_CLOSE);
-    this->vertical.setPosition(this.VERTICAL_PET_ABOVE_CHASSIS);
+    this->grabber.setPositionDegrees(this->GRABBER_BASKET_OPEN);
+    this->vertical.setPosition(this->VERTICAL_MIN);
+    this->grabber.setPositionDegrees(this->GRABBER_CLOSE);
+    this->vertical.setPosition(this->VERTICAL_PET_ABOVE_CHASSIS);
 }
 
 /**
@@ -148,19 +177,19 @@ void ClawManager::seqRetrieve(bool direction) {
  * @param chute false for pet three, true for pet four
  */
 void ClawManager::seqPickUpHigh(bool chute) {
-    this->base.setPosition(this.BASE_LEFT);
+    this->base.setPosition(this->BASE_LEFT);
     if (chute) {
-        this->grabber.setPosition(this.GRABBER_CHUTE_OPEN);
+        this->grabber.setPositionDegrees(this->GRABBER_CHUTE_OPEN);
     }
     else {
-        this->grabber.setPosition(this.GRABBER_OPEN);        
+        this->grabber.setPositionDegrees(this->GRABBER_OPEN);        
     }
-    this->vertical.setPosition(this.VERTICAL_MAX);
-    this->arm.moveBy(this.ARM_HIGH_GRAB);
-    this->grabber.setPosition(this.GRABBER_CLOSE); 
-    this->arm.setPosition(this.ARM_MIN);
-    this->base.setPosition(this.BASE_FORWARD);
-    this->vertical.setPosition(this.VERTICAL_PET_ABOVE_CHASSIS);
+    this->vertical.setPosition(this->VERTICAL_MAX);
+    this->arm.moveBy(this->ARM_HIGH_GRAB);
+    this->grabber.setPositionDegrees(this->GRABBER_CLOSE); 
+    this->arm.setPosition(this->ARM_MIN);
+    this->base.setPosition(this->BASE_FORWARD);
+    this->vertical.setPosition(this->VERTICAL_PET_ABOVE_CHASSIS);
 }
 
 /**
@@ -168,22 +197,21 @@ void ClawManager::seqPickUpHigh(bool chute) {
  * @param direction 0 is left, 1 is right 
  */
 void ClawManager::seqWindowDrop(bool direction) {
-    this->arm.setPosition(this.ARM_OUTSIDE_CHASSIS);
-    this->vertical.setPosition(this.VERTICAL_DEBRIS_HEIGHT);
+    this->arm.setPosition(this->ARM_OUTSIDE_CHASSIS);
+    this->vertical.setPosition(this->VERTICAL_DEBRIS_HEIGHT);
 
     if (direction) {
-        this->base.setPosition(this.BASE_LEFT);
+        this->base.setPosition(this->BASE_LEFT);
     }
     else {
-        this->base.setPosition(this.BASE_RIGHT);
+        this->base.setPosition(this->BASE_RIGHT);
     }
     
-    this->arm.setPosition(this.ARM_MAX);
-    this->grabber.setPosition(this.GRABBER_OPEN);
+    this->arm.setPosition(this->ARM_MAX);
+    this->grabber.setPositionDegrees(this->GRABBER_OPEN);
     delay(1000);
-    this->grabber.setPosition(this.GRABBER_CLOSE);
-    this->arm.setPosition(this.ARM_MIN);
-    this->base.setPOsition(this.BASE_FORWARD)
+    this->grabber.setPositionDegrees(this->GRABBER_CLOSE);
+    this->arm.setPosition(this->ARM_MIN);
+    this->base.setPosition(this->BASE_FORWARD);
 }
 
-}

@@ -51,7 +51,11 @@ class ClawManager {
         float armPos = -1;
         float grabPos = -1;
 
-    public: 
+    public:
+        ClawManager(int armMotorPin1, int armMotorPin2, int armPwmChannel1, int armPwmChannel2, int armMuxLine, bool armEncoderOnTerminalSide,
+int armSwitchPin, bool armNormallyOpen, int verticalStageMotorPin1, int verticalStageMotorPin2, int verticalStagePwmChannel1, int verticalStagePwmChannel2, int verticalStageMuxLine, bool verticalStageEncoderOnTerminalSide,
+int verticalStageSwitchPin, bool verticalStageNormallyOpen, int baseMotorPin1, int baseMotorPin2, int basePwmChannel1, int basePwmChannel2, int baseMuxLine, bool baseEncoderOnTerminalSide, 
+int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmChannel, int manager1, int manager2); 
         ClawBase base;
         ClawVerticalStage vertical;
         ClawArm arm;
@@ -88,8 +92,6 @@ class ClawManager {
 
         bool LEFT = 0; 
         bool RIGHT = 1;
-
-        ClawManager();
 
         // Call in setup
         void begin();
