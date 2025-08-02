@@ -54,13 +54,14 @@ void SteeringManager::forward(int duty) {
  */
 void SteeringManager::backward(int duty) {
     // portENTER_CRITICAL(&mux);
-    drive = true;
+    //drive = true;
     // portEXIT_CRITICAL(&mux);
-    while (drive) {
+    while (robotState == RobotState::BACKWARD) {
         leftMotor.drivePWM(-duty);
         rightMotor.drivePWM(-duty);
+        delay(5);
     }
-    this->stop();
+ //   this->stop();
 }
 
 /**
@@ -148,7 +149,7 @@ void SteeringManager::turnBackwards(int duty) {
 
     while (!this->array.isCentered()) {
         // turn in place until back on line
-        leftMotor.drivePWM(0);
+        leftMotor.drivePWM(-duty/4);
         rightMotor.drivePWM(-duty);
         this->array.takeReading(true);
         this->array.getError();

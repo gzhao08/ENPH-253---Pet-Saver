@@ -153,7 +153,7 @@ void SectionManager::getNextSection(){
                     display.display();
                 }
                 recordStartTime();
-                currentSpeed = 750;
+                currentSpeed = 650;
             }
             break;
         }
@@ -172,7 +172,7 @@ void SectionManager::getNextSection(){
                     }
                     recordStartTime();
                     robotState = RobotState::STOPPED;
-                    currentSpeed = 900;
+                    currentSpeed = 800;
                 }
             }
             
@@ -181,7 +181,7 @@ void SectionManager::getNextSection(){
 
       case SectionManager::RAMP: {
         if (millis() - startMovementTime > 500) {
-                if (detectCloser(true, 375, 3)) {
+                if (detectCloser(true, 365, 5)) {
                     // detectionTime = millis();
                     incrementSection();
                     if (useDisplay) {
@@ -265,7 +265,7 @@ void SectionManager::getNextSection(){
                         display.clearDisplay();
                         display.setCursor(30, 24);
                         display.setTextSize(2);
-                        display.println("WINDOW_BACKWARD");
+                        display.println("END_RAMP_BACKWARD");
                         display.display();
                     }
                     recordStartTime();
@@ -277,9 +277,29 @@ void SectionManager::getNextSection(){
             break;
       }
 
+      case SectionManager::END_RAMP_BACKWARD: {
+            if (millis() - startMovementTime >= 1900) {
+                if (detectFurther(true, 350, 3)) {
+                    incrementSection();
+                    if (useDisplay) {
+                        display.clearDisplay();
+                        display.setCursor(30, 24);
+                        display.setTextSize(2);
+                        display.println("WINDOW_BACKWARD");
+                        display.display();
+                    }
+                    recordStartTime();
+                    stopDrive();
+                    currentSpeed = 800;
+                }
+            }
+            
+            break;
+      }
+
       case SectionManager::WINDOW_BACKWARD: {
-            if (millis() - startMovementTime >= 2500) {
-                if (detectFurther(false, 350, 2)) {
+            if (millis() - startMovementTime >= 1000) {
+                if (detectFurther(true, 350, 3)) {
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();
@@ -295,6 +315,7 @@ void SectionManager::getNextSection(){
             
             break;
       }
+      
 
     }
 }

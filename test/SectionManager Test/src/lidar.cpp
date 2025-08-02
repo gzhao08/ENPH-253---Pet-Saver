@@ -50,6 +50,13 @@ void objectDetected(void *parameter) {
             sectionManager.getNextSection();
             break;
         }
+
+        case RobotState::BACKWARD:{
+          Serial.println("lidar.cpp: BACKWARD");
+          sectionManager.getNextSection();
+          break;
+        }
+        
             
         case RobotState::STOPPED: {
             Serial.println("lidar.cpp: STOPPED");
@@ -64,8 +71,12 @@ void objectDetected(void *parameter) {
                   turnCW();
                   break;
               }
-              case SectionManager::WINDOW_BACKWARD: {
+              case SectionManager::END_RAMP_BACKWARD: {
                   turnCW_Back();
+                  break;
+              }
+              case SectionManager::WINDOW_BACKWARD: {
+                  startBackward();
                   break;
               }
               default:

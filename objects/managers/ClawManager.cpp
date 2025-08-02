@@ -43,168 +43,147 @@ void ClawManager::homingSequence() {
     this->vertical.homingSequence();
     this->base.homingSequence();
 }
-// /**
-//  * Sets all degrees of freedom to home position: 
-//  * base position = 0 (forward)
-//  * vertical stage above basket but below door (test mon) 
-//  * arm fully retracted
-//  * claw closed
-//  */
-// void ClawManager::reset() {
-//     this->grab->setPosition(this->grab->CLOSE);
-//     this->grabPos = this->grab->CLOSE;
 
-//     this->vertical->setPosition(this->vertical->RESET_HEIGHT);
-//     this->verticalPos = this->vertical->RESET_HEIGHT;
+// ROUTINES //
+/** 
+ * 1. Drive position V -- input height
+ * 2. Pick up low pet V
+ *  a. coarse scan
+ *  b. fine scan
+ * 3. Retract pet NV
+ * 4. Ramp Drop NV
+ * 5. Deposit V
+ * 6. Retrieve V
+ * 7. Pick up high pet V
+ * 7. Window Drop V
+ */
 
-//     this->arm->setPosition(this->arm->MIN); 
-//     this->armPos = this->arm->MIN;
+/**
+ * Set drive position
+ * Sequence: Base forward, arm retracted, vertical stage at specified height, claw closed 
+ * @param height position of vertical stage, set to VERTICAL_MIN for doorway
+ */
+void ClawManager::seqDrivePosition(float height) {
+    this->arm.setPosition(this.ARM_MIN);
+    this->vertical.setPosition(height);
+    this->base.setPosition(this.BASE_FORWARD);
+    this->grabber.setPosition(this.GRABBER_CLOSE);
+}
+/*
+ * Picks up pet assuming pet is directly below magnetometer 
+ * Sequence: arm retracts, lower by VERTICAL_PICKUP, arm extends, grabber closes, raise to debris height
+ */
+void ClawManager::seqPickUpLow() {
+    this->arm.moveBy(this.ARM_PICKUP_LOW); 
+    this->vertical.moveBy(this.VERTICAL_PICKUP_LOW);
+    this->arm.moveBy(-1 * this.ARM_PICKUP_LOW); 
+    this.grabber.setPosition(this.GRABBER_CLOSE);
+    this->vertical.moveBy(this.VERTICAL_PET_ABOVE_CHASSIS); 
+}
 
-//     this->base->setPosition(0);
-//     this->basePos = 0;
-// }
+/*
+ * Retracts pet to chassis once it has been picked up, does not deposit anywhere 
+ * Sequence: retract arm, rotate base
+ */
+void ClawManager::seqRetract() { 
+    this->arm.setPosition(this.ARM_MIN); 
+    this->base.setPosition(this.BASE_FORWARD);
+}
 
-// /**
-//  * Extend arm to sensing position (for sensing while driving)
-//  * @param direction of pets -- 0 is left, 1 is right
-//  * @param height of pets -- 0 is low pets, 1 is high pets
-//  */
-// void ClawManager::sense(bool height, bool direction) {
-//     //reset height
-//     this->vertical->setPosition(this->vertical->RESET_HEIGHT);
-//     this->verticalPos = this->vertical->RESET_HEIGHT;
+/*
+ * Drops pet 1 off of ramp, assuming arm is closed around pet and retracted facing forward
+ * Sequence: rotate base left, extend arm, open grabber, close grabber, retract arm, rotate base forward 
+ */
+void ClawManager::seqRampDrop() {
+    this->base.setPosition(this.BASE_LEFT);
+    this->arm.setPosition(this.ARM_MAX); 
+    this->grabber.setPosition(this.GRABBER_OPEN);
+    this->grabber.setPosition(this.GRABBER_CLOSE);
+    this->arm.setPosition(this.ARM_MIN); 
+    this->base.setPosition(this.BASE_FORWARD);
 
-//     //rotate, change height, extend
-//     if (direction) {
-//         this->base->setPosition(90);
-//         this->basePos = 90;
-//     }
-//     else {
-//         this->base->setPosition(-90);
-//         this->basePos = -90;
-//     }
+/**
+ * deposits pet in basket assuming it won't hit another pet on the way, and has not been retracted  
+ * Sequence: retract arm, rotate to basket position, lower to min, open, raise to above pet head height, 
+ * @param direction left or right of basket; 0 is left, 1 is right 
+ */    
+void ClawManager::seqDeposit(bool direction) {
+    this->arm.setPosition(this.ARM_MIN);
 
-//     if (height) {
-//         this->vertical->setPosition(this->vertical->HIGH_SENSE);
-//         this->verticalPos = this->vertical->HIGH_SENSE;
-//     }
-//     else {
-//         this->vertical->setPosition(this->vertical->LOW_SENSE);
-//         this->verticalPos = this->vertical->LOW_SENSE;
-//     }
+    if (direction) {
+        this->base.setPosition(this.BASE_LEFT_BASKET);
+    }
+    else {
+        this->base.setPosition(this.BASE_RIGHT_BASKET);
+    }
 
-//     this->arm->setPosition(this->arm->MAX);
-//     this->armPos = this->arm->MAX;
-// }
+    this->vertical.setPosition(this.VERTICAL_MIN); 
+    this->grabber.setPosition(this.GRABBER_BASKET_OPEN); 
+    this->vertical.setPosition(this.VERTICAL_PET_ABOVE_CHASSIS);
+}
 
-// /**
-//  * open claw, lower arm to pet height and close claw
-//  * @param height 0 for low pets, 1 for high pets
-//  */
-// void ClawManager::grab(bool height) {
-//     this->grab->setPosition(this->grab->OPEN);
-//     this->grabPos = this->grab->OPEN;
+/**
+ * retrieves pet from basket and lifts above chassis
+ * sequence: raise arm, rotate, open, lower to min, close, raise  
+ * @param direction left or right of basket; 0 is left, 1 is right
+ */
+void ClawManager::seqRetrieve(bool direction) {
+    this->vertical.setPosition(this.VERTICAL_PET_ABOVE_CHASSIS);
+    
+    if (direction) {
+        this->base.setPosition(this.BASE_LEFT_BASKET);
+    }
+    else {
+        this->base.setPosition(this.BASE_RIGHT_BASKET);
+    }
 
-//     if (height) {
-//         this->vertical->setPosition(this->vertical->HIGH_PET);
-//         this->verticalPos = this->vertical->HIGH_PET;
-//     }
-//     else {
-//         this->vertical->setPosition(this->vertical->LOW_PET);
-//         this->verticalPos = this->vertical->LOW_PET;
-//     }    
+    this->grabber.setPosition(this.GRABBER_BASKET_OPEN);
+    this->vertical.setPosition(this.VERTICAL_MIN);
+    this->grabber.setPosition(this.GRABBER_CLOSE);
+    this->vertical.setPosition(this.VERTICAL_PET_ABOVE_CHASSIS);
+}
 
-//     this->grab->setPosition(this->grab->PET_CLOSE);
-//     this->grabPos = this->grab->PET_CLOSE;
-// }
+/**
+ * Sequence: open to pos, raise, extend into pillar, close, retract from pillar
+ * @param chute false for pet three, true for pet four
+ */
+void ClawManager::seqPickUpHigh(bool chute) {
+    this->base.setPosition(this.BASE_LEFT);
+    if (chute) {
+        this->grabber.setPosition(this.GRABBER_CHUTE_OPEN);
+    }
+    else {
+        this->grabber.setPosition(this.GRABBER_OPEN);        
+    }
+    this->vertical.setPosition(this.VERTICAL_MAX);
+    this->arm.moveBy(this.ARM_HIGH_GRAB);
+    this->grabber.setPosition(this.GRABBER_CLOSE); 
+    this->arm.setPosition(this.ARM_MIN);
+    this->base.setPosition(this.BASE_FORWARD);
+    this->vertical.setPosition(this.VERTICAL_PET_ABOVE_CHASSIS);
+}
 
-// /**
-//  * Deposit a pet in the basket (retract, vertical up, rotate to angleL, open, close)
-//  * @param direction 0 is left, 1 is right
-//  */
-// void ClawManager::deposit(bool direction) {
-//     this->arm->setPosition(this->arm->MIN);
-//     this->armPos = this->arm->MIN; 
-//     this->vertical->setPosition(this->vertical->RESET_HEIGHT);
-//     this->verticalPos = this->vertical->RESET_HEIGHT;
+/**
+ * Sequence: retract, rotate, extend, open, close, retract, rotate
+ * @param direction 0 is left, 1 is right 
+ */
+void ClawManager::seqWindowDrop(bool direction) {
+    this->arm.setPosition(this.ARM_OUTSIDE_CHASSIS);
+    this->vertical.setPosition(this.VERTICAL_DEBRIS_HEIGHT);
 
-//     if (direction) {
-//         this->base->setPosition(this->LEFT_ANGLE);
-//         this->basePos = this->LEFT_ANGLE;
-//     }
-//     else {
-//         this->base->setPosition(this->RIGHT_ANGLE);    
-//         this->basePos = this->RIGHT_ANGLE;
-//     }
+    if (direction) {
+        this->base.setPosition(this.BASE_LEFT);
+    }
+    else {
+        this->base.setPosition(this.BASE_RIGHT);
+    }
+    
+    this->arm.setPosition(this.ARM_MAX);
+    this->grabber.setPosition(this.GRABBER_OPEN);
+    delay(1000);
+    this->grabber.setPosition(this.GRABBER_CLOSE);
+    this->arm.setPosition(this.ARM_MIN);
+    this->base.setPOsition(this.BASE_FORWARD)
+}
 
-//     this->grab->setPosition(this->grab->OPEN);
-//     this->grabPos = this->grab->OPEN;
-//     this->grab->setPosition(this->grab->CLOSE);
-//     this->grabPos = this->grab->CLOSE;
-// }
-
-// /**
-//  * pick up pet from basket
-//  * @param direction 0 is left, 1 is right
-//  */
-// void ClawManager::retrieve(bool direction) {
-// //vertical to reset, retract, rotate to basket side
-//     this->vertical->setPosition(this->vertical->RESET_HEIGHT);
-//     this->verticalPos = this->vertical->RESET_HEIGHT; 
-
-//     this->arm->setPosition(this->arm->MIN);
-//     this->armPos = this->arm->MIN; 
-
-//     if (direction) {
-//         this->base->setPosition(this->RIGHT_ANGLE);
-//         this->basePos = this->RIGHT_ANGLE;
-//     }
-//     else {
-//         this->base->setPosition(this->LEFT_ANGLE);
-//         this->basePos = this->LEFT_ANGLE;
-//     }
-
-// //open, lower, close
-//     this->grab->setPosition(this->grab->OPEN);
-//     this->grabPos = this->grab->OPEN; 
-
-//     this->vertical->setPosition(this->vertical->MIN_HEIGHT);
-//     this->verticalPos = this->vertical->MIN_HEIGHT; 
-
-//     this->grab->setPosition(this->grab->PET_CLOSE);
-//     this->grabPos = this->grab->PET_CLOSE;
-// }
-
-// /**
-//  * Assumes window is perpendicular to claw (retract, rotate -90 if pos is 1 and 90 if pos is 0, extend fully, open, close, retract fully, rotate 0)
-//  * @param pos is 0 if robot is right of window and 1 if robot is left of window
-//  */
-// void ClawManager::windowDrop(bool direction) {
-// //retract and lift for rotation
-// this->arm->setPosition(0);
-// this->armPos = 0;
-// this->vertical->setPosition(this->vertical->RESET_HEIGHT);
-// this->verticalPos = this->vertical->RESET_HEIGHT;
-
-// //rotate, lower, extend and drop
-// if (direction) {
-//     this->base->setPosition(-90);
-//     this->basePos = -90;
-// }
-// else {
-//     this->base->setPosition(90);
-//     this->basePos = 90; 
-// }
-// this->vertical->setPosition(this->vertical->MIN_HEIGHT);
-// this->verticalPos = this->vertical->MIN_HEIGHT;
-// this->arm->setPosition(this->arm->MAX);
-// this->armPos = this->arm->MAX;
-// this->grab->setPosition(this->grap->OPEN);
-// this->grabPos = this->grab->OPEN;
-
-// //close and retract
-// this->grab->setPosition(this->grab->PET_CLOSE);
-// this->grabPos = this->grab->PET_CLOSE;
-// this->arm->setPosition(this->arm->MIN);
-// this->armPos = this->arm->MIN; 
-// }
+}
