@@ -41,8 +41,13 @@ void DCMotor::setMaxVoltage(int voltage) {
  *  Note: Might be wrong, check!
  */
 void DCMotor::drivePWM(int signedDuty) {
+    const int MIN_DUTY_CYCLE = 200;
+
     int duty = abs(signedDuty);
     duty = constrain(duty, 0, this->maxDutyCycle);
+    if (duty < MIN_DUTY_CYCLE) {
+        duty = 0;
+    }
 
     if (signedDuty > 0) {
         ledcWrite(pwmChannel2, 0);
