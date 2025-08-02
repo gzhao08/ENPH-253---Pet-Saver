@@ -4,9 +4,10 @@
 
 //volatile boolean drive = false; // Global variable to control driving state
 
-SteeringManager::SteeringManager(DCMotor* left, DCMotor* right)
-    : leftMotor(left), rightMotor(right),
-      pidController(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT)
+SteeringManager::SteeringManager()
+    : leftMotor(LEFT_MOTOR_PIN_A,LEFT_MOTOR_PIN_B,LEFT_MOTOR_PWM_CHANNEL_A,LEFT_MOTOR_PWM_CHANNEL_B,12), 
+      rightMotor(RIGHT_MOTOR_PIN_A,RIGHT_MOTOR_PIN_B,RIGHT_MOTOR_PWM_CHANNEL_A,RIGHT_MOTOR_PWM_CHANNEL_B,12),
+      pidController(&input, &output, &setpoint, KP_DEFAULT, Ki, Kd, DIRECT)
 {
 
 }
@@ -19,18 +20,20 @@ SteeringManager::SteeringManager(DCMotor* left, DCMotor* right)
  * @param innerRightPin Pin for the inner right IR sensor
  * @param outerRightPin Pin for the outer right IR sensor
  */
-void SteeringManager::begin(int outerLeftPin, int innerLeftPin, int innerRightPin, int outerRightPin) {
+void SteeringManager::begin() {
+    // Motor
+    leftMotor.begin();
+    rightMotor.begin();
     // PID
     this->pidController.SetMode(AUTOMATIC);
-    this->pidController.SetOutputLimits(-leftMotor->getMaxDutyCycle(), leftMotor->getMaxDutyCycle()); // Set output limits to motor max duty cycle
+    this->pidController.SetOutputLimits(-leftMotor.getMaxDutyCycle(), leftMotor.getMaxDutyCycle()); // Set output limits to motor max duty cycle
     this->pidController.SetSampleTime(this->PIDSampleTime);
+    this->pidController.SetTunings(KP_DEFAULT, 0, 0);
 
-    // Motor
-    leftMotor->begin();
-    rightMotor->begin();
+    
 
     // IR
-    this->array.begin(outerLeftPin, innerLeftPin, innerRightPin, outerRightPin);
+    this->array.begin(OUTER_LEFT_PIN,INNER_LEFT_PIN,INNER_RIGHT_PIN,OUTER_RIGHT_PIN);
 }
 
 /**
@@ -38,15 +41,11 @@ void SteeringManager::begin(int outerLeftPin, int innerLeftPin, int innerRightPi
  * @param duty the positive duty cycle to drive the motors forwards with
  */
 void SteeringManager::forward(int duty) {
-    // portENTER_CRITICAL(&mux);
-    drive = true;
-    // portEXIT_CRITICAL(&mux);
-    while (drive) {
-        leftMotor->drivePWM(duty);
-        rightMotor->drivePWM(duty);
-        delay(10);
+    while (robotState == RobotState::FORWARD) {
+        leftMotor.drivePWM(duty);
+        rightMotor.drivePWM(duty);
+        delay(5);
     }
-    this->stop();
 }
 
 /**
@@ -58,8 +57,23 @@ void SteeringManager::backward(int duty) {
     drive = true;
     // portEXIT_CRITICAL(&mux);
     while (drive) {
-        leftMotor->drivePWM(-duty);
-        rightMotor->drivePWM(-duty);
+        leftMotor.drivePWM(-duty);
+        rightMotor.drivePWM(-duty);
+    }
+    this->stop();
+}
+
+/**
+ * Drive both motors backward with the same duty cycle
+ * @param duty the positive duty cycle to drive the motors backwards with
+ */
+void SteeringManager::backward(int duty, int timeInMS) {
+    unsigned long startTime = millis();
+    unsigned long currentTime = startTime;
+    while (currentTime - startTime <= timeInMS) {
+        leftMotor.drivePWM(-duty);
+        rightMotor.drivePWM(-duty);
+        currentTime = millis();
     }
     this->stop();
 }
@@ -69,8 +83,20 @@ void SteeringManager::backward(int duty) {
  * Sets the PWM channels to 0
  */
 void SteeringManager::stop() {
-    leftMotor->stop();
-    rightMotor->stop();
+    leftMotor.stop();
+    rightMotor.stop();
+    robotState = RobotState::STOPPED;
+}
+
+/**
+ * Stop both motors
+ * Sets the PWM channels to 0
+ */
+void SteeringManager::quickStop() {
+    this->backward(1000,100);
+    leftMotor.stop();
+    rightMotor.stop();
+    robotState = RobotState::STOPPED;
 }
 
 /**
@@ -80,49 +106,56 @@ void SteeringManager::stop() {
  */
 void SteeringManager::turnAround(int duty, boolean clockwise) {
 
-    // IMPORTANT:
-    // for some reason [left -> negative, right -> positive] is clockwise
-
-    // clockwise means the robot is moving right so error should be positive
-    // counter-clockwise means the robot is moving left so error should be negative
+    duty = clockwise ? duty : -duty;
     
-    if (!clockwise) {
-        duty = -duty; // if counter-clockwise, invert the duty cycle
-    }
-
-    this->array.takeReading(false);
-    if (!this->array.isOnLine()) {
-        return; //do nothing if not on line
-    }
-
+    // counter clockwise
     while (this->array.isOnLine()) {
         // turn in place until off line
         this->array.takeReading(true);
         this->array.getError();
         this->array.update();
-        leftMotor->drivePWM(-duty);
-        rightMotor->drivePWM(duty);
+        leftMotor.drivePWM(duty);
+        rightMotor.drivePWM(-duty);
     }
 
     Serial.println("Off line now");
-    delay(1000);
 
     while (!this->array.isCentered()) {
         // turn in place until back on line
-        leftMotor->drivePWM(-duty);
-        rightMotor->drivePWM(duty);
+        leftMotor.drivePWM(duty);
+        rightMotor.drivePWM(-duty);
         this->array.takeReading(true);
         this->array.getError();
         this->array.update();
     }
     Serial.println("Finish reverse");
+    startLineFollow();
+}
 
-    // while (!this->array.isCentered()) {
-    //     // turn in place until back on line
-    //     leftMotor->drivePWM(duty/2);
-    //     rightMotor->drivePWM(-duty/2);
-    // }
-    stop();
+void SteeringManager::turnBackwards(int duty) {
+
+    // counter clockwise
+    while (this->array.isOnLine()) {
+        // turn in place until off line
+        this->array.takeReading(true);
+        this->array.getError();
+        this->array.update();
+        leftMotor.drivePWM(0);
+        rightMotor.drivePWM(-duty);
+    }
+
+    Serial.println("Off line now");
+
+    while (!this->array.isCentered()) {
+        // turn in place until back on line
+        leftMotor.drivePWM(0);
+        rightMotor.drivePWM(-duty);
+        this->array.takeReading(true);
+        this->array.getError();
+        this->array.update();
+    }
+    Serial.println("Finish turnBackwards()");
+    startLineFollow();
 }
 
 /**
@@ -131,13 +164,18 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
  * The PID controller will adjust the speed of the motors based on the error from the IR sensors
  */
 void SteeringManager::lineFollow(int baseSpeed) {
-    // Serial.println()
-    // Serial.printf("drive address (steeringManager): %p\n", (void*)&drive);
+    
+    while (!drive) {
+        Serial.println("lineFollow(): waiting for drive to be true");
+    }
 
+    recordStartTime();
+    Serial.println("lineFollow(): Reading Started");
     this->array.takeReading(false);
     input = this->array.getError();
     unsigned long lastComputeTime = millis();
     this->array.update();
+    // Serial.printf("Kp: %lf", this->pidController.GetKp());
     while (drive) {
         // only poll and calculate PID at PID sample rate
         if (millis() - lastComputeTime >= this->PIDSampleTime) {
@@ -145,8 +183,8 @@ void SteeringManager::lineFollow(int baseSpeed) {
             pidController.Compute();
             lastComputeTime = millis();
             // drive motors
-            leftMotor->drivePWM(baseSpeed-output);
-            rightMotor->drivePWM(baseSpeed+output);
+            leftMotor.drivePWM(baseSpeed  -output);
+            rightMotor.drivePWM(baseSpeed+output);
             
         }
         // update IR data every cycle so that error is accurate
@@ -156,10 +194,42 @@ void SteeringManager::lineFollow(int baseSpeed) {
         // Serial.printf(" -- %lf\n", output);
         this->array.update();
         delay(1);
-        // esp_task_wdt_reset();
-        // vTaskDelay(10);
+        Serial.printf("lineFollow -- drive : %d\n", drive);
     }
-    this->stop();
+    Serial.println("lineFollow(): Reading Stopped");
+}
+
+
+void SteeringManager::lineFollow() {
+    
+    recordStartTime();
+    Serial.println("lineFollow(): Reading Started");
+    this->array.takeReading(false);
+    input = this->array.getError();
+    unsigned long lastComputeTime = millis();
+    this->array.update();
+    // Serial.printf("Kp: %lf", this->pidController.GetKp());
+    while (robotState == RobotState::LINE_FOLLOW) {
+        // only poll and calculate PID at PID sample rate
+        if (millis() - lastComputeTime >= this->PIDSampleTime) {
+            // compute PID
+            pidController.Compute();
+            lastComputeTime = millis();
+            // drive motors
+            leftMotor.drivePWM(currentSpeed - output);
+            rightMotor.drivePWM(currentSpeed + output);
+            
+        }
+        // update IR data every cycle so that error is accurate
+        this->array.takeReading(false);
+        input = this->array.getError();
+        // array.showState();
+        // Serial.printf(" -- %lf\n", output);
+        this->array.update();
+        delay(1);
+        Serial.printf("lineFollow -- drive : %d\n", drive);
+    }
+    Serial.println("lineFollow(): Reading Stopped");
 }
 
 /**

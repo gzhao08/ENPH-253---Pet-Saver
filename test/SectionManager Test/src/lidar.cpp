@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <lidar.h>
-#include <Adafruit_VL53L0X.h>
+// #include <Adafruit_VL53L0X.h>
+#include <VL53L0X.h>
 #include "../GlobalConstants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -26,8 +27,8 @@ void objectDetected(void *parameter) {
     delay(200); // wait for the drivetrain to set startRead to true (done PID tuning)
   }
   
-  currentSpeed = 500;
-  startDrive();
+  currentSpeed = 1300;
+  startLineFollow();
   int thresholds[6] = {250, 250, 250, 350, 325, 350}; // thresholds for sections 0-5
   int stops[6] = {false, false, true, true, true, true};
   int useRightLidar[6] = {true, true, true, true, true, false};
@@ -36,26 +37,47 @@ void objectDetected(void *parameter) {
   
   
   while(true) {
-    // drive and use lidar to stop
-    // startDrive();
-    // sectionManager.detectCloser(useRightLidar[0], thresholds[0], consecutiveCount[0]);
-    // stopDrive();
-    // sectionManager.show("STOP");
-    // delay(2000);
-    // sectionManager.detectOutOfRange(useRightLidar[0]);
 
-    // drive and use lidar to change speed
-    sectionManager.detectCloser(useRightLidar[0], thresholds[0], consecutiveCount[0]);
-    sectionManager.show(String(currentSpeed));
-    delay(1000);
-    currentSpeed += 100;
-    sectionManager.detectOutOfRange(useRightLidar[0]);
+    switch (robotState) {
+        case RobotState::LINE_FOLLOW: {
+            Serial.println("lidar.cpp: LINE_FOLLOW");
+            sectionManager.getNextSection();
+            break;
+        }
 
-
-  }
-  
-
-  
+        case RobotState::FORWARD: {
+            Serial.println("lidar.cpp: FORWARD");
+            sectionManager.getNextSection();
+            break;
+        }
+            
+        case RobotState::STOPPED: {
+            Serial.println("lidar.cpp: STOPPED");
+            delay(3000);
+            recordStartTime();
+            switch (sectionManager.getCurrentSection()) {
+              case SectionManager::WINDOW_FORWARD: {
+                  startForward();
+                  break;
+              }
+              case SectionManager::PET_3: {
+                  turnCW();
+                  break;
+              }
+              case SectionManager::WINDOW_BACKWARD: {
+                  turnCW_Back();
+                  break;
+              }
+              default:
+                startLineFollow();
+                break;
+            }
+            
+            break;
+        }
+    }  
+  delay(10);
+  }  
 }
 
 

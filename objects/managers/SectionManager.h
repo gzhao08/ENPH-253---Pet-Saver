@@ -1,10 +1,11 @@
 #pragma once
 #include <Arduino.h>
-#include <Adafruit_VL53L0X.h>
+// #include <Adafruit_VL53L0X.h>
 #include "../GlobalConstants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "SharedState.h"
+#include <VL53L0X.h>
 
 class SectionManager {
     private:
@@ -12,15 +13,26 @@ class SectionManager {
         int objectCount;
         bool useDisplay;
         int numConsecutive;
+        unsigned long detectionTime;
 
-        Adafruit_VL53L0X rightLidar;
-        Adafruit_VL53L0X leftLidar;
-        VL53L0X_RangingMeasurementData_t rightMeasure;
-        VL53L0X_RangingMeasurementData_t leftMeasure;
+        VL53L0X rightLidar;
+        VL53L0X leftLidar;
+
         
 
     public:
         Adafruit_SSD1306 display;
+
+        enum Section {
+            DOORWAY,
+            PET_1,
+            RAMP,
+            RAMP_END,
+            WINDOW_FORWARD,
+            PET_3,
+            PET_4,
+            WINDOW_BACKWARD
+        };
 
         SectionManager();
 
@@ -42,6 +54,8 @@ class SectionManager {
         boolean detectCloser(bool useRight, int threshold, int consecutiveCount);
         boolean detectFurther(bool useRight, int threshold, int consecutiveCount);
         boolean show(String message);
+        void getNextSection();
+        void setDetectionTime();
 };
 
 

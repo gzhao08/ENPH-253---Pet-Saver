@@ -13,30 +13,35 @@ class SteeringManager {
         int PIDSampleTime = 10;
         double setpoint = 0;   
         double input = 0;      
-        double output;     
+        double output = 0;     
 
         // 2) Choose your initial tuning constants
         double Kp = 0.0;
         double Ki = 0.0;
         double Kd = 0.0;
 
-        // Motor
-        DCMotor* leftMotor; 
-        DCMotor* rightMotor; 
+        
         
     public:
+        // Motor
+        DCMotor leftMotor; 
+        DCMotor rightMotor; 
         IRArray array; 
         
-        SteeringManager(DCMotor* left, DCMotor* right); 
+        SteeringManager(); 
 
-        void begin(int outerLeftPin, int innerLeftPin, int innerRightPin, int outerRightPin);
+        void begin();
         
         // Movement
         void forward(int duty);
         void backward(int duty);
+        void backward(int duty, int timeInMS);
         void stop();
+        void quickStop();
         void turnAround(int duty, boolean clockwise);
+        void turnBackwards(int duty);
         void lineFollow(int baseSpeed);
+        void lineFollow();
 
         // Tune PID
         void setPID(double kp, double kd);
