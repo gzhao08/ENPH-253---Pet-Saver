@@ -106,49 +106,56 @@ void SteeringManager::quickStop() {
  */
 void SteeringManager::turnAround(int duty, boolean clockwise) {
 
-    // IMPORTANT:
-    // for some reason [left -> negative, right -> positive] is clockwise
-
-    // clockwise means the robot is moving right so error should be positive
-    // counter-clockwise means the robot is moving left so error should be negative
+    duty = clockwise ? duty : -duty;
     
-    if (!clockwise) {
-        duty = -duty; // if counter-clockwise, invert the duty cycle
-    }
-
-    this->array.takeReading(false);
-    if (!this->array.isOnLine()) {
-        return; //do nothing if not on line
-    }
-
+    // counter clockwise
     while (this->array.isOnLine()) {
         // turn in place until off line
         this->array.takeReading(true);
         this->array.getError();
         this->array.update();
-        leftMotor.drivePWM(-duty);
-        rightMotor.drivePWM(duty);
+        leftMotor.drivePWM(duty);
+        rightMotor.drivePWM(-duty);
     }
 
     Serial.println("Off line now");
-    delay(1000);
 
     while (!this->array.isCentered()) {
         // turn in place until back on line
-        leftMotor.drivePWM(-duty);
-        rightMotor.drivePWM(duty);
+        leftMotor.drivePWM(duty);
+        rightMotor.drivePWM(-duty);
         this->array.takeReading(true);
         this->array.getError();
         this->array.update();
     }
     Serial.println("Finish reverse");
+    startLineFollow();
+}
 
-    // while (!this->array.isCentered()) {
-    //     // turn in place until back on line
-    //     leftMotor->drivePWM(duty/2);
-    //     rightMotor->drivePWM(-duty/2);
-    // }
-    stop();
+void SteeringManager::turnBackwards(int duty) {
+
+    // counter clockwise
+    while (this->array.isOnLine()) {
+        // turn in place until off line
+        this->array.takeReading(true);
+        this->array.getError();
+        this->array.update();
+        leftMotor.drivePWM(0);
+        rightMotor.drivePWM(-duty);
+    }
+
+    Serial.println("Off line now");
+
+    while (!this->array.isCentered()) {
+        // turn in place until back on line
+        leftMotor.drivePWM(0);
+        rightMotor.drivePWM(-duty);
+        this->array.takeReading(true);
+        this->array.getError();
+        this->array.update();
+    }
+    Serial.println("Finish turnBackwards()");
+    startLineFollow();
 }
 
 /**

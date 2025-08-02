@@ -50,6 +50,11 @@ void driveTrain(void *parameter) {
                 break;
             case RobotState::FORWARD: {
                 steer.forward(currentSpeed);
+                break;
+            }
+            case RobotState::TURN_CW_BACK: {
+                steer.turnBackwards(currentSpeed);
+                break;
             }
             
         }

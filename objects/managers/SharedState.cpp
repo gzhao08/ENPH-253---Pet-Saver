@@ -34,3 +34,21 @@ void startForward() {
     robotState = FORWARD;
     portEXIT_CRITICAL(&robotStateMux);
 }
+
+void turnCW() {
+    portENTER_CRITICAL(&robotStateMux);
+    robotState = TURN_CW;
+    portEXIT_CRITICAL(&robotStateMux);
+}
+
+void turnCCW() {
+    portENTER_CRITICAL(&robotStateMux);
+    robotState = TURN_CCW;
+    portEXIT_CRITICAL(&robotStateMux);
+}
+
+void turnCW_Back() {
+    portENTER_CRITICAL(&robotStateMux);
+    robotState = TURN_CW_BACK;
+    portEXIT_CRITICAL(&robotStateMux);
+}

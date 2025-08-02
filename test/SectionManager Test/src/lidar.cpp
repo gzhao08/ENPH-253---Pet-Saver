@@ -64,6 +64,10 @@ void objectDetected(void *parameter) {
                   turnCW();
                   break;
               }
+              case SectionManager::WINDOW_BACKWARD: {
+                  turnCW_Back();
+                  break;
+              }
               default:
                 startLineFollow();
                 break;

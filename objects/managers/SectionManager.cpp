@@ -153,7 +153,7 @@ void SectionManager::getNextSection(){
                     display.display();
                 }
                 recordStartTime();
-                currentSpeed = 600;
+                currentSpeed = 750;
             }
             break;
         }
@@ -192,7 +192,7 @@ void SectionManager::getNextSection(){
                         display.display();
                     }
                     recordStartTime();
-                    currentSpeed = 2200;
+                    currentSpeed = 2000;
                 }
             }
         break;
@@ -231,7 +231,7 @@ void SectionManager::getNextSection(){
                 }
                 recordStartTime();
                 stopDrive();
-                currentSpeed = 900;
+                currentSpeed = 950;
             }
             
         break;
@@ -239,7 +239,7 @@ void SectionManager::getNextSection(){
 
       case SectionManager::PET_3: {
         if (millis() - startMovementTime >= 1000) {
-            if (detectCloser(false, 200, 3)) {
+            if (detectCloser(false, 250, 3)) {
                 incrementSection();
                 if (useDisplay) {
                     display.clearDisplay();
@@ -258,8 +258,28 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::PET_4: {
-            if (millis() - startMovementTime >= 500) {
+            if (millis() - startMovementTime >= 1000) {
                 if (detectCloser(false, 350, 2)) {
+                    incrementSection();
+                    if (useDisplay) {
+                        display.clearDisplay();
+                        display.setCursor(30, 24);
+                        display.setTextSize(2);
+                        display.println("WINDOW_BACKWARD");
+                        display.display();
+                    }
+                    recordStartTime();
+                    stopDrive();
+                    currentSpeed = 1000;
+                }
+            }
+            
+            break;
+      }
+
+      case SectionManager::WINDOW_BACKWARD: {
+            if (millis() - startMovementTime >= 2500) {
+                if (detectFurther(false, 350, 2)) {
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();

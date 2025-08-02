@@ -12,9 +12,11 @@ enum RobotState {
     LINE_FOLLOW,
     SENSING,
     STOPPED,
-    TURNING,
+    TURN_CW,
+    TURN_CCW,
     FORWARD,
-    BACKWARD
+    BACKWARD,
+    TURN_CW_BACK
 };
 
 extern volatile RobotState robotState;
@@ -25,3 +27,6 @@ void startLineFollow();
 void changeSpeed(int speed);
 void stopDrive();
 void startForward();
+void turnCW();
+void turnCW_Back();
+void turnCCW();
