@@ -18,7 +18,7 @@ void driveTrain(void *parameter) {
     steer.begin(); // put IR pins here -> left to right
 
     Serial.begin(115200);
-    steer.setPID(KP_DEFAULT,35);
+    steer.setPID(KP_DEFAULT,KD_DEFAULT);
     delay(2000);
 
     startRead = true; // start reading the lidar data
@@ -35,15 +35,18 @@ void driveTrain(void *parameter) {
                 break;
             }
             case RobotState::STOPPED: {
-                Serial.println("drivetrain.cpp: LINE_FOLLOW");
+                //Serial.println("drivetrain.cpp: LINE_FOLLOW");
                 steer.quickStop();
                 while(robotState == STOPPED) {
                     delay(10);
                 }
                 break;
             }
-            case RobotState::TURNING:
+            case RobotState::TURN_CW:
                 steer.turnAround(currentSpeed,true);
+                break;
+            case RobotState::TURN_CCW:
+                steer.turnAround(currentSpeed,false);
                 break;
             case RobotState::FORWARD: {
                 steer.forward(currentSpeed);

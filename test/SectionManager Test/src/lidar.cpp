@@ -60,6 +60,10 @@ void objectDetected(void *parameter) {
                   startForward();
                   break;
               }
+              case SectionManager::PET_3: {
+                  turnCW();
+                  break;
+              }
               default:
                 startLineFollow();
                 break;
@@ -67,10 +71,6 @@ void objectDetected(void *parameter) {
             
             break;
         }
-            
-        case RobotState::TURNING:
-            break;
-        
     }  
   delay(10);
   }  
