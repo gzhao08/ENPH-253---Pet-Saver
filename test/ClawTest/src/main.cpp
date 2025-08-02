@@ -59,11 +59,15 @@ bool baseNormallyOpen = true;
 
 ClawBase base(baseMotorPin1, baseMotorPin2, basePwmChannel1, basePwmChannel2, baseMuxLine, baseEncoderOnTerminalSide, baseSwitchPin, baseNormallyOpen);
 
+bool armHomed = false;
+bool verticalHomed = false;
+bool baseHomed = false;
+
 void setup() {
-  Serial.begin(115200);\
+  Serial.begin(115200);
   Serial.setTimeout(3000);
   // 1. Initialize Wire (I2C-SDA, I2C_SCL) -- clock next to dot then data
-  Wire.begin(5, 7);
+  Wire.begin(7, 5);
   Wire1.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
   // 2. Begin wire manager
   wireManager.begin(&Wire);
@@ -79,7 +83,6 @@ void setup() {
   // positionDelayManager.reset();
 
   // arm.continuousServo.logPIDOutput = true;
-  arm.setPosition(100);
 
 }
 
@@ -137,15 +140,17 @@ void loop() {
       case 4:
         Serial.println("Command: Arm homing");
         arm.homingSequence();
-        arm.setPosition(100);
+        armHomed = true;
         break;
       case 5:
         Serial.println("Command: Vertical homing");
-        verticalStage.homingSequence();
+        // verticalStage.homingSequence();
+        verticalHomed = true;
         break;
       case 6:
         Serial.println("Command: Base homing");
         base.homingSequence();
+        baseHomed = true;
         break;
 
       case 7:
@@ -162,15 +167,19 @@ void loop() {
         break;
       
       case 10:
+      {
         Serial.println("Command: Arm set position");
         while (true) {
           arm.loop();
           if (Serial.available()) {
-            String pos = Serial.readStringUntil('\n');
-            Serial.println(pos);
-            if (pos.toInt() != -1) {
-              arm.setPosition(pos.toInt());
-              Serial.println("Set position  of arm to: " + String(pos.toInt()));
+            String posSetArm = Serial.readStringUntil('\n');
+            if (posSetArm == "q" || posSetArm.length() == 0) {
+              Serial.println("Quit");
+              break;
+            }            
+            if (posSetArm.toInt() != -1) {
+              arm.setPosition(posSetArm.toInt());
+              Serial.println("Set position  of arm to: " + String(posSetArm.toInt()));
             } else {
               Serial.println("Quit");
               break;
@@ -178,37 +187,51 @@ void loop() {
           }
         }
         break;
+      }
       case 11:
+      {
         Serial.println("Command: Vertical set position");
         while (true) {
           verticalStage.loop();
           if (Serial.available()) {
-            String pos = Serial.readStringUntil('\n');
-            if (pos.toInt() != -1) {
-              verticalStage.setPosition(pos.toInt());
-              Serial.println("Set position of vertical stage to: " + String(pos.toInt()));
+            String posSetVert = Serial.readStringUntil('\n');
+            if (posSetVert == "q" || posSetVert.length() == 0) {
+              Serial.println("Quit");
+              break;
+            }
+            if (posSetVert.toInt() != -1) {
+              verticalStage.setPosition(posSetVert.toInt());
+              Serial.println("Set position of vertical stage to: " + String(posSetVert.toInt()));
             } else {
+              Serial.println("Quit");
               break;
             }
           }
         }
         break;
+      }
       case 12:
+      {
         Serial.println("Command: Base set position");
         while (true) {
           base.loop();
           if (Serial.available()) {
-            String pos = Serial.readStringUntil('\n');
-            if (pos.toInt() != -1) {
-              base.setPosition(pos.toInt());
-              Serial.println("Set position of base to: " + String(pos.toInt()));
+            String posSetBase = Serial.readStringUntil('\n');
+            if (posSetBase == "q" || posSetBase.length() == 0) {
+              Serial.println("Quit");
+              break;
+            }
+            if (posSetBase.toInt() != -1) {
+              base.setPosition(posSetBase.toInt());
+              Serial.println("Set position of base to: " + String(posSetBase.toInt()));
             } else {
+              Serial.println("Quit");
               break;
             }
           }
         }
         break;
-      
+      }
       case 13:
         Serial.println("Command: Grabber close");
         grabber.close();
@@ -222,22 +245,35 @@ void loop() {
         grabber.parallel();
         break;
       case 16:
+      {
         Serial.println("Command: Grabber set position");
         while (true) {
           if (Serial.available()) {
-            String pos = Serial.readStringUntil('\n');
-            if (pos.toInt() != -1) {
-              grabber.setPositionDegrees(pos.toInt());
-              Serial.println("Set position of grabber to: " + String(pos.toInt()));
+            String posGrabber = Serial.readStringUntil('\n');
+            if (posGrabber == "q" || posGrabber.length() == 0) {
+              Serial.println("Quit");
+              break;
+            }
+            if (posGrabber.toInt() != -1) {
+              grabber.setPositionDegrees(posGrabber.toInt());
+              Serial.println("Set position of grabber to: " + String(posGrabber.toInt()));
             } else {
+              Serial.println("Quit");
               break;
             }
           }
         }
         break;
+      }
       case 17:
       {
         Serial.println("Command: PID Tuning arm");
+        if (!armHomed || !verticalHomed || !baseHomed) {
+          Serial.println("Claw not fully homed. Can't PID Tune");
+          break;
+        }
+        verticalStage.setPosition(60);
+        base.setPosition(0);
         DelayManager positionDelay(2000);
         positionDelay.reset();
         const int posArm1 = 50;
@@ -249,6 +285,10 @@ void loop() {
             float Pk = Pks.toFloat();
             String Dks = Serial.readStringUntil('\n');
             float Dk = Dks.toFloat();
+            if (Pks == "q" || Pks.length() == 0 || Dks == "q" || Pks.length() == 0) {
+              Serial.println("Quit");
+              break;
+            }
             if (Dk == -1 || Pk == -1) {
               Serial.println("Quit");
               break;
@@ -258,8 +298,10 @@ void loop() {
             }
           }
 
-          arm.loop();
 
+          arm.loop();
+          verticalStage.loop();
+          base.loop();
           if(positionDelay.checkAndReset()) {
             if (posArm == posArm1) {
               posArm = posArm2;
@@ -267,6 +309,7 @@ void loop() {
               posArm = posArm1;
             }
             Serial.printf("Arm position: %.3f\n", arm.getPosition());
+            Serial.println(posArm);
             arm.setPosition(posArm);
           }
 
@@ -275,7 +318,14 @@ void loop() {
       }
       case 18:
       {
-        Serial.println("Command: PID Tuning vertical");        DelayManager positionDelay(2000);
+        Serial.println("Command: PID Tuning vertical");     
+        if (!armHomed || !verticalHomed || !baseHomed) {
+          Serial.println("Claw not fully homed. Can't PID Tune");
+          break;
+        }   
+        base.setPosition(0);
+        arm.setPosition(100);
+        DelayManager positionDelay(2000);
         positionDelay.reset();
         const int posVert1 = 30;
         const int posVert2 = 70;
@@ -286,6 +336,10 @@ void loop() {
             float Pk = Pks.toFloat();
             String Dks = Serial.readStringUntil('\n');
             float Dk = Dks.toFloat();
+            if (Pks == "q" || Pks.length() == 0 || Dks == "q" || Pks.length() == 0) {
+              Serial.println("Quit");
+              break;
+            }
             if (Dk == -1 || Pk == -1) {
               Serial.println("Quit");
               break;
@@ -295,7 +349,9 @@ void loop() {
             }
           }
 
+          arm.loop();
           verticalStage.loop();
+          base.loop();
 
           if(positionDelay.checkAndReset()) {
             if (posVert == posVert1) {
@@ -312,6 +368,12 @@ void loop() {
       case 19:
       {
         Serial.println("Command: PID Tuning base");
+        if (!armHomed || !verticalHomed || !baseHomed) {
+          Serial.println("Claw not fully homed. Can't PID Tune");
+          break;
+        }
+        verticalStage.setPosition(60);
+        arm.setPosition(100);
         DelayManager positionDelay(2000);
         positionDelay.reset();
         const int posBase1 = -30;
@@ -323,6 +385,11 @@ void loop() {
             float Pk = Pks.toFloat();
             String Dks = Serial.readStringUntil('\n');
             float Dk = Dks.toFloat();
+            if (Pks == "q" || Pks.length() == 0 || Dks == "q" || Pks.length() == 0) {
+              Serial.println("Quit");
+              break;
+            }
+
             if (Dk == -1 || Pk == -1) {
               Serial.println("Quit");
               break;
@@ -332,6 +399,8 @@ void loop() {
             }
           }
 
+          arm.loop();
+          verticalStage.loop();
           base.loop();
 
           if(positionDelay.checkAndReset()) {
@@ -344,9 +413,27 @@ void loop() {
             base.setPosition(posBase);
           }
         }
-        break;
-      
+      break;
     }
+
+    case 20:
+    {
+      arm.continuousServo.logPIDOutput = !arm.continuousServo.logPIDOutput;
+      break;
+    }
+
+    case 21:
+    {
+      verticalStage.continuousServo.logPIDOutput = !verticalStage.continuousServo.logPIDOutput;
+      break;
+    }
+
+    case 22:
+    {
+      base.continuousServo.logPIDOutput = !base.continuousServo.logPIDOutput;
+      break;
+    }
+
   }
 }
 

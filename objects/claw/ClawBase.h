@@ -16,16 +16,16 @@ class ClawBase : public ClawPart {
         const float _ENCODER_TO_POS_CONVERSION = -0.4; /// Calibrating from 2mm pitch * 4 starts / 360 degrees
         const float _POS_TO_ENCODER_CONVERSION = 1 / _ENCODER_TO_POS_CONVERSION; // 1mm corresponds to 1/0.42 degrees
         const int _ABS_POS_LIMIT = 80;
-        const int _MIN_POSITION = -80;
-        const int _MAX_POSITION = 80;
+        const int _MIN_POSITION = -130;
+        const int _MAX_POSITION = 60;
 
         // PID Parameters
-        const float _Pk = 30;
-        const float _Dk = 1;
+        const float _Pk = 50;
+        const float _Dk = 3.5;
 
         // Servo parameters
-        const int _servoMaxVoltage = 8;
-        const int _servoTolerance = 10; // How much can angle deviate from target
+        const int _servoMaxVoltage = 6;
+        const int _servoTolerance = 15; // How much can angle deviate from target
 
 
     public: 

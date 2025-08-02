@@ -12,7 +12,7 @@
 #include "claw/ClawArm.h"
 #include "claw/ClawVerticalStage.h"
 #include "claw/ClawBase.h"
-
+#include "sensors/Microswitch.h"
 #include "sensors/Microswitch.h"
 
 float last_reading = 0.0;
@@ -52,6 +52,8 @@ bool verticalStageNormallyOpen = true;
 ClawVerticalStage verticalStage(verticalStageMotorPin1, verticalStageMotorPin2, verticalStagePwmChannel1, verticalStagePwmChannel2, verticalStageMuxLine, verticalStageEncoderOnTerminalSide,
   verticalStageSwitchPin, verticalStageNormallyOpen);
 
+Microswitch resetSwitch(verticalStageSwitchPin, true);
+
 int baseMotorPin1 = 14;
 int baseMotorPin2 = 27;
 int basePwmChannel1 = 6; //motor pin 1 goes to B
@@ -76,12 +78,15 @@ bool directionForward = true;
 float getMagnetReadingMagSq();
 void sensePet();
 
+float baseMagnetX = 0;
+float baseMagnetY = 0;
+float baseMagnetZ = 0;
 
 void setup() {
   Serial.begin(115200);
 
   // 1. Initialize Wire (I2C-SDA, I2C_SCL) -- clock next to dot then data
-  Wire.begin(5, 7);
+  Wire.begin(7, 5);
   Wire1.begin(I2C_SDA_A_PIN, I2C_SCL_A_PIN);
   // 2. Begin wire manager
   wireManager.begin(&Wire);
@@ -93,6 +98,7 @@ void setup() {
 
   positionDelayManager.reset();
   printDelayManager.reset();
+  resetSwitch.begin();
   
   delay(1000);
   Serial.println("LIS3MDL test");
@@ -110,13 +116,34 @@ void setup() {
   lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ);
   lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
   Serial.println("ready set go");
-    // base.homingSequence();
-    base.setAsHome();
 
-    arm.homingSequence();
+  // Set base
+  float sampleSize = 10;
+  float x_tot = 0;
+  float y_tot = 0;
+  float z_tot = 0;
+  sensors_event_t event;
+  for (int i = 0; i < sampleSize; i++) {
+    lis3mdl.getEvent(&event);
+    x_tot += event.magnetic.x;
+    y_tot += event.magnetic.y;
+    z_tot += event.magnetic.z;
+  }
+  baseMagnetX = x_tot/sampleSize;
+  baseMagnetY = y_tot/sampleSize;
+  baseMagnetZ = z_tot/sampleSize;
+    while (true) {
+    Serial.printf("Squared reading: %.2f\n", getMagnetReadingMagSq());
+    Serial.println("---");
+    delay(500);
+  }
+  arm.homingSequence();
+  base.homingSequence();
+    // base.setAsHome();
 
-  verticalStage.homingSequence();
-  verticalStage.setPosition(100);
+
+  // verticalStage.homingSequence();
+  // verticalStage.setPosition(100);
   Serial.println("HOME!");
   // arm.setPosition(100);
   // base.setPosition(60);
@@ -127,6 +154,9 @@ void setup() {
 }
 
 void loop() {
+  if (resetSwitch.isPressed()) {
+    sensePet();
+  }
   // // MAGNETOMETER STUFF
   // while (millis() < 7000) {
   //   verticalStage.loop();
@@ -205,62 +235,150 @@ void loop() {
 
 float getMagnetReadingMagSq() {
   // Remember to benchmark
-  int sampleSize = 50;
+  float sampleSize = 10;
   float x_tot = 0;
   float y_tot = 0;
   float z_tot = 0;
   sensors_event_t event;
   for (int i = 0; i < sampleSize; i++) {
     lis3mdl.getEvent(&event);
-    x_tot += event.magnetic.x;
-    y_tot += event.magnetic.y;
-    z_tot += event.magnetic.z;
+    x_tot += event.magnetic.x - (-27.92);
+    y_tot += event.magnetic.y - 69.15;
+    z_tot += event.magnetic.z - (-36.27);
+    // x_tot += abs(event.magnetic.x-baseMagnetX);
+    // y_tot += abs(event.magnetic.y-baseMagnetY);
+    // z_tot += abs(event.magnetic.z-baseMagnetZ);
   }
   x_tot /= sampleSize;
   y_tot /= sampleSize;
   z_tot /= sampleSize;
-  return x_tot*x_tot + y_tot*y_tot + z_tot*z_tot;
+
+  // x_tot -= -27.92;
+  // y_tot -= 69.15;
+  // z_tot -= -36.27;
+  Serial.printf("X Reading: %.2f\n", x_tot);
+  Serial.printf("Y Reading: %.2f\n", y_tot);
+  Serial.printf("Z Reading: %.2f\n", z_tot);
+  return sqrt(x_tot*x_tot + y_tot*y_tot + z_tot*z_tot);
 }
 
 void sensePet() {
-  int baseInit = 0;
-  verticalStage.setPosition(80);
-  arm.setPosition(70);
+  int samples = 0;
+  Serial.println("Sensing pet start");
+  // Params:
+  int baseInit = -20;
+  int verticalInit = 80;
+  int armInit = 80;
+  // verticalStage.setPosition(verticalInit);
+  arm.setPosition(armInit);
   base.setPosition(baseInit);
 
 
-  while (!arm.reachedTarget() || !verticalStage.reachedTarget() || !base.reachedTarget()) {
+  while (!arm.reachedTarget() || !base.reachedTarget()) {
+    Serial.println("Going to initial");
+    // Serial.println(getMagnetReadingMagSq());
     arm.loop();
-    verticalStage.loop();
+    // verticalStage.loop();
     base.loop();
   }
+  Serial.println("Initial position reached");
 
-  // Try find best base
-  int sweepAngle = 15; // one side from initial position (so movement 2x sweepangle)
+  // Try find best angle
+  int sweepAngle = 40; // one side from initial position (so movement 2x sweepangle)
   base.setPosition(baseInit + sweepAngle);
   int maxMagnetReading = 0;
   int maxMagnetReadingPos = 0;
+
+  for (int i = 0; i < 2; i++) {
+    while (!base.reachedTarget()) {
+      Serial.println("Moving correct base to position");
+      base.loop();
+      arm.loop();
+      float currentReading = getMagnetReadingMagSq();
+      Serial.println(currentReading);
+      if (maxMagnetReading < currentReading) {
+        maxMagnetReading = currentReading;
+        maxMagnetReadingPos = base.getPosition();
+      }
+      samples += 1;
+    }
+    base.setPosition(baseInit-sweepAngle);
+    while (!base.reachedTarget()) {
+      Serial.println("Moving to other base position");
+      base.loop();
+      arm.loop();
+
+      float currentReading = getMagnetReadingMagSq();
+      Serial.println(currentReading);
+
+      if (maxMagnetReading < currentReading) {
+        maxMagnetReading = currentReading;
+        maxMagnetReadingPos = base.getPosition();
+      }
+      samples += 1;
+    }
+  }
+
+
+    base.setPosition(baseInit+sweepAngle);
   while (!base.reachedTarget()) {
+    Serial.println("Moving correct base to position");
     base.loop();
+    arm.loop();
     float currentReading = getMagnetReadingMagSq();
+    Serial.println(currentReading);
     if (maxMagnetReading < currentReading) {
       maxMagnetReading = currentReading;
       maxMagnetReadingPos = base.getPosition();
     }
+    samples += 1;
   }
   base.setPosition(baseInit-sweepAngle);
   while (!base.reachedTarget()) {
+    Serial.println("Moving to other base position");
     base.loop();
+    arm.loop();
+
     float currentReading = getMagnetReadingMagSq();
+    Serial.println(currentReading);
+
     if (maxMagnetReading < currentReading) {
       maxMagnetReading = currentReading;
       maxMagnetReadingPos = base.getPosition();
     }
+    samples += 1;
   }
 
   base.setPosition(maxMagnetReadingPos);
   while (!base.reachedTarget()) {
+    Serial.println("moving to max reading position");
     base.loop();
+    arm.loop();
+
   }
+
+  Serial.printf("Max magnet reading position: %d\n", maxMagnetReadingPos);
+  Serial.printf("Done, samples: %d\n", samples);
+
+  // // Try to find best position
+  // int armExtension = 200;
+  // float maxMagnetReadingArm = 0;
+  // float maxMagnetReadingArmPos = 0;
+  // arm.setPosition(armInit + armExtension);
+  // while (!arm.reachedTarget()) {
+  //   base.loop();
+  //   arm.loop();
+  //   float currentReading = getMagnetReadingMagSq();
+  //   if (maxMagnetReadingArm < currentReading) {
+  //     maxMagnetReadingArm = currentReading;
+  //     maxMagnetReadingArmPos = arm.getPosition();
+  //   }
+  // }
+
+  // arm.setPosition(maxMagnetReadingArmPos);
+  // while (!arm.reachedTarget()) {
+  //   arm.loop();
+  //   base.loop();
+  // }
 
 }
