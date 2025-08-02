@@ -95,13 +95,7 @@ boolean SectionManager::detectOutOfRange(bool useRight) {
 boolean SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCount) {
     
     int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
-    // if (useDisplay) {
-    //     display.clearDisplay();
-    //     display.setCursor(50, 25);
-    //     display.setTextSize(3);
-    //     display.println(distance);
-    //     display.display();
-    // }
+    
     if (distance <= threshold) {
         numConsecutive++;
         if (numConsecutive >= consecutiveCount) {
@@ -116,25 +110,8 @@ boolean SectionManager::detectCloser(bool useRight, int threshold, int consecuti
 }
 
 boolean SectionManager::detectFurther(bool useRight, int threshold, int consecutiveCount) {
-    int numConsecutive = 0;
-
-    // if (useDisplay) {
-    //     display.clearDisplay();
-    //     display.setCursor(0, 0);
-    //     display.setTextSize(2);
-    //     display.print(useRight ? "Detecting Right..." : "Detecting Left...");
-    //     display.display();
-    // }
-
-    
     int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
-    if (useDisplay) {
-        display.clearDisplay();
-        display.setCursor(50, 25);
-        display.setTextSize(3);
-        display.println(distance);
-        display.display();
-    }
+    
     if (distance >= threshold) {
         numConsecutive++;
         if (numConsecutive >= consecutiveCount) {
@@ -145,7 +122,6 @@ boolean SectionManager::detectFurther(bool useRight, int threshold, int consecut
     else {
         numConsecutive = 0; // reset if not detecting
     }
-        
     return false;
 }
 
@@ -176,14 +152,15 @@ void SectionManager::getNextSection(){
                     display.println("PET 1");
                     display.display();
                 }
-                stopDrive();
+                recordStartTime();
+                currentSpeed = 750;
             }
             break;
         }
 
         case SectionManager::PET_1: {
-            if (millis() - startMovementTime > 2000) {
-                if (detectCloser(true, 300, 1)) {
+            if (millis() - startMovementTime > 1000) {
+                if (detectCloser(true, 350, 1)) {
                     // detectionTime = millis();
                     incrementSection();
                     if (useDisplay) {
@@ -193,8 +170,9 @@ void SectionManager::getNextSection(){
                         display.println("RAMP");
                         display.display();
                     }
-                    stopDrive();
-                    Serial.println("SectionManager: Stopped Drive and Read");
+                    recordStartTime();
+                    robotState = RobotState::STOPPED;
+                    currentSpeed = 900;
                 }
             }
             
@@ -202,8 +180,8 @@ void SectionManager::getNextSection(){
         }
 
       case SectionManager::RAMP: {
-        if (millis() - startMovementTime > 1000) {
-                if (detectCloser(true, 350, 3)) {
+        if (millis() - startMovementTime > 500) {
+                if (detectCloser(true, 375, 3)) {
                     // detectionTime = millis();
                     incrementSection();
                     if (useDisplay) {
@@ -213,8 +191,8 @@ void SectionManager::getNextSection(){
                         display.println("RAMP END");
                         display.display();
                     }
-                    stopDrive();
-                    Serial.println("SectionManager: Stopped Drive and Read");
+                    recordStartTime();
+                    currentSpeed = 2000;
                 }
             }
         break;
@@ -229,13 +207,93 @@ void SectionManager::getNextSection(){
                         display.clearDisplay();
                         display.setCursor(30, 24);
                         display.setTextSize(2);
-                        display.println("DONE");
+                        display.println("WINDOW");
                         display.display();
                     }
+                    recordStartTime();
                     stopDrive();
+                    currentSpeed = 800;
                 }
             }
         break;
+      }
+
+      case SectionManager::WINDOW_FORWARD: {
+            if (detectFurther(false, 300, 3)) {
+                // detectionTime = millis();
+                incrementSection();
+                if (useDisplay) {
+                    display.clearDisplay();
+                    display.setCursor(30, 24);
+                    display.setTextSize(2);
+                    display.println("PET_3");
+                    display.display();
+                }
+                recordStartTime();
+                stopDrive();
+                currentSpeed = 950;
+            }
+            
+        break;
+      }
+
+      case SectionManager::PET_3: {
+        if (millis() - startMovementTime >= 1000) {
+            if (detectCloser(false, 250, 3)) {
+                incrementSection();
+                if (useDisplay) {
+                    display.clearDisplay();
+                    display.setCursor(30, 24);
+                    display.setTextSize(2);
+                    display.println("PET_4");
+                    display.display();
+                }
+                recordStartTime();
+                stopDrive();
+                currentSpeed = 800;
+            }
+        }
+            
+        break;
+      }
+
+      case SectionManager::PET_4: {
+            if (millis() - startMovementTime >= 1000) {
+                if (detectCloser(false, 350, 2)) {
+                    incrementSection();
+                    if (useDisplay) {
+                        display.clearDisplay();
+                        display.setCursor(30, 24);
+                        display.setTextSize(2);
+                        display.println("WINDOW_BACKWARD");
+                        display.display();
+                    }
+                    recordStartTime();
+                    stopDrive();
+                    currentSpeed = 1000;
+                }
+            }
+            
+            break;
+      }
+
+      case SectionManager::WINDOW_BACKWARD: {
+            if (millis() - startMovementTime >= 2500) {
+                if (detectFurther(false, 350, 2)) {
+                    incrementSection();
+                    if (useDisplay) {
+                        display.clearDisplay();
+                        display.setCursor(30, 24);
+                        display.setTextSize(2);
+                        display.println("DONE");
+                        display.display();
+                    }
+                    recordStartTime();
+                    stopDrive();
+                }
+            }
+            
+            break;
       }
 
     }

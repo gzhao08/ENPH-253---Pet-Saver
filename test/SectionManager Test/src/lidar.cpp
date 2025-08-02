@@ -27,8 +27,8 @@ void objectDetected(void *parameter) {
     delay(200); // wait for the drivetrain to set startRead to true (done PID tuning)
   }
   
-  currentSpeed = 500;
-  startDrive();
+  currentSpeed = 1300;
+  startLineFollow();
   int thresholds[6] = {250, 250, 250, 350, 325, 350}; // thresholds for sections 0-5
   int stops[6] = {false, false, true, true, true, true};
   int useRightLidar[6] = {true, true, true, true, true, false};
@@ -37,15 +37,46 @@ void objectDetected(void *parameter) {
   
   
   while(true) {
-    if (startRead) {
-      sectionManager.getNextSection();
-    }
 
-    // if (sectionManager.getCurrentSection() == SectionManager::PET_1) {
-    //   put
-    // }
+    switch (robotState) {
+        case RobotState::LINE_FOLLOW: {
+            Serial.println("lidar.cpp: LINE_FOLLOW");
+            sectionManager.getNextSection();
+            break;
+        }
 
-
+        case RobotState::FORWARD: {
+            Serial.println("lidar.cpp: FORWARD");
+            sectionManager.getNextSection();
+            break;
+        }
+            
+        case RobotState::STOPPED: {
+            Serial.println("lidar.cpp: STOPPED");
+            delay(3000);
+            recordStartTime();
+            switch (sectionManager.getCurrentSection()) {
+              case SectionManager::WINDOW_FORWARD: {
+                  startForward();
+                  break;
+              }
+              case SectionManager::PET_3: {
+                  turnCW();
+                  break;
+              }
+              case SectionManager::WINDOW_BACKWARD: {
+                  turnCW_Back();
+                  break;
+              }
+              default:
+                startLineFollow();
+                break;
+            }
+            
+            break;
+        }
+    }  
+  delay(10);
   }  
 }
 

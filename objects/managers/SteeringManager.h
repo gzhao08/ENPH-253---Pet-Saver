@@ -39,7 +39,9 @@ class SteeringManager {
         void stop();
         void quickStop();
         void turnAround(int duty, boolean clockwise);
+        void turnBackwards(int duty);
         void lineFollow(int baseSpeed);
+        void lineFollow();
 
         // Tune PID
         void setPID(double kp, double kd);

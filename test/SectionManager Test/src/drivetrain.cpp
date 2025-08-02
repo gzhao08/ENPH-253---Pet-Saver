@@ -18,7 +18,7 @@ void driveTrain(void *parameter) {
     steer.begin(); // put IR pins here -> left to right
 
     Serial.begin(115200);
-    steer.setPID(KP_DEFAULT,0);
+    steer.setPID(KP_DEFAULT,KD_DEFAULT);
     delay(2000);
 
     startRead = true; // start reading the lidar data
@@ -28,23 +28,37 @@ void driveTrain(void *parameter) {
     //----------------------------LOOP----------------------------//
     while (true) {
      
-        while(!drive) {
-            //Serial.println("Waiting for drive to be true");
-            vTaskDelay(10);
+        switch (robotState) {
+            case RobotState::LINE_FOLLOW: {
+                Serial.println("drivetrain.cpp: LINE_FOLLOW");
+                steer.lineFollow();
+                break;
+            }
+            case RobotState::STOPPED: {
+                //Serial.println("drivetrain.cpp: LINE_FOLLOW");
+                steer.quickStop();
+                while(robotState == STOPPED) {
+                    delay(10);
+                }
+                break;
+            }
+            case RobotState::TURN_CW:
+                steer.turnAround(currentSpeed,true);
+                break;
+            case RobotState::TURN_CCW:
+                steer.turnAround(currentSpeed,false);
+                break;
+            case RobotState::FORWARD: {
+                steer.forward(currentSpeed);
+                break;
+            }
+            case RobotState::TURN_CW_BACK: {
+                steer.turnBackwards(currentSpeed);
+                break;
+            }
+            
         }
-        Serial.printf("drivetrain -- drive : %p\n", &drive);
-        steer.lineFollow(1300); // up to doorway
-        Serial.println("drivetrain: Detected Doorway, now looking for pet");
-        steer.lineFollow(600);  // up to pet 1
-        steer.quickStop();
-        delay(2000);      // stop at pet 1
-        steer.lineFollow(900); //up to beginning of ramp
-        // steer.stop();// stop at beginning of ramp
-        // delay(2000);
-        steer.lineFollow(1500);// up to end of ramp
-        steer.quickStop();// stop at end of ramp
-        delay(10000);
-
+        delay(10);
     }
     
     
