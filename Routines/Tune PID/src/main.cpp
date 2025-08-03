@@ -27,11 +27,11 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Serial Started");
 
-  WifiHelper wifi = WifiHelper();
-  wifi.begin();
-  Serial.println("Wifi Server Started");
-  wifi.startTune(&kp, &kd, &baseSpeed); // try kp = 210, baseSpeed = 875
-  baseSpeed = constrain(baseSpeed,0,1500);
+  // WifiHelper wifi = WifiHelper();
+  // wifi.begin();
+  // Serial.println("Wifi Server Started");
+  // wifi.startTune(&kp, &kd, &baseSpeed); // try kp = 210, baseSpeed = 875
+  // baseSpeed = constrain(baseSpeed,0,1500);
   // kp = 150;
   // baseSpeed = 850;
   steer.setPID(kp,kd); 
@@ -43,7 +43,7 @@ void setup() {
 void loop() {
   
   // Line Following
-  steer.lineFollow(baseSpeed);
+  // steer.lineFollow(baseSpeed);
 
   // steer.array.takeReading(false);
   // steer.array.getError();
@@ -51,14 +51,14 @@ void loop() {
   // Serial.print("\n");
   // steer.array.update();
 
-  // Serial.println("left");
-  // left.drivePWM(800);
-  // delay(2000);
-  // left.stop();
-  // Serial.println("right");
-  // right.drivePWM(800);
-  // delay(2000);
-  // right.stop();
+  Serial.println("left");
+  left.drivePWM(800);
+  delay(2000);
+  left.stop();
+  Serial.println("right");
+  right.drivePWM(800);
+  delay(2000);
+  right.stop();
 
 
 }
