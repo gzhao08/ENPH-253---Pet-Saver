@@ -39,9 +39,9 @@ void ClawPart::setAsHome() {
  */
 void ClawPart::homingSequence() {
     int overshootAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 1.2;
-    this->continuousServo.moveBy(overshootAngle); // Move down to ensure we are not at the top
+    this->continuousServo.moveBy(overshootAngle);
     
-    DelayManager timeout(7000);
+    DelayManager timeout(5000);
     timeout.reset();
     while (!this->microswitch.isPressed()) {
         this->loop();
@@ -52,7 +52,6 @@ void ClawPart::homingSequence() {
     }  
 
     this->setAsHome();
-    Serial.println("Current position of " + this->partName + " is set as home");
 
     timeout.reset();
     this->setPosition(this->MIN_POSITION + (this->MAX_POSITION-this->MIN_POSITION) * 0.05);
@@ -64,6 +63,35 @@ void ClawPart::homingSequence() {
         }
     }
     Serial.println("Position adjusted");
+
+
+    int rehomeAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 0.1;
+    this->continuousServo.moveBy(rehomeAngle); // Gentle rehome
+    
+    timeout.reset();
+    while (!this->microswitch.isPressed()) {
+        this->loop();
+        if (timeout.checkAndReset()) {
+            Serial.println("Homing timed out (10 seconds) for " + this->partName);
+            break;
+        }
+    }  
+
+    this->setAsHome();
+
+    timeout.reset();
+    this->setPosition(this->MIN_POSITION + (this->MAX_POSITION-this->MIN_POSITION) * 0.05);
+    while (!this->reachedTarget()) {
+        this->loop();
+        if (timeout.checkAndReset()) {
+            Serial.println("Adjust position after homing timed out (10 seconds) for " + this->partName);
+            break;
+        }
+    }
+    Serial.println("Position adjusted");
+
+    Serial.println("Current position of " + this->partName + " is set as home");
+
 
     Serial.println("Homing sequence done");
 }

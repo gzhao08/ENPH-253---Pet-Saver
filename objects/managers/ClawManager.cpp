@@ -69,6 +69,10 @@ void ClawManager::loop() {
 void ClawManager::homingSequence() {
     this->arm.homingSequence();
     this->vertical.homingSequence();
+    this->vertical.setPosition(50);
+    while (!this->vertical.reachedTarget()) {
+        this->vertical.loop();
+    }
     this->base.homingSequence();
 }
 
@@ -93,8 +97,8 @@ void ClawManager::homingSequence() {
  */
 void ClawManager::seqDrivePosition(float height) {
     this->arm.setPosition(this->ARM_MIN);
-    this->vertical.setPosition(height);
     this->base.setPosition(this->BASE_FORWARD);
+    this->vertical.setPosition(height);
     this->grabber.setPositionDegrees(this->GRABBER_CLOSE);
 }
 /*

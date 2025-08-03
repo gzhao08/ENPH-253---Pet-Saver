@@ -56,6 +56,10 @@ void driveTrain(void *parameter) {
                 steer.turnBackwards(currentSpeed);
                 break;
             }
+            case RobotState::BACKWARD:{
+                steer.backward(currentSpeed);
+                break;
+            }
             
         }
         delay(10);

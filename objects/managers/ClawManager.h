@@ -74,10 +74,10 @@ int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmCha
         float VERTICAL_MIN = 0; 
         float VERTICAL_PICKUP_LOW = -10;
         float VERTICAL_DEBRIS_HEIGHT = 60; //use every time pet is picked up, 2.5"
-        float VERTICAL_PET_ABOVE_CHASSIS = 120; //CHECK
+        float VERTICAL_PET_ABOVE_CHASSIS = 30; //CHECK
         float VERTICAL_LOW_SCAN = 40; //CHECK
         float VERTICAL_HIGH_SCAN = 80; //CHECk
-        float VERTICAL_MAX = 130; 
+        float VERTICAL_MAX = 130; //CHECK
         //Horizontal
         float ARM_MIN = 0; 
         float ARM_PICKUP_LOW = -10; 
@@ -85,10 +85,10 @@ int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmCha
         float ARM_HIGH_GRAB = 10;
         float ARM_OUTSIDE_CHASSIS = 60;
         //Grabber
-        float GRABBER_CLOSE = 100;
-        float GRABBER_BASKET_OPEN = 80;
-        float GRABBER_CHUTE_OPEN = 80;
-        float GRABBER_OPEN = 0;
+        float GRABBER_CLOSE = 20;
+        float GRABBER_BASKET_OPEN = 50;
+        float GRABBER_CHUTE_OPEN = 22;
+        float GRABBER_OPEN = 100;
 
         bool LEFT = 0; 
         bool RIGHT = 1;

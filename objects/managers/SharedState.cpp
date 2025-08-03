@@ -52,3 +52,9 @@ void turnCW_Back() {
     robotState = TURN_CW_BACK;
     portEXIT_CRITICAL(&robotStateMux);
 }
+
+void startBackward() {
+    portENTER_CRITICAL(&robotStateMux);
+    robotState = BACKWARD;
+    portEXIT_CRITICAL(&robotStateMux);
+}
