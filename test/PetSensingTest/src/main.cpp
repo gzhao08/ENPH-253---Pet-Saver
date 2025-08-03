@@ -82,6 +82,12 @@ float baseMagnetX = 0;
 float baseMagnetY = 0;
 float baseMagnetZ = 0;
 
+void calibrateMagnet();
+
+float last_x;
+float last_y;
+float last_z;
+
 void setup() {
   Serial.begin(115200);
 
@@ -117,6 +123,8 @@ void setup() {
   lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
   Serial.println("ready set go");
 
+  // calibrateMagnet();
+
   // Set base
   float sampleSize = 10;
   float x_tot = 0;
@@ -125,18 +133,12 @@ void setup() {
   sensors_event_t event;
   for (int i = 0; i < sampleSize; i++) {
     lis3mdl.getEvent(&event);
-    x_tot += event.magnetic.x;
-    y_tot += event.magnetic.y;
-    z_tot += event.magnetic.z;
+    x_tot += event.magnetic.x - (-20.3);
+    y_tot += event.magnetic.y - 87.5;
+    z_tot += event.magnetic.z - (19.3);
   }
-  baseMagnetX = x_tot/sampleSize;
-  baseMagnetY = y_tot/sampleSize;
-  baseMagnetZ = z_tot/sampleSize;
-    while (true) {
-    Serial.printf("Squared reading: %.2f\n", getMagnetReadingMagSq());
-    Serial.println("---");
-    delay(500);
-  }
+  
+
   arm.homingSequence();
   base.homingSequence();
     // base.setAsHome();
@@ -240,39 +242,40 @@ float getMagnetReadingMagSq() {
   float y_tot = 0;
   float z_tot = 0;
   sensors_event_t event;
+
+  float HARD_IRON_OFFSET_X = -20.3;
+  float HARD_IRON_OFFSET_Y = 87.5;
+  float HARD_IRON_OFFSET_Z = 19.3;
+
   for (int i = 0; i < sampleSize; i++) {
     lis3mdl.getEvent(&event);
-    x_tot += event.magnetic.x - (-27.92);
-    y_tot += event.magnetic.y - 69.15;
-    z_tot += event.magnetic.z - (-36.27);
-    // x_tot += abs(event.magnetic.x-baseMagnetX);
-    // y_tot += abs(event.magnetic.y-baseMagnetY);
-    // z_tot += abs(event.magnetic.z-baseMagnetZ);
+    x_tot += event.magnetic.x - HARD_IRON_OFFSET_X;
+    y_tot += event.magnetic.y - HARD_IRON_OFFSET_Y;
+    z_tot += event.magnetic.z - HARD_IRON_OFFSET_Z;
   }
   x_tot /= sampleSize;
   y_tot /= sampleSize;
   z_tot /= sampleSize;
 
-  // x_tot -= -27.92;
-  // y_tot -= 69.15;
-  // z_tot -= -36.27;
-  Serial.printf("X Reading: %.2f\n", x_tot);
-  Serial.printf("Y Reading: %.2f\n", y_tot);
-  Serial.printf("Z Reading: %.2f\n", z_tot);
-  return sqrt(x_tot*x_tot + y_tot*y_tot + z_tot*z_tot);
+  // Serial.printf("X Reading: %.2f\n", x_tot);
+  // Serial.printf("Y Reading: %.2f\n", y_tot);
+  // Serial.printf("Z Reading: %.2f\n", z_tot);
+  return x_tot*x_tot + y_tot*y_tot + z_tot*z_tot;
 }
 
 void sensePet() {
   int samples = 0;
   Serial.println("Sensing pet start");
   // Params:
-  int baseInit = -20;
+  int baseInit = -30;
   int verticalInit = 80;
   int armInit = 80;
+
+  const int MAGNETIC_THRESHOLD = 1000;
+
   // verticalStage.setPosition(verticalInit);
   arm.setPosition(armInit);
   base.setPosition(baseInit);
-
 
   while (!arm.reachedTarget() || !base.reachedTarget()) {
     Serial.println("Going to initial");
@@ -284,56 +287,42 @@ void sensePet() {
   Serial.println("Initial position reached");
 
   // Try find best angle
+
   int sweepAngle = 40; // one side from initial position (so movement 2x sweepangle)
-  base.setPosition(baseInit + sweepAngle);
+  int sweepAngle2 = 20;
+  int sweepAngle3 = 10;
+
   int maxMagnetReading = 0;
   int maxMagnetReadingPos = 0;
 
-  for (int i = 0; i < 2; i++) {
-    while (!base.reachedTarget()) {
-      Serial.println("Moving correct base to position");
-      base.loop();
-      arm.loop();
-      float currentReading = getMagnetReadingMagSq();
-      Serial.println(currentReading);
-      if (maxMagnetReading < currentReading) {
-        maxMagnetReading = currentReading;
-        maxMagnetReadingPos = base.getPosition();
-      }
-      samples += 1;
-    }
-    base.setPosition(baseInit-sweepAngle);
-    while (!base.reachedTarget()) {
-      Serial.println("Moving to other base position");
-      base.loop();
-      arm.loop();
-
-      float currentReading = getMagnetReadingMagSq();
-      Serial.println(currentReading);
-
-      if (maxMagnetReading < currentReading) {
-        maxMagnetReading = currentReading;
-        maxMagnetReadingPos = base.getPosition();
-      }
-      samples += 1;
-    }
-  }
-
-
-    base.setPosition(baseInit+sweepAngle);
+  base.setPosition(baseInit + sweepAngle);
   while (!base.reachedTarget()) {
     Serial.println("Moving correct base to position");
     base.loop();
     arm.loop();
     float currentReading = getMagnetReadingMagSq();
     Serial.println(currentReading);
-    if (maxMagnetReading < currentReading) {
+    if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
       maxMagnetReading = currentReading;
       maxMagnetReadingPos = base.getPosition();
     }
     samples += 1;
   }
-  base.setPosition(baseInit-sweepAngle);
+  base.setPosition(baseInit - sweepAngle);
+  while (!base.reachedTarget()) {
+    Serial.println("Moving correct base to position");
+    base.loop();
+    arm.loop();
+    float currentReading = getMagnetReadingMagSq();
+    Serial.println(currentReading);
+    if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
+      maxMagnetReading = currentReading;
+      maxMagnetReadingPos = base.getPosition();
+    }
+    samples += 1;
+  }
+    
+  base.setPosition(maxMagnetReadingPos-sweepAngle2);
   while (!base.reachedTarget()) {
     Serial.println("Moving to other base position");
     base.loop();
@@ -342,6 +331,20 @@ void sensePet() {
     float currentReading = getMagnetReadingMagSq();
     Serial.println(currentReading);
 
+    if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
+      maxMagnetReading = currentReading;
+      maxMagnetReadingPos = base.getPosition();
+    }
+    samples += 1;
+  }
+
+  base.setPosition(maxMagnetReadingPos+sweepAngle3);
+  while (!base.reachedTarget()) {
+    Serial.println("Moving correct base to position");
+    base.loop();
+    arm.loop();
+    float currentReading = getMagnetReadingMagSq();
+    Serial.println(currentReading);
     if (maxMagnetReading < currentReading) {
       maxMagnetReading = currentReading;
       maxMagnetReadingPos = base.getPosition();
@@ -381,4 +384,87 @@ void sensePet() {
   //   base.loop();
   // }
 
+}
+
+float min_x, max_x, mid_x;
+float min_y, max_y, mid_y;
+float min_z, max_z, mid_z;
+
+void calibrateMagnet() {
+
+  sensors_event_t event;
+  lis3mdl.getEvent(&event);
+
+  min_x = max_x = event.magnetic.x;
+  min_y = max_y = event.magnetic.y;
+  min_z = max_z = event.magnetic.z;
+  delay(10);
+
+  while (true) {
+    lis3mdl.getEvent(&event);
+    float x = event.magnetic.x;
+    float y = event.magnetic.y;
+    float z = event.magnetic.z;
+    
+    Serial.print("Mag: (");
+    Serial.print(x); Serial.print(", ");
+    Serial.print(y); Serial.print(", ");
+    Serial.print(z); Serial.print(")");
+
+    min_x = min(min_x, x);
+    min_y = min(min_y, y);
+    min_z = min(min_z, z);
+
+    max_x = max(max_x, x);
+    max_y = max(max_y, y);
+    max_z = max(max_z, z);
+
+    mid_x = (max_x + min_x) / 2;
+    mid_y = (max_y + min_y) / 2;
+    mid_z = (max_z + min_z) / 2;
+    Serial.print(" Hard offset: (");
+    Serial.print(mid_x); Serial.print(", ");
+    Serial.print(mid_y); Serial.print(", ");
+    Serial.print(mid_z); Serial.print(")");  
+
+    Serial.print(" Field: (");
+    Serial.print((max_x - min_x)/2); Serial.print(", ");
+    Serial.print((max_y - min_y)/2); Serial.print(", ");
+    Serial.print((max_z - min_z)/2); Serial.println(")");    
+    delay(10); 
+  }
+}
+
+void test() {
+  //   last_x = x_tot/sampleSize;
+  // last_y = y_tot/sampleSize;
+  // last_z = z_tot/sampleSize;
+  
+
+  // float lastReading = getMagnetReadingMagSq();
+  // int lastPosition = base.getPosition();
+  // int bestPosition = lastPosition;
+  // float bestReading = lastReading;
+  // while (true) {
+  //   base.loop();
+  //   float currentReading = getMagnetReadingMagSq();
+  //   int currentPosition = base.getPosition();
+  //   // Serial.printf("Squared reading: %.2f\n", getMagnetReadingMagSq());
+  //   Serial.printf("Change squared reading: %.2f\n", getMagnetReadingMagSq());
+
+  //   float delta = currentReading - lastReading;
+  //   Serial.printf("Change in reading: %.2f\n",delta);
+  //   Serial.printf("Current position: %d\n", currentPosition);
+  //   Serial.printf("Best position: %d\n", bestPosition);
+  //   Serial.printf("Best reading: %.2f\n", bestReading);
+  //   Serial.println("---");
+
+  //   if (abs(delta) >= abs(bestReading)) {
+  //     bestPosition = currentPosition;
+  //     bestReading = currentReading;
+  //   }
+
+  //   lastReading = currentReading;
+  //   delay(500);
+  // }
 }
