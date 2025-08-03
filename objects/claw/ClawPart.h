@@ -34,9 +34,11 @@ class ClawPart {
         int ABS_POS_LIMIT; // Position limit (for homing purposes)
         int MIN_POSITION;
         int MAX_POSITION;
+        float targetPosition;
 
         Microswitch microswitch;
         ContinuousServo continuousServo;
+        DelayManager reachTargetTimeout;
 
         ClawPart(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
             int switchPin, bool normallyOpen);
@@ -46,8 +48,10 @@ class ClawPart {
 
         float getPosition();
         void setPosition(float position);
+        void waitToReachTarget(int timeout);
         void moveBy(float movement);
         bool reachedTarget();
+        bool almostReachedTarget(int distance);
         float getSpeed();
 
         void homingSequence();

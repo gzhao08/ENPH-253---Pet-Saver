@@ -18,7 +18,6 @@ class ContinuousServo {
         // Should be multiplied to every duty cycle when driving the motor
         // to get the correct direction of rotation
         int DIRECTION_MULTIPLIER;
-        DCMotor motor;
 
         MagneticEncoder encoder;
 
@@ -47,6 +46,8 @@ class ContinuousServo {
         void tunePID();
         unsigned long lastPrint = 0;
     public: 
+        DCMotor motor;
+
         // PID Variables (needs to be public because referenced in PID controller)
         double Setpoint = 0, Input = 0, Output = 1;
         bool logPIDOutput = false;
