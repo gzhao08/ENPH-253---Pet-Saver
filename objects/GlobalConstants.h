@@ -14,7 +14,7 @@
 #define ERR_2 3
 #define ERR_1 1
 
-#define KP_DEFAULT 150.0
+#define KP_DEFAULT 170.0
 #define KD_DEFAULT 20.0
 
 // Map Division
@@ -30,14 +30,14 @@
 // Left to right: 35,34,36,39
 #define OUTER_RIGHT_PIN 39 
 #define INNER_RIGHT_PIN 36
-#define INNER_LEFT_PIN 35
-#define OUTER_LEFT_PIN 34
+#define INNER_LEFT_PIN 10
+#define OUTER_LEFT_PIN 9
 
 // Drive Motors Pins
 #define LEFT_MOTOR_PIN_A 27 // 26
 #define LEFT_MOTOR_PIN_B 14 // 25
-#define RIGHT_MOTOR_PIN_A 12 // 32
-#define RIGHT_MOTOR_PIN_B 2 // 33
+#define RIGHT_MOTOR_PIN_A 2 // 32
+#define RIGHT_MOTOR_PIN_B 12 // 33
 
 // Claw Motors Pins
 #define ARM_MOTOR_PIN_1 22

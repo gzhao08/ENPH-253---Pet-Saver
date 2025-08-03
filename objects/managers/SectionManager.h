@@ -1,6 +1,5 @@
 #pragma once
 #include <Arduino.h>
-#include <Adafruit_VL53L0X.h>
 #include "../GlobalConstants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
