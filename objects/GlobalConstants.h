@@ -34,10 +34,10 @@
 #define OUTER_LEFT_PIN 34
 
 // Drive Motors Pins
-#define LEFT_MOTOR_PIN_A 19 // 26
-#define LEFT_MOTOR_PIN_B 22 // 25
-#define RIGHT_MOTOR_PIN_A 20 // 32
-#define RIGHT_MOTOR_PIN_B 21 // 33
+#define LEFT_MOTOR_PIN_A 27 // 26
+#define LEFT_MOTOR_PIN_B 14 // 25
+#define RIGHT_MOTOR_PIN_A 12 // 32
+#define RIGHT_MOTOR_PIN_B 2 // 33
 
 // Claw Motors Pins
 #define ARM_MOTOR_PIN_1 22
