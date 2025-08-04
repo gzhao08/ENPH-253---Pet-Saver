@@ -68,8 +68,30 @@ void objectDetected(void *parameter) {
   int useRightLidar[6] = {true, true, true, true, true, false};
   int consecutiveCount[] = {2, 2, 2, 2, 15, 2}; // number of consecutive measurements to consider a section change
 
+  // home claw
+  claw.begin();
+  claw.homingSequence();
+  claw.setPositionVertical(50);
+  while (!claw.vertical.reachedTarget()) {
+    claw.loop();
+  }
+
+  claw.setPositionBase(0);
+  while (!claw.base.reachedTarget()) {
+    claw.loop();
+  }
+
+  // swipe to start
+  while (true) {
+    if (sectionManager.getMeasurement(true) <= 50 && sectionManager.getMeasurement(false) <= 50) {
+      robotState = RobotState::LINE_FOLLOW;
+      break;
+    }
+  }
   
   
+  // main loop
+
   while(true) {
 
     switch (robotState) {
@@ -99,8 +121,7 @@ void objectDetected(void *parameter) {
               case SectionManager::RAMP:{
                 Serial.println("Picking up pet");
                 int petDistance = sectionManager.getMeasurement(true);
-                claw.begin();
-                claw.homingSequence();
+                
                 claw.setPositionGrabber(110);
                 claw.setPositionVertical(100);
 
