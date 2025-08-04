@@ -30,6 +30,7 @@ class SectionManager {
             WINDOW_FORWARD,
             PET_3,
             PET_4,
+            RAMP_END_BACKWARD,
             WINDOW_BACKWARD
         };
 
@@ -50,10 +51,10 @@ class SectionManager {
         }
 
         boolean detectOutOfRange(bool useRight);
-        boolean detectCloser(bool useRight, int threshold, int consecutiveCount);
-        boolean detectFurther(bool useRight, int threshold, int consecutiveCount);
+        int detectCloser(bool useRight, int threshold, int consecutiveCount);
+        int detectFurther(bool useRight, int threshold, int consecutiveCount);
         boolean show(String message);
-        void getNextSection();
+        int getNextSection();
         void setDetectionTime();
 };
 

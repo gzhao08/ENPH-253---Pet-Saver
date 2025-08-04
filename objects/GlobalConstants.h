@@ -14,7 +14,7 @@
 #define ERR_2 3
 #define ERR_1 1
 
-#define KP_DEFAULT 170.0
+#define KP_DEFAULT 425.0
 #define KD_DEFAULT 20.0
 
 // Map Division

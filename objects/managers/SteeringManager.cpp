@@ -94,7 +94,7 @@ void SteeringManager::stop() {
  * Sets the PWM channels to 0
  */
 void SteeringManager::quickStop() {
-    this->backward(1000,100);
+    this->backward(1200,100);
     leftMotor.stop();
     rightMotor.stop();
     robotState = RobotState::STOPPED;

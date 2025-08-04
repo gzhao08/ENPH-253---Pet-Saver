@@ -15,11 +15,11 @@ void objectDetected(void *parameter) {
   // Initialize I2C
   // Wire.begin(15, 13);  // Wire.begin(sda-21, scl-22)
   
-  Wire.begin(15, 13);  // SDA, SCL for right lidar
-  Wire1.begin(7, 5);  // SDA, SCL for
+  Wire.begin(7, 5);  // SDA, SCL for right lidar 15, 13
+  Wire1.begin(15, 13);  // SDA, SCL for
   
   SectionManager sectionManager;
-  sectionManager.begin(true); // Initialize the section manager with display
+  sectionManager.begin(false); // Initialize the section manager with display
   
 
   while (!startRead) {
@@ -71,9 +71,9 @@ void objectDetected(void *parameter) {
                   turnCW();
                   break;
               }
-              case SectionManager::END_RAMP_BACKWARD: {
-                  turnCW_Back();
-                  break;
+              case SectionManager::RAMP_END_BACKWARD:{
+                turnCW_Back();
+                break;
               }
               case SectionManager::WINDOW_BACKWARD: {
                   startBackward();
