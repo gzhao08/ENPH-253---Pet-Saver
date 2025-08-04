@@ -368,8 +368,8 @@ void ClawTester::use() {
                     arm.setPosition(100);
                     DelayManager positionDelay(2000);
                     positionDelay.reset();
-                    const int posBase1 = -30;
-                    const int posBase2 = 30;
+                    const int posBase1 = -10;
+                    const int posBase2 = 10;
                     int posBase = posBase1;
                     while (true) {
                     if (Serial.available()) {
