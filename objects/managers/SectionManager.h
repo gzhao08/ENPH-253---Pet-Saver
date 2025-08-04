@@ -55,7 +55,7 @@ class SectionManager {
         boolean detectFurther(bool useRight, int threshold, int consecutiveCount);
         boolean show(String message);
         int getMeasurement(bool useRight);
-        int getNextSection();
+        void getNextSection();
         void setDetectionTime();
 };
 

@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "driver/ledc.h"
+#include <Adafruit_LIS3MDL.h>
 
 #include "../claw/ClawBase.h"
 #include "../claw/ClawArm.h"
@@ -62,6 +63,8 @@ int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmCha
         ClawGrabber grabber;
         WireManager wireManager1;
         WireManager wireManager2;
+        Adafruit_LIS3MDL lis3mdl;
+
 
         //POSITIONS
         //Base
@@ -97,6 +100,10 @@ int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmCha
         void begin();
         void homingSequence();
         void reset(); 
+
+        void sensePet(); 
+        float getMagnetReadingMagSq();
+
 
         void seqDrivePosition(float height);
         void seqPickUpLow();

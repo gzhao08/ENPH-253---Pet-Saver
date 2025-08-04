@@ -9,6 +9,39 @@
 #include "SharedState.h"
 #include "ClawManager.h"
 
+int armMotorPin1 = ARM_MOTOR_PIN_1;
+int armMotorPin2 = ARM_MOTOR_PIN_2;
+int armPwmChannel1 = ARM_MOTOR_PWM_CHANNEL_1; //motor pin 1 goes to B
+int armPwmChannel2 = ARM_MOTOR_PWM_CHANNEL_2; 
+int armMuxLine = 1; 
+bool armEncoderOnTerminalSide = true; //false for arm, 
+int armSwitchPin = MICROSWITCH_ARM; 
+bool armNormallyOpen = true; 
+//muxLine: 1 is 1, 0 is 2, -1 is not muxing
+
+int verticalStageMotorPin1 = VERTICAL_STAGE_MOTOR_PIN_1;
+int verticalStageMotorPin2 = VERTICAL_STAGE_MOTOR_PIN_2;
+int verticalStagePwmChannel1 = VERTICAL_STAGE_MOTOR_PWM_CHANNEL_1; //motor pin 1 goes to B
+int verticalStagePwmChannel2 = VERTICAL_STAGE_MOTOR_PWM_CHANNEL_2; 
+int verticalStageMuxLine = 0; 
+bool verticalStageEncoderOnTerminalSide = true; //false for arm, 
+int verticalStageSwitchPin = MICROSWITCH_VERTICAL_STAGE; 
+bool verticalStageNormallyOpen = true; 
+
+int baseMotorPin1 = BASE_MOTOR_PIN_1;
+int baseMotorPin2 = BASE_MOTOR_PIN_2;
+int basePwmChannel1 = BASE_MOTOR_PWM_CHANNEL_1; //motor pin 1 goes to B
+int basePwmChannel2 = BASE_MOTOR_PWM_CHANNEL_2; 
+int baseMuxLine = -1; 
+bool baseEncoderOnTerminalSide = false; //false for arm, 
+int baseSwitchPin = MICROSWITCH_BASE; 
+bool baseNormallyOpen = true; 
+
+ClawManager claw(armMotorPin1, armMotorPin2, armPwmChannel1, armPwmChannel2, armMuxLine, armEncoderOnTerminalSide, 
+  armSwitchPin, armNormallyOpen, verticalStageMotorPin1, verticalStageMotorPin2, verticalStagePwmChannel1, verticalStagePwmChannel2, verticalStageMuxLine, verticalStageEncoderOnTerminalSide,
+  verticalStageSwitchPin, verticalStageNormallyOpen, baseMotorPin1, baseMotorPin2, basePwmChannel1, basePwmChannel2, baseMuxLine, baseEncoderOnTerminalSide, 
+  baseSwitchPin, baseNormallyOpen, GRABBER_MOTOR_PIN, GRABBER_PWM_CHANNEL, 8, -1);
+
 void objectDetected(void *parameter) {
 
   Serial.begin(115200);
@@ -41,11 +74,8 @@ void objectDetected(void *parameter) {
 
     switch (robotState) {
         case RobotState::LINE_FOLLOW: {
-            Serial.println("lidar.cpp: LINE_FOLLOW");
-            int pet_distance = sectionManager.getNextSection(); 
-            if (pet_distance) {
-              claw.begin();
-            }
+            // Serial.println("lidar.cpp: LINE_FOLLOW");
+            sectionManager.getNextSection(); 
             break;
         }
 
@@ -66,8 +96,31 @@ void objectDetected(void *parameter) {
             Serial.println("lidar.cpp: STOPPED");
             recordStartTime();
             switch (sectionManager.getCurrentSection()) {
-              case SectionManager::PET_1:{
+              case SectionManager::RAMP:{
+                Serial.println("Picking up pet");
                 int petDistance = sectionManager.getMeasurement(true);
+                claw.begin();
+                claw.homingSequence();
+                claw.setPositionVertical(90);
+
+                while (!claw.vertical.reachedTarget()) {
+                  claw.loop();
+                }
+                claw.setPositionBase(-90);
+                while (!claw.base.reachedTarget()) {
+                  claw.loop();
+                }
+                claw.setPositionArm(200);
+                while (!claw.arm.reachedTarget()) {
+                  claw.loop();
+                }
+
+                claw.sensePet();
+                Serial.println("Done picking up pet, starting line follow");
+                startLineFollow();
+                break;
+
+
               }
               case SectionManager::WINDOW_FORWARD: {
                   startForward();

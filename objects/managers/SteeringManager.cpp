@@ -224,8 +224,8 @@ void SteeringManager::lineFollow() {
         // update IR data every cycle so that error is accurate
         this->array.takeReading(false);
         input = this->array.getError();
-        array.showState();
-        Serial.printf(" -- %lf\n", output);
+        // array.showState();
+        // Serial.printf(" -- %lf\n", output);
         this->array.update();
         delay(1);
     }

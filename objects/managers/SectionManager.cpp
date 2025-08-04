@@ -92,11 +92,11 @@ boolean SectionManager::detectOutOfRange(bool useRight) {
     return false;
 }
 
-boolean SectionManager::detectOutOfRange(bool useRight) {
+int SectionManager::getMeasurement(bool useRight) {
     return (useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters());
 }
 
-int SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCount) {
+boolean SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCount) {
     
     int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
     
@@ -104,29 +104,29 @@ int SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCo
         numConsecutive++;
         if (numConsecutive >= consecutiveCount) {
             numConsecutive = 0; // reset after detecting
-            return distance;
+            return true;
         }
     }
     else {
         numConsecutive = 0; // reset if not detecting
     }
-    return 0;
+    return false;
 }
 
-int SectionManager::detectFurther(bool useRight, int threshold, int consecutiveCount) {
+boolean SectionManager::detectFurther(bool useRight, int threshold, int consecutiveCount) {
     int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
     
     if (distance >= threshold) {
         numConsecutive++;
         if (numConsecutive >= consecutiveCount) {
             numConsecutive = 0; // reset after detecting
-            return distance;
+            return true;
         }
     }
     else {
         numConsecutive = 0; // reset if not detecting
     }
-    return 0;
+    return false;
 }
 
 boolean SectionManager::show(String message) {
@@ -141,12 +141,13 @@ boolean SectionManager::show(String message) {
     return false;
 }
 
-int SectionManager::getNextSection(){
+void SectionManager::getNextSection(){
     switch(getCurrentSection()) {
 
         case SectionManager::DOORWAY: {
             // looking for doorway
             if (detectCloser(false, 120, 1)) {
+                Serial.println("found doorway");
                 incrementSection();
                 if (useDisplay) {
                     display.clearDisplay();
@@ -164,6 +165,7 @@ int SectionManager::getNextSection(){
         case SectionManager::PET_1: {
             if (millis() - startMovementTime > 1000) {
                 if (detectCloser(true, 350, 1)) {
+                    Serial.println("found pet 1");
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();

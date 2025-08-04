@@ -31,6 +31,7 @@ void ClawPart::begin(WireManager* wireManager) {
 
 void ClawPart::setAsHome() {
     this->continuousServo.setAsHome();
+    this->setPosition(this->MIN_POSITION);
 }
 
 /**
