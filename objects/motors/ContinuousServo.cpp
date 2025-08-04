@@ -145,6 +145,14 @@ void ContinuousServo::loop() {
 }
 
 /**
+ * Stops motor
+ */
+void ContinuousServo::stop() {
+    this->motor.drivePWM(0);
+}
+
+
+/**
  * Set the current position as home
  * This also makes the servo want to stay at the current angle
  * This is useful for homing the servo to a known position

@@ -282,6 +282,12 @@ void ClawManager::setPositionGrabber(int pos) {
     this->grabber.setPositionDegrees(pos);
 }
 
+void ClawManager::stopAll() {
+    this->arm.stop();
+    this->vertical.stop();
+    this->base.stop();
+}
+
 // ROUTINES //
 /** 
  * 1. Drive position V -- input height

@@ -53,6 +53,7 @@ class ClawPart {
         bool reachedTarget();
         bool almostReachedTarget(int distance);
         float getSpeed();
+        void stop();
 
         void homingSequence();
         void setAsHome();

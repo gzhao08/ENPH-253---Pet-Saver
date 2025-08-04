@@ -25,6 +25,8 @@ void ClawPart::begin(WireManager* wireManager) {
     this->lastPositionTime = millis();
 }
 
+void ClawPart::stop() {
+}
 /**
  * Sets current position as home
  */
@@ -167,6 +169,10 @@ void ClawPart::updateSpeed() {
  */
 float ClawPart::getSpeed() {
     return this->speed;
+}
+
+void ClawPart::stop() {
+    this->continuousServo.stop();
 }
 
 /**

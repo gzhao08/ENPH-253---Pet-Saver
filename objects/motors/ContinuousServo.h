@@ -63,6 +63,7 @@ class ContinuousServo {
         bool reachedTarget();
         void setAsHome();
         float getAngle();
+        void stop();
 
         // PID Stuff
         void setPIDTuningMode(bool mode);

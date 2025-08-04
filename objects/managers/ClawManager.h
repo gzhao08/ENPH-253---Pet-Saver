@@ -102,6 +102,7 @@ class ClawManager {
         float getMagnetReadingMagSq();
 
 
+        void stopAll();
         void seqDrivePosition(float height);
         void seqPickUpLow();
         void seqRetract();
