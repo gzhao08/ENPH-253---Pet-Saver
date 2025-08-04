@@ -42,6 +42,13 @@ void driveTrain(void *parameter) {
                 }
                 break;
             }
+            case RobotState::IDLE:{
+                steer.stop();
+                while(robotState == IDLE) {
+                    delay(100);
+                }
+                break;
+            }
             case RobotState::TURN_CW:
                 steer.turnAround(currentSpeed,true);
                 break;

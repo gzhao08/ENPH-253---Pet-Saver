@@ -16,7 +16,8 @@ enum RobotState {
     TURN_CCW,
     FORWARD,
     BACKWARD,
-    TURN_CW_BACK
+    TURN_CW_BACK,
+    IDLE
 };
 
 extern volatile RobotState robotState;
