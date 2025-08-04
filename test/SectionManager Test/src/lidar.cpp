@@ -101,7 +101,8 @@ void objectDetected(void *parameter) {
                 int petDistance = sectionManager.getMeasurement(true);
                 claw.begin();
                 claw.homingSequence();
-                claw.setPositionVertical(95);
+                claw.setPositionGrabber(110);
+                claw.setPositionVertical(100);
 
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
@@ -124,7 +125,7 @@ void objectDetected(void *parameter) {
                 }
                 claw.setPositionGrabber(20);
                 delay(500);
-                claw.setPositionVertical(110);
+                claw.setPositionVertical(120);
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
                 }

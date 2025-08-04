@@ -28,6 +28,7 @@ class ClawBase : public ClawPart {
         const int _servoTolerance = 15; // How much can angle deviate from target
 
 
+        
     public: 
         ClawBase(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, 
             int switchPin, bool normallyOpen);
