@@ -101,7 +101,7 @@ void objectDetected(void *parameter) {
                 int petDistance = sectionManager.getMeasurement(true);
                 claw.begin();
                 claw.homingSequence();
-                claw.setPositionVertical(90);
+                claw.setPositionVertical(95);
 
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
@@ -116,6 +116,19 @@ void objectDetected(void *parameter) {
                 }
 
                 claw.sensePet();
+
+
+                claw.setPositionVertical(60);
+                while (!claw.vertical.reachedTarget()) {
+                  claw.loop();
+                }
+                claw.setPositionGrabber(20);
+                delay(500);
+                claw.setPositionVertical(110);
+                while (!claw.vertical.reachedTarget()) {
+                  claw.loop();
+                }
+        
                 Serial.println("Done picking up pet, starting line follow");
                 startLineFollow();
                 break;
