@@ -11,52 +11,49 @@
 #include "../claw/ClawGrabber.h"
 
 class ClawManager {
-    private:
-        // Arm
-        static const int armMotorPin1 = 22;
-        static const int armMotorPin2 = 19;
-        static const int armPwmChannel1 = 15; //motor pin 1 goes to B
-        static const int armPwmChannel2 = 14; 
-        static const int armMuxLine = 1; 
-        static const bool armEncoderOnTerminalSide = true; //false for arm, 
-        static const int armSwitchPin = 37; 
-        static const bool armNormallyOpen = true; 
-        //muxLine: 1 is 1, 0 is 2, -1 is not muxing
+    // private:
+    //     // Arm
+    //     static const int armMotorPin1 = 22;
+    //     static const int armMotorPin2 = 19;
+    //     static const int armPwmChannel1 = 15; //motor pin 1 goes to B
+    //     static const int armPwmChannel2 = 14; 
+    //     static const int armMuxLine = 1; 
+    //     static const bool armEncoderOnTerminalSide = true; //false for arm, 
+    //     static const int armSwitchPin = 37; 
+    //     static const bool armNormallyOpen = true; 
+    //     //muxLine: 1 is 1, 0 is 2, -1 is not muxing
 
-        // Vertical stage
-        static const int verticalStageMotorPin1 = 20;
-        static const int verticalStageMotorPin2 = 21;
-        static const int verticalStagePwmChannel1 = 4; //motor pin 1 goes to B
-        static const int verticalStagePwmChannel2 = 5; 
-        int verticalStageMuxLine = 0; 
-        bool verticalStageEncoderOnTerminalSide = true; //false for arm, 
-        int verticalStageSwitchPin = 38; 
-        bool verticalStageNormallyOpen = true; 
+    //     // Vertical stage
+    //     static const int verticalStageMotorPin1 = 20;
+    //     static const int verticalStageMotorPin2 = 21;
+    //     static const int verticalStagePwmChannel1 = 4; //motor pin 1 goes to B
+    //     static const int verticalStagePwmChannel2 = 5; 
+    //     int verticalStageMuxLine = 0; 
+    //     bool verticalStageEncoderOnTerminalSide = true; //false for arm, 
+    //     int verticalStageSwitchPin = 38; 
+    //     bool verticalStageNormallyOpen = true; 
 
-        // Base
-        int baseMotorPin1 = 14;
-        int baseMotorPin2 = 27;
-        int basePwmChannel1 = 6; //motor pin 1 goes to B
-        int basePwmChannel2 = 7; 
-        int baseMuxLine = -1; 
-        bool baseEncoderOnTerminalSide = false; //false for arm, 
-        int baseSwitchPin = 9; 
-        bool baseNormallyOpen = true; 
+    //     // Base
+    //     int baseMotorPin1 = 14;
+    //     int baseMotorPin2 = 27;
+    //     int basePwmChannel1 = 6; //motor pin 1 goes to B
+    //     int basePwmChannel2 = 7; 
+    //     int baseMuxLine = -1; 
+    //     bool baseEncoderOnTerminalSide = false; //false for arm, 
+    //     int baseSwitchPin = 9; 
+    //     bool baseNormallyOpen = true; 
 
-        // Grabber
-        static const int grabberMotorPin = 12;
-        static const int grabberPwmChannel = 1;
-        //position in degrees
-        float basePos = -1;
-        float verticalPos = -1;
-        float armPos = -1;
-        float grabPos = -1;
+    //     // Grabber
+    //     static const int grabberMotorPin = 12;
+    //     static const int grabberPwmChannel = 1;
+    //     //position in degrees
+    //     float basePos = -1;
+    //     float verticalPos = -1;
+    //     float armPos = -1;
+    //     float grabPos = -1;
 
     public:
-        ClawManager(int armMotorPin1, int armMotorPin2, int armPwmChannel1, int armPwmChannel2, int armMuxLine, bool armEncoderOnTerminalSide,
-int armSwitchPin, bool armNormallyOpen, int verticalStageMotorPin1, int verticalStageMotorPin2, int verticalStagePwmChannel1, int verticalStagePwmChannel2, int verticalStageMuxLine, bool verticalStageEncoderOnTerminalSide,
-int verticalStageSwitchPin, bool verticalStageNormallyOpen, int baseMotorPin1, int baseMotorPin2, int basePwmChannel1, int basePwmChannel2, int baseMuxLine, bool baseEncoderOnTerminalSide, 
-int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmChannel, int manager1, int manager2); 
+        ClawManager(); 
         ClawBase base;
         ClawVerticalStage vertical;
         ClawArm arm;

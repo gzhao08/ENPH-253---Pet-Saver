@@ -31,20 +31,17 @@
 // int verticalStageSwitchPin = 0, bool verticalStageNormallyOpen = 0, int baseMotorPin1 = 0, int baseMotorPin2 = 0, int basePwmChannel1 = 0, int basePwmChannel2 = 0, int baseMuxLine = 0, bool baseEncoderOnTerminalSide = 0, 
 // int baseSwitchPin = 0, bool baseNormallyOpen = 0, int grabberMotorPin = 0, int grabberPwmChannel = 0, int manager1 = 0, int manager2 = 0
 
-ClawManager::ClawManager(int armMotorPin1, int armMotorPin2, int armPwmChannel1, int armPwmChannel2, int armMuxLine, bool armEncoderOnTerminalSide,
-int armSwitchPin, bool armNormallyOpen, int verticalStageMotorPin1, int verticalStageMotorPin2, int verticalStagePwmChannel1, int verticalStagePwmChannel2, int verticalStageMuxLine, bool verticalStageEncoderOnTerminalSide,
-int verticalStageSwitchPin, bool verticalStageNormallyOpen, int baseMotorPin1, int baseMotorPin2, int basePwmChannel1, int basePwmChannel2, int baseMuxLine, bool baseEncoderOnTerminalSide, 
-int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmChannel, int manager1, int manager2) :
-    arm(armMotorPin1, armMotorPin2, armPwmChannel1, armPwmChannel2, armMuxLine, armEncoderOnTerminalSide, 
-        armSwitchPin, armNormallyOpen), 
-    vertical(verticalStageMotorPin1, verticalStageMotorPin2, verticalStagePwmChannel1, verticalStagePwmChannel2, verticalStageMuxLine, verticalStageEncoderOnTerminalSide,
-         verticalStageSwitchPin, verticalStageNormallyOpen),
-    base(baseMotorPin1, baseMotorPin2, basePwmChannel1, basePwmChannel2, baseMuxLine, baseEncoderOnTerminalSide, 
-          baseSwitchPin, baseNormallyOpen),
-    grabber(grabberMotorPin, grabberPwmChannel),
+ClawManager::ClawManager() :
+    arm(ARM_MOTOR_PIN_1, ARM_MOTOR_PIN_2, ARM_MOTOR_PWM_CHANNEL_1, ARM_MOTOR_PWM_CHANNEL_2, 1, true, 
+        MICROSWITCH_ARM, true), 
+    vertical(VERTICAL_STAGE_MOTOR_PIN_1, VERTICAL_STAGE_MOTOR_PIN_2, VERTICAL_STAGE_MOTOR_PWM_CHANNEL_1, VERTICAL_STAGE_MOTOR_PWM_CHANNEL_2, 0, true,
+         MICROSWITCH_VERTICAL_STAGE, true),
+    base(BASE_MOTOR_PIN_1, BASE_MOTOR_PIN_2, BASE_MOTOR_PWM_CHANNEL_1, BASE_MOTOR_PWM_CHANNEL_2, -1, true, 
+          MICROSWITCH_BASE, true),
+    grabber(GRABBER_MOTOR_PIN, GRABBER_PWM_CHANNEL),
     wireManager1(8),
     wireManager2(-1)
-    {
+{
 
 }
 
