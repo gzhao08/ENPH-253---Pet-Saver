@@ -84,6 +84,7 @@ void ClawPart::homingSequence() {
 
     this->setAsHome();
 
+    this->continuousServo.setMaxVoltage(this->servoMaxVoltage);
     timeout.reset();
     this->setPosition(this->MIN_POSITION + (this->MAX_POSITION-this->MIN_POSITION) * 0.05);
     while (!this->reachedTarget()) {
