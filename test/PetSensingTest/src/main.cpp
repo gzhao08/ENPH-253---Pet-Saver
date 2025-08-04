@@ -77,16 +77,7 @@ bool directionForward = true;
 
 float getMagnetReadingMagSq();
 void sensePet();
-
-float baseMagnetX = 0;
-float baseMagnetY = 0;
-float baseMagnetZ = 0;
-
 void calibrateMagnet();
-
-float last_x;
-float last_y;
-float last_z;
 
 void setup() {
   Serial.begin(115200);
@@ -109,8 +100,6 @@ void setup() {
   delay(1000);
   Serial.println("LIS3MDL test");
 
-  //Wire.begin(25, 26);  // defaults to GPIO21 (SDA), GPIO22 (SCL) on ESP32
-
   if (!lis3mdl.begin_I2C(LIS3MDL_I2CADDR_DEFAULT, &Wire)) {
     Serial.println("Failed to find LIS3MDL chip");
     while (1) delay(10);
@@ -121,26 +110,20 @@ void setup() {
   lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE);
   lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ);
   lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
-  Serial.println("ready set go");
 
-  // calibrateMagnet();
 
-  // Set base
-  float sampleSize = 10;
-  float x_tot = 0;
-  float y_tot = 0;
-  float z_tot = 0;
-  sensors_event_t event;
-  for (int i = 0; i < sampleSize; i++) {
-    lis3mdl.getEvent(&event);
-    x_tot += event.magnetic.x - (-20.3);
-    y_tot += event.magnetic.y - 87.5;
-    z_tot += event.magnetic.z - (19.3);
-  }
-  
-
+  Serial.println("Starting homing sequence");
   arm.homingSequence();
+  verticalStage.homingSequence();
+  verticalStage.setPosition(80);
+  while (!verticalStage.reachedTarget()) {
+    verticalStage.loop();
+  }
   base.homingSequence();
+
+  calibrateMagnet();
+
+
     // base.setAsHome();
 
 
@@ -288,13 +271,14 @@ void sensePet() {
 
   // Try find best angle
 
-  int sweepAngle = 40; // one side from initial position (so movement 2x sweepangle)
+  int sweepAngle = 30; // one side from initial position (so movement 2x sweepangle)
   int sweepAngle2 = 20;
   int sweepAngle3 = 10;
 
   int maxMagnetReading = 0;
   int maxMagnetReadingPos = 0;
 
+  // First sweep
   base.setPosition(baseInit + sweepAngle);
   while (!base.reachedTarget()) {
     Serial.println("Moving correct base to position");
@@ -321,7 +305,23 @@ void sensePet() {
     }
     samples += 1;
   }
-    
+
+  // Second sweep
+  base.setPosition(maxMagnetReadingPos+sweepAngle2);
+  while (!base.reachedTarget()) {
+    Serial.println("Moving to other base position");
+    base.loop();
+    arm.loop();
+
+    float currentReading = getMagnetReadingMagSq();
+    Serial.println(currentReading);
+
+    if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
+      maxMagnetReading = currentReading;
+      maxMagnetReadingPos = base.getPosition();
+    }
+    samples += 1;
+  }
   base.setPosition(maxMagnetReadingPos-sweepAngle2);
   while (!base.reachedTarget()) {
     Serial.println("Moving to other base position");
@@ -338,7 +338,21 @@ void sensePet() {
     samples += 1;
   }
 
+  // Third sweep
   base.setPosition(maxMagnetReadingPos+sweepAngle3);
+  while (!base.reachedTarget()) {
+    Serial.println("Moving correct base to position");
+    base.loop();
+    arm.loop();
+    float currentReading = getMagnetReadingMagSq();
+    Serial.println(currentReading);
+    if (maxMagnetReading < currentReading) {
+      maxMagnetReading = currentReading;
+      maxMagnetReadingPos = base.getPosition();
+    }
+    samples += 1;
+  }
+  base.setPosition(maxMagnetReadingPos-sweepAngle3);
   while (!base.reachedTarget()) {
     Serial.println("Moving correct base to position");
     base.loop();
@@ -386,12 +400,13 @@ void sensePet() {
 
 }
 
-float min_x, max_x, mid_x;
-float min_y, max_y, mid_y;
-float min_z, max_z, mid_z;
+
 
 void calibrateMagnet() {
-
+  float min_x, max_x, mid_x;
+  float min_y, max_y, mid_y;
+  float min_z, max_z, mid_z;
+  
   sensors_event_t event;
   lis3mdl.getEvent(&event);
 

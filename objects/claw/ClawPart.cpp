@@ -5,14 +5,14 @@
  */
 ClawPart::ClawPart(int motorPin1, int motorPin2, int pwmChannel1, int pwmChannel2, int muxLine, bool encoderOnTerminalSide, int switchPin, bool normallyOpen) : 
 continuousServo(motorPin1, motorPin2, pwmChannel1, pwmChannel2, muxLine, encoderOnTerminalSide), 
-microswitch(switchPin, normallyOpen) {}
+microswitch(switchPin, normallyOpen),
+reachTargetTimeout(7000) {}
 
 /**
  * Sets up claw part
  */
 void ClawPart::begin(WireManager* wireManager) {
     this->continuousServo.begin(wireManager);
-    ledcAttachPin(22, 15);
 
     this->continuousServo.setPDTuning(this->Pk, this->Dk);
     this->continuousServo.setMaxVoltage(this->servoMaxVoltage); 
@@ -104,6 +104,26 @@ bool ClawPart::reachedTarget() {
 }
 
 /**
+ * A blocking function that waits for the claw part to reach its target
+ * @param timeout in milliseconds
+ */
+void ClawPart::waitToReachTarget(int timeout) {
+    this->reachTargetTimeout.setTimeInterval(timeout);
+    this->reachTargetTimeout.reset();
+
+    while (!this->reachedTarget() && !this->reachTargetTimeout.isElapsed()) {
+        this->loop();
+    }
+}
+
+/**
+ * @return true if the claw part is within some distance from the target position
+ */
+bool ClawPart::almostReachedTarget(int distance) {
+    return abs(this->getPosition() - this->targetPosition) <= distance;
+}
+
+/**
  * Get position of claw part
  */
  float ClawPart::getPosition() {
@@ -118,6 +138,8 @@ void ClawPart::setPosition(float position) {
     float constrainedPosition = constrain(position, this->MIN_POSITION, this->MAX_POSITION);
     float shiftedPosition = constrainedPosition - this->MIN_POSITION;
     float relAngle = shiftedPosition * this->POS_TO_ENCODER_CONVERSION;
+
+    this->targetPosition = position;
     // Serial.println("Set position in " + this->partName + " called: " + String(constrainedPosition));
     // Serial.println(shiftedPosition);
     // Serial.println(relAngle);

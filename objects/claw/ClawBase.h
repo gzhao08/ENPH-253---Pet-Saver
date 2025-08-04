@@ -13,15 +13,15 @@ class ClawBase : public ClawPart {
     private:
         String _partName = "Claw Base";
 
-        const float _ENCODER_TO_POS_CONVERSION = -0.4; /// Calibrating from 2mm pitch * 4 starts / 360 degrees
+        const float _ENCODER_TO_POS_CONVERSION = -0.39; /// Calibrating from 2mm pitch * 4 starts / 360 degrees
         const float _POS_TO_ENCODER_CONVERSION = 1 / _ENCODER_TO_POS_CONVERSION; // 1mm corresponds to 1/0.42 degrees
         const int _ABS_POS_LIMIT = 80;
-        const int _MIN_POSITION = -130;
-        const int _MAX_POSITION = 60;
+        const int _MIN_POSITION = -135;
+        const int _MAX_POSITION = 130;
 
         // PID Parameters
-        const float _Pk = 50;
-        const float _Dk = 3.5;
+        const float _Pk = 150;
+        const float _Dk = 11;
 
         // Servo parameters
         const int _servoMaxVoltage = 6;
