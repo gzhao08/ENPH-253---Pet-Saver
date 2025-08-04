@@ -25,8 +25,6 @@ void ClawPart::begin(WireManager* wireManager) {
     this->lastPositionTime = millis();
 }
 
-void ClawPart::stop() {
-}
 /**
  * Sets current position as home
  */
@@ -68,7 +66,7 @@ void ClawPart::homingSequence() {
     Serial.println("Position adjusted");
 
 
-    int rehomeAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 0.1;
+    int rehomeAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 0.2;
     this->continuousServo.moveBy(rehomeAngle); // Gentle rehome
     
     timeout.reset();

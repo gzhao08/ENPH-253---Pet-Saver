@@ -86,7 +86,7 @@ void SteeringManager::backward(int duty, int timeInMS) {
 void SteeringManager::stop() {
     leftMotor.stop();
     rightMotor.stop();
-    robotState = RobotState::STOPPED;
+    robotState = RobotState::IDLE;
 }
 
 /**

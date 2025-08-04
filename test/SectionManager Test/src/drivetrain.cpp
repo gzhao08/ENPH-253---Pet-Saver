@@ -11,10 +11,6 @@ void driveTrain(void *parameter) {
     //----------------------------SETUP----------------------------// 
     SteeringManager steer;
 
-    // double kp = 160.0;
-    // double kd = 0;
-    // int baseSpeed = 1050;
-
     steer.begin(); // put IR pins here -> left to right
 
     Serial.begin(115200);
@@ -22,8 +18,6 @@ void driveTrain(void *parameter) {
     delay(2000);
 
     startRead = true; // start reading the lidar data
-
-    int speed = 600;
 
     //----------------------------LOOP----------------------------//
     while (true) {

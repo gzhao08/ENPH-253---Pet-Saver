@@ -40,25 +40,26 @@ void objectDetected(void *parameter) {
   while (!claw.vertical.reachedTarget()) {
     claw.loop();
   }
-
   claw.setPositionBase(0);
   Serial.println("Set position base to 0");
   while (!claw.base.reachedTarget()) {
     // Serial.println(claw.base.getPosition());
     claw.loop();
   }
-
+  claw.stopAll();
+  claw.loop();
   Serial.println("Waiting for swipe");
 
   // swipe to start
   while (true) {
-    claw.loop();
-    if (sectionManager.getMeasurement(true) <= 50 && sectionManager.getMeasurement(false) <= 50) {
+    Serial.println(sectionManager.getMeasurement(true));
+    if (sectionManager.detectCloser(true, 80, 15)) {
       currentSpeed = 1300;
       robotState = RobotState::LINE_FOLLOW;
       break;
     }
   }
+  Serial.println("Starting main loop!");
   
   
   // main loop
@@ -103,22 +104,41 @@ void objectDetected(void *parameter) {
                 while (!claw.base.reachedTarget()) {
                   claw.loop();
                 }
-                claw.setPositionArm(200);
+                claw.setPositionArm(170);
                 while (!claw.arm.reachedTarget()) {
                   claw.loop();
                 }
 
+                Serial.println("Initial position of arm has been set");
+
                 claw.sensePet();
 
 
-                claw.setPositionVertical(60);
+                claw.setPositionVertical(30);
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
                 }
-                claw.setPositionGrabber(20);
+                claw.setPositionGrabber(15);
                 delay(500);
-                claw.setPositionVertical(120);
+
+                claw.setPositionArm(100);
+                while (!claw.arm.reachedTarget()) {
+                  claw.loop();
+                }
+                
+                claw.setPositionVertical(50);
                 while (!claw.vertical.reachedTarget()) {
+                  claw.loop();
+                }
+
+                claw.setPositionBase(0);
+                while (!claw.base.reachedTarget()) {
+                  
+                  claw.loop();
+                }
+
+                claw.setPositionArm(0);
+                while (!claw.arm.reachedTarget()) {
                   claw.loop();
                 }
         

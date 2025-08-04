@@ -446,7 +446,7 @@ void ClawTester::use() {
 
 float getMagnetReadingMagSq() {
     // Remember to benchmark
-    float sampleSize = 10;
+    float sampleSize = 5;
     float x_tot = 0;
     float y_tot = 0;
     float z_tot = 0;
@@ -505,7 +505,7 @@ void sensePet() {
     // First sweep
     base.setPosition(baseInit + sweepAngle);
     while (!base.reachedTarget()) {
-        Serial.println("Moving correct base to position");
+        // Serial.println("Moving correct base to position");
         base.loop();
         arm.loop();
         float currentReading = getMagnetReadingMagSq();
@@ -518,7 +518,7 @@ void sensePet() {
     }
     base.setPosition(baseInit - sweepAngle);
     while (!base.reachedTarget()) {
-        Serial.println("Moving correct base to position");
+        // Serial.println("Moving correct base to position");
         base.loop();
         arm.loop();
         float currentReading = getMagnetReadingMagSq();
