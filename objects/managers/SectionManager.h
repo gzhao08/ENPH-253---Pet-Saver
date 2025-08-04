@@ -51,9 +51,10 @@ class SectionManager {
         }
 
         boolean detectOutOfRange(bool useRight);
-        int detectCloser(bool useRight, int threshold, int consecutiveCount);
-        int detectFurther(bool useRight, int threshold, int consecutiveCount);
+        boolean detectCloser(bool useRight, int threshold, int consecutiveCount);
+        boolean detectFurther(bool useRight, int threshold, int consecutiveCount);
         boolean show(String message);
+        int getMeasurement(bool useRight);
         int getNextSection();
         void setDetectionTime();
 };

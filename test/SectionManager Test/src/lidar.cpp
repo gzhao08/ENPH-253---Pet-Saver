@@ -60,9 +60,11 @@ void objectDetected(void *parameter) {
             
         case RobotState::STOPPED: {
             Serial.println("lidar.cpp: STOPPED");
-            delay(3000);
             recordStartTime();
             switch (sectionManager.getCurrentSection()) {
+              case SectionManager::PET_1:{
+                int petDistance = sectionManager.getMeasurement(true);
+              }
               case SectionManager::WINDOW_FORWARD: {
                   startForward();
                   break;
