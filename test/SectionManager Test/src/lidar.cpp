@@ -9,34 +9,6 @@
 #include "SharedState.h"
 #include "ClawManager.h"
 
-int armMotorPin1 = ARM_MOTOR_PIN_1;
-int armMotorPin2 = ARM_MOTOR_PIN_2;
-int armPwmChannel1 = ARM_MOTOR_PWM_CHANNEL_1; //motor pin 1 goes to B
-int armPwmChannel2 = ARM_MOTOR_PWM_CHANNEL_2; 
-int armMuxLine = 1; 
-bool armEncoderOnTerminalSide = true; //false for arm, 
-int armSwitchPin = MICROSWITCH_ARM; 
-bool armNormallyOpen = true; 
-//muxLine: 1 is 1, 0 is 2, -1 is not muxing
-
-int verticalStageMotorPin1 = VERTICAL_STAGE_MOTOR_PIN_1;
-int verticalStageMotorPin2 = VERTICAL_STAGE_MOTOR_PIN_2;
-int verticalStagePwmChannel1 = VERTICAL_STAGE_MOTOR_PWM_CHANNEL_1; //motor pin 1 goes to B
-int verticalStagePwmChannel2 = VERTICAL_STAGE_MOTOR_PWM_CHANNEL_2; 
-int verticalStageMuxLine = 0; 
-bool verticalStageEncoderOnTerminalSide = true; //false for arm, 
-int verticalStageSwitchPin = MICROSWITCH_VERTICAL_STAGE; 
-bool verticalStageNormallyOpen = true; 
-
-int baseMotorPin1 = BASE_MOTOR_PIN_1;
-int baseMotorPin2 = BASE_MOTOR_PIN_2;
-int basePwmChannel1 = BASE_MOTOR_PWM_CHANNEL_1; //motor pin 1 goes to B
-int basePwmChannel2 = BASE_MOTOR_PWM_CHANNEL_2; 
-int baseMuxLine = -1; 
-bool baseEncoderOnTerminalSide = false; //false for arm, 
-int baseSwitchPin = MICROSWITCH_BASE; 
-bool baseNormallyOpen = true; 
-
 ClawManager claw;
 
 void objectDetected(void *parameter) {
@@ -58,12 +30,8 @@ void objectDetected(void *parameter) {
     delay(200); // wait for the drivetrain to set startRead to true (done PID tuning)
   }
   
-  currentSpeed = 1300;
-  startLineFollow();
-  int thresholds[6] = {250, 250, 250, 350, 325, 350}; // thresholds for sections 0-5
-  int stops[6] = {false, false, true, true, true, true};
-  int useRightLidar[6] = {true, true, true, true, true, false};
-  int consecutiveCount[] = {2, 2, 2, 2, 15, 2}; // number of consecutive measurements to consider a section change
+  currentSpeed = 0;
+  robotState = RobotState::IDLE;
 
   // home claw
   claw.begin();
@@ -74,13 +42,19 @@ void objectDetected(void *parameter) {
   }
 
   claw.setPositionBase(0);
+  Serial.println("Set position base to 0");
   while (!claw.base.reachedTarget()) {
+    // Serial.println(claw.base.getPosition());
     claw.loop();
   }
 
+  Serial.println("Waiting for swipe");
+
   // swipe to start
   while (true) {
+    claw.loop();
     if (sectionManager.getMeasurement(true) <= 50 && sectionManager.getMeasurement(false) <= 50) {
+      currentSpeed = 1300;
       robotState = RobotState::LINE_FOLLOW;
       break;
     }
