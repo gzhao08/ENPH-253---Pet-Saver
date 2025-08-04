@@ -7,6 +7,7 @@
 #include <Adafruit_SSD1306.h>
 #include "SectionManager.h"
 #include "SharedState.h"
+#include "ClawManager.h"
 
 void objectDetected(void *parameter) {
 
@@ -41,7 +42,10 @@ void objectDetected(void *parameter) {
     switch (robotState) {
         case RobotState::LINE_FOLLOW: {
             Serial.println("lidar.cpp: LINE_FOLLOW");
-            sectionManager.getNextSection();
+            int pet_distance = sectionManager.getNextSection(); 
+            if (pet_distance) {
+              claw.begin();
+            }
             break;
         }
 

@@ -76,6 +76,22 @@ void ClawManager::homingSequence() {
     this->base.homingSequence();
 }
 
+void ClawManager::setPositionArm(int pos) {
+    this->arm.setPosition(pos);
+}
+
+void ClawManager::setPositionVertical(int pos) {
+    this->vertical.setPosition(pos);
+}
+
+void ClawManager::setPositionBase(int pos) {
+    this->base.setPosition(pos);
+}
+
+void ClawManager::setPositionGrabber(int pos) {
+    this->grabber.setPositionDegrees(pos);
+}
+
 // ROUTINES //
 /** 
  * 1. Drive position V -- input height

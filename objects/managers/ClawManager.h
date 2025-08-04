@@ -107,5 +107,10 @@ int baseSwitchPin, bool baseNormallyOpen, int grabberMotorPin, int grabberPwmCha
         void seqPickUpHigh(bool chute);
         void seqWindowDrop(bool direction);
         
+        void setPositionArm(int pos);
+        void setPositionVertical(int pos);
+        void setPositionBase(int pos);
+        void setPositionGrabber(int pos);
+
         void loop();
 };
