@@ -92,6 +92,10 @@ boolean SectionManager::detectOutOfRange(bool useRight) {
     return false;
 }
 
+boolean SectionManager::detectOutOfRange(bool useRight) {
+    return (useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters());
+}
+
 int SectionManager::detectCloser(bool useRight, int threshold, int consecutiveCount) {
     
     int distance = useRight ? rightLidar.readRangeContinuousMillimeters() : leftLidar.readRangeContinuousMillimeters();
@@ -143,7 +147,6 @@ int SectionManager::getNextSection(){
         case SectionManager::DOORWAY: {
             // looking for doorway
             if (detectCloser(false, 120, 1)) {
-                // detectionTime = millis();
                 incrementSection();
                 if (useDisplay) {
                     display.clearDisplay();
@@ -160,9 +163,7 @@ int SectionManager::getNextSection(){
 
         case SectionManager::PET_1: {
             if (millis() - startMovementTime > 1000) {
-                int distance = detectCloser(true, 350, 1);
-                if (distance) {
-                    // detectionTime = millis();
+                if (detectCloser(true, 350, 1)) {
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();
@@ -174,7 +175,6 @@ int SectionManager::getNextSection(){
                     recordStartTime();
                     robotState = RobotState::STOPPED;
                     currentSpeed = 1200;
-                    return distance;
                 }
             }
             
@@ -184,7 +184,6 @@ int SectionManager::getNextSection(){
       case SectionManager::RAMP: {
         if (millis() - startMovementTime > 500) {
                 if (detectCloser(true, 375, 3)) {
-                    // detectionTime = millis();
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();
@@ -202,9 +201,7 @@ int SectionManager::getNextSection(){
 
       case SectionManager::RAMP_END: {
         if (millis() - startMovementTime > 1000) {
-            int distance = detectCloser(false, 300, 3);
-                if (distance) {
-                    // detectionTime = millis();
+                if (detectCloser(false, 300, 3)) {
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();
@@ -216,16 +213,13 @@ int SectionManager::getNextSection(){
                     recordStartTime();
                     stopDrive();
                     currentSpeed = 1100;
-                    return distance;
                 }
             }
         break;
       }
 
       case SectionManager::WINDOW_FORWARD: {
-        int distance = detectFurther(false, 300, 3);
-            if (distance) {
-                // detectionTime = millis();
+            if (detectFurther(false, 300, 3)) {
                 incrementSection();
                 if (useDisplay) {
                     display.clearDisplay();
@@ -237,7 +231,6 @@ int SectionManager::getNextSection(){
                 recordStartTime();
                 stopDrive();
                 currentSpeed = 1200;
-                return distance;
             }
             
         break;
@@ -245,8 +238,7 @@ int SectionManager::getNextSection(){
 
       case SectionManager::PET_3: {
         if (millis() - startMovementTime >= 1000) {
-            int distance = detectCloser(false, 250, 3);
-            if (distance) {
+            if (detectCloser(false, 250, 3)) {
                 incrementSection();
                 if (useDisplay) {
                     display.clearDisplay();
@@ -258,7 +250,6 @@ int SectionManager::getNextSection(){
                 recordStartTime();
                 stopDrive();
                 currentSpeed = 1100;
-                return distance;
             }
         }
             
@@ -267,8 +258,7 @@ int SectionManager::getNextSection(){
 
       case SectionManager::PET_4: {
             if (millis() - startMovementTime >= 1000) {
-                int distance = detectCloser(false, 350, 2);
-                if (distance) {
+                if (detectCloser(false, 350, 2)) {
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();
@@ -280,7 +270,6 @@ int SectionManager::getNextSection(){
                     recordStartTime();
                     stopDrive();
                     currentSpeed = 1100;
-                    return distance;
                 }
             }
             
@@ -325,9 +314,7 @@ int SectionManager::getNextSection(){
             
             break;
       }
-
     }
-    return 0;
 }
 
 void SectionManager::setDetectionTime() {
