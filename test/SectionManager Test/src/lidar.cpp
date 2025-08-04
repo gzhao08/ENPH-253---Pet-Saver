@@ -37,10 +37,7 @@ bool baseEncoderOnTerminalSide = false; //false for arm,
 int baseSwitchPin = MICROSWITCH_BASE; 
 bool baseNormallyOpen = true; 
 
-ClawManager claw(armMotorPin1, armMotorPin2, armPwmChannel1, armPwmChannel2, armMuxLine, armEncoderOnTerminalSide, 
-  armSwitchPin, armNormallyOpen, verticalStageMotorPin1, verticalStageMotorPin2, verticalStagePwmChannel1, verticalStagePwmChannel2, verticalStageMuxLine, verticalStageEncoderOnTerminalSide,
-  verticalStageSwitchPin, verticalStageNormallyOpen, baseMotorPin1, baseMotorPin2, basePwmChannel1, basePwmChannel2, baseMuxLine, baseEncoderOnTerminalSide, 
-  baseSwitchPin, baseNormallyOpen, GRABBER_MOTOR_PIN, GRABBER_PWM_CHANNEL, 8, -1);
+ClawManager claw;
 
 void objectDetected(void *parameter) {
 
