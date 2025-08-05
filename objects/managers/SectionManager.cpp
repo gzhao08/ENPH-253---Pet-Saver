@@ -186,6 +186,7 @@ void SectionManager::getNextSection(){
       case SectionManager::RAMP: {
         if (millis() - startMovementTime > 500) {
                 if (detectCloser(true, 375, 3)) {
+                    Serial.println("found ramp");
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();

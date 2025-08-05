@@ -91,7 +91,7 @@ void objectDetected(void *parameter) {
             recordStartTime();
             switch (sectionManager.getCurrentSection()) {
               case SectionManager::RAMP:{
-                Serial.println("Picking up pet");
+                Serial.println("Picking up first pet");
                 int petDistance = sectionManager.getMeasurement(true);
                 claw.setPositionGrabber(20);  
 
