@@ -422,13 +422,26 @@ void ClawTester::use() {
 
                 case 22:
                 {
-                base.continuousServo.logPIDOutput = !base.continuousServo.logPIDOutput;
-                break;
+                    base.continuousServo.logPIDOutput = !base.continuousServo.logPIDOutput;
+                    break;
                 }
 
                 case 23:
                 {
                     sensePet();
+                    break;
+                }
+
+                case 24:
+                {
+                    arm.homingSequence();
+                    verticalStage.homingSequence();
+                    verticalStage.setPosition(60);
+                    while (!verticalStage.reachedTarget()) {
+                        verticalStage.loop();
+                    }
+                    base.homingSequence();
+                    break;
                 }
 
                 case -1:
@@ -452,9 +465,14 @@ float getMagnetReadingMagSq() {
     float z_tot = 0;
     sensors_event_t event;
 
-    float HARD_IRON_OFFSET_X = -20.3;
-    float HARD_IRON_OFFSET_Y = 87.5;
-    float HARD_IRON_OFFSET_Z = 19.3;
+    // float HARD_IRON_OFFSET_X = -20.3;
+    // float HARD_IRON_OFFSET_Y = 87.5;
+    // float HARD_IRON_OFFSET_Z = 19.3;
+
+    
+    float HARD_IRON_OFFSET_X = 0;
+    float HARD_IRON_OFFSET_Y = 0;
+    float HARD_IRON_OFFSET_Z = 0;
 
     for (int i = 0; i < sampleSize; i++) {
         lis3mdl.getEvent(&event);
