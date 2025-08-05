@@ -39,7 +39,7 @@ void ClawPart::setAsHome() {
  * This will set the home position of the claw part
  */
 void ClawPart::homingSequence() {
-    this->continuousServo.setMaxVoltage(this->servoMaxVoltage/1.4);
+    this->continuousServo.setMaxVoltage(this->servoMaxVoltage/1.3);
 
     int overshootAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 1.2;
     this->continuousServo.moveBy(overshootAngle);
@@ -68,9 +68,9 @@ void ClawPart::homingSequence() {
     }
     Serial.println("Position adjusted");
 
-    this->continuousServo.setMaxVoltage(this->servoMaxVoltage/1.4);
+    this->continuousServo.setMaxVoltage(this->servoMaxVoltage/1.3);
 
-    int rehomeAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 0.2;
+    int rehomeAngle = -(this->ABS_POS_LIMIT - this->MIN_POSITION) * POS_TO_ENCODER_CONVERSION * 0.3;
     this->continuousServo.moveBy(rehomeAngle); // Gentle rehome
     
     timeout.reset();

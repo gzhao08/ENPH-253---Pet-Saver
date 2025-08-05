@@ -70,6 +70,13 @@ void objectDetected(void *parameter) {
         case RobotState::LINE_FOLLOW: {
             // Serial.println("lidar.cpp: LINE_FOLLOW");
             sectionManager.getNextSection(); 
+            if (sectionManager.getCurrentSection() == SectionManager::RAMP_END) {
+              claw.base.setPosition(90);
+              claw.waitToReachTarget(2000);
+              claw.setPositionGrabber(100);
+              claw.base.setPosition(0);
+              claw.waitToReachTarget(2000);
+            }
             break;
         }
 
@@ -95,7 +102,7 @@ void objectDetected(void *parameter) {
                 int petDistance = sectionManager.getMeasurement(true);
                 claw.setPositionGrabber(20);  
 
-                claw.setPositionVertical(100);
+                claw.setPositionVertical(130);
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
                 }
@@ -112,19 +119,18 @@ void objectDetected(void *parameter) {
                 claw.base.continuousServo.logPIDOutput = true;
                 claw.sensePet();
 
-                claw.arm.moveBy(-10);
-                while (!claw.arm.reachedTarget()) {
-                  claw.loop();
-                }
+                claw.arm.moveBy(50);
+                claw.base.moveBy(5);
+                claw.waitToReachTarget(3000);
 
                 claw.setPositionGrabber(110);
 
-                claw.setPositionVertical(30);
-                while (!claw.vertical.reachedTarget()) {
-                  claw.loop();
-                }
 
-                claw.setPositionGrabber(15);
+                claw.setPositionVertical(30);
+                claw.waitToReachTarget();
+
+                // Let it grab
+                claw.setPositionGrabber(10);
                 delay(500);
 
                 claw.setPositionArm(100);
@@ -132,7 +138,7 @@ void objectDetected(void *parameter) {
                   claw.loop();
                 }
                 
-                claw.setPositionVertical(110);
+                claw.setPositionVertical(100);
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
                 }
@@ -143,10 +149,10 @@ void objectDetected(void *parameter) {
                   claw.loop();
                 }
 
-                claw.setPositionArm(0);
-                while (!claw.arm.reachedTarget()) {
-                  claw.loop();
-                }
+                // claw.setPositionArm(0);
+                // while (!claw.arm.reachedTarget()) {
+                //   claw.loop();
+                // }
 
                 // claw.setPositionVertical(100);
                 // while (!claw.vertical.reachedTarget()) {

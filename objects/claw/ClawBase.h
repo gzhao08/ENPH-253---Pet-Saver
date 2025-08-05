@@ -20,12 +20,12 @@ class ClawBase : public ClawPart {
         const int _MAX_POSITION = 130;
 
         // PID Parameters
-        const float _Pk = 75;
-        const float _Dk = 5;
+        const float _Pk = 150;
+        const float _Dk = 8;
 
         // Servo parameters
         const int _servoMaxVoltage = 8;
-        const int _servoTolerance = 20; // How much can angle deviate from target
+        const int _servoTolerance = 15; // How much can angle deviate from target
 
 
         
