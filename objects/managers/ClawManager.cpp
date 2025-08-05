@@ -96,7 +96,7 @@ void ClawManager::waitToReachTarget(int timeout) {
     if (timeout < 0) {
         hasTimeout = false;
     }
-    
+
     DelayManager timeoutManager(timeout);
     timeoutManager.reset();
 
@@ -216,109 +216,44 @@ void ClawManager::sensePet() {
     int armInit = arm.getPosition();
 
 
-    // Try find best angle
-
-    int sweepAngle = 30; // one side from initial position (so movement 2x sweepangle)
-    int sweepAngle2 = 20;
-    int sweepAngle3 = 10;
-
+    // Try find best angle by sweeping
+    int sweepAngles[] = {30, 20, 10};
+    int baseSweepCenter = baseInit;
     int maxMagnetReading = 0;
-    int maxMagnetReadingPos = 0;
-
-    // First sweep
-    base.setPosition(baseInit + sweepAngle);
-    while (!base.reachedTarget()) {
-        // Serial.println("Moving correct base to position");
-        base.loop();
-        arm.loop();
-        float currentReading = getMagnetReadingMagSq();
-        Serial.println(currentReading);
-        if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
-        maxMagnetReading = currentReading;
-        maxMagnetReadingPos = base.getPosition();
+    int maxMagnetReadingPos = baseInit;
+    for (int sweepAngle : sweepAngles) {
+        base.setPosition(baseSweepCenter + sweepAngle);
+        while (!base.reachedTarget()) {
+            // Serial.println("Moving correct base to position");
+            base.loop();
+            arm.loop();
+            float currentReading = getMagnetReadingMagSq();
+            Serial.println(currentReading);
+            if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
+                maxMagnetReading = currentReading;
+                maxMagnetReadingPos = base.getPosition();
+            }
+            samples += 1;
         }
-        samples += 1;
-    }
-    base.setPosition(baseInit - sweepAngle);
-    while (!base.reachedTarget()) {
-        // Serial.println("Moving correct base to position");
-        base.loop();
-        arm.loop();
-        float currentReading = getMagnetReadingMagSq();
-        Serial.println(currentReading);
-        if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
-        maxMagnetReading = currentReading;
-        maxMagnetReadingPos = base.getPosition();
-        }
-        samples += 1;
-    }
-
-    // Second sweep
-    base.setPosition(maxMagnetReadingPos+sweepAngle2);
-    while (!base.reachedTarget()) {
-        // Serial.println("Moving to other base position");
-        base.loop();
-        arm.loop();
-
-        float currentReading = getMagnetReadingMagSq();
-        Serial.println(currentReading);
-
-        if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
-        maxMagnetReading = currentReading;
-        maxMagnetReadingPos = base.getPosition();
-        }
-        samples += 1;
-    }
-    base.setPosition(maxMagnetReadingPos-sweepAngle2);
-    while (!base.reachedTarget()) {
-        // Serial.println("Moving to other base position");
-        base.loop();
-        arm.loop();
-
-        float currentReading = getMagnetReadingMagSq();
-        Serial.println(currentReading);
-
-        if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
-        maxMagnetReading = currentReading;
-        maxMagnetReadingPos = base.getPosition();
-        }
-        samples += 1;
-    }
-
-    // Third sweep
-    base.setPosition(maxMagnetReadingPos+sweepAngle3);
-    while (!base.reachedTarget()) {
-        // Serial.println("Moving correct base to position");
-        base.loop();
-        arm.loop();
-        float currentReading = getMagnetReadingMagSq();
-        Serial.println(currentReading);
-        if (maxMagnetReading < currentReading) {
-        maxMagnetReading = currentReading;
-        maxMagnetReadingPos = base.getPosition();
-        }
-        samples += 1;
-    }
-    base.setPosition(maxMagnetReadingPos-sweepAngle3);
-    while (!base.reachedTarget()) {
-        // Serial.println("Moving correct base to position");
-        base.loop();
-        arm.loop();
-        float currentReading = getMagnetReadingMagSq();
-        Serial.println(currentReading);
-        if (maxMagnetReading < currentReading) {
-        maxMagnetReading = currentReading;
-        maxMagnetReadingPos = base.getPosition();
-        }
-        samples += 1;
+        base.setPosition(baseSweepCenter - sweepAngle);
+        while (!base.reachedTarget()) {
+            // Serial.println("Moving correct base to position");
+            base.loop();
+            arm.loop();
+            float currentReading = getMagnetReadingMagSq();
+            Serial.println(currentReading);
+            if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
+                maxMagnetReading = currentReading;
+                maxMagnetReadingPos = base.getPosition();
+            }
+            samples += 1;
+        }   
     }
 
     base.setPosition(maxMagnetReadingPos);
     while (!base.reachedTarget()) {
-        // Serial.println("moving to max reading position");
         base.loop();
         arm.loop();
-
     }
 
     Serial.printf("Max magnet reading position: %d\n", maxMagnetReadingPos);
