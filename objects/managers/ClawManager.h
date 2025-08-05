@@ -63,6 +63,11 @@ class ClawManager {
         Adafruit_LIS3MDL lis3mdl;
 
 
+        float HARD_IRON_OFFSET_X = 0;
+        float HARD_IRON_OFFSET_Y = 0;
+        float HARD_IRON_OFFSET_Z = 0;
+
+
         //POSITIONS
         //Base
         float BASE_FORWARD = 0;
@@ -100,6 +105,9 @@ class ClawManager {
 
         void sensePet(); 
         float getMagnetReadingMagSq();
+        void calibrateMagnet();
+
+        void waitToReachTarget(int timeout);
 
 
         void stopAll();

@@ -84,6 +84,29 @@ void ClawManager::homingSequence() {
         this->vertical.loop();
     }
     this->base.homingSequence();
+    this->calibrateMagnet();
+}
+
+/**
+ * Loops the claw while it waits for it to reach its desired position (blocking)
+ * @param timeout in ms. If no timeout (can be infinite), pass in -1
+ */
+void ClawManager::waitToReachTarget(int timeout) {
+    bool hasTimeout = true;
+    if (timeout < 0) {
+        hasTimeout = false;
+    }
+    
+    DelayManager timeoutManager(timeout);
+    timeoutManager.reset();
+
+    while (!this->arm.reachedTarget() || !this->vertical.reachedTarget() || !this->base.reachedTarget()) {
+        this->loop();
+        if (hasTimeout && !timeoutManager.isElapsed()) {
+            break;
+        }
+    }
+    
 }
 
 
@@ -94,10 +117,6 @@ float ClawManager::getMagnetReadingMagSq() {
     float y_tot = 0;
     float z_tot = 0;
     sensors_event_t event;
-
-    float HARD_IRON_OFFSET_X = -20.3;
-    float HARD_IRON_OFFSET_Y = 87.5;
-    float HARD_IRON_OFFSET_Z = 19.3;
 
     for (int i = 0; i < sampleSize; i++) {
         lis3mdl.getEvent(&event);
@@ -113,6 +132,67 @@ float ClawManager::getMagnetReadingMagSq() {
     // Serial.printf("Y Reading: %.2f\n", y_tot);
     // Serial.printf("Z Reading: %.2f\n", z_tot);
     return x_tot*x_tot + y_tot*y_tot + z_tot*z_tot;
+}
+
+
+
+void ClawManager::calibrateMagnet() {
+    int baseCalibrationMin = -110;
+    int baseCalibrationMax = 110;
+    float min_x, max_x, mid_x;
+    float min_y, max_y, mid_y;
+    float min_z, max_z, mid_z;
+    
+    sensors_event_t event;
+    lis3mdl.getEvent(&event);
+
+    min_x = max_x = event.magnetic.x;
+    min_y = max_y = event.magnetic.y;
+    min_z = max_z = event.magnetic.z;
+    delay(10);
+
+    this->base.setPosition(baseCalibrationMin);
+    this->base.waitToReachTarget(5000);
+    this->base.setPosition(baseCalibrationMax);
+
+    while (!this->base.reachedTarget()) {
+        lis3mdl.getEvent(&event);
+        float x = event.magnetic.x;
+        float y = event.magnetic.y;
+        float z = event.magnetic.z;
+
+        min_x = min(min_x, x);
+        min_y = min(min_y, y);
+        min_z = min(min_z, z);
+
+        max_x = max(max_x, x);
+        max_y = max(max_y, y);
+        max_z = max(max_z, z);
+
+        mid_x = (max_x + min_x) / 2;
+        mid_y = (max_y + min_y) / 2;
+        mid_z = (max_z + min_z) / 2;
+
+        HARD_IRON_OFFSET_X = mid_x;
+        HARD_IRON_OFFSET_Y = mid_y;
+        HARD_IRON_OFFSET_Z = mid_z;
+
+        // Serial.print("Mag: (");
+        // Serial.print(x); Serial.print(", ");
+        // Serial.print(y); Serial.print(", ");
+        // Serial.print(z); Serial.print(")");
+
+        // Serial.print(" Hard offset: (");
+        // Serial.print(mid_x); Serial.print(", ");
+        // Serial.print(mid_y); Serial.print(", ");
+        // Serial.print(mid_z); Serial.print(")");  
+
+        // Serial.print(" Field: (");
+        // Serial.print((max_x - min_x)/2); Serial.print(", ");
+        // Serial.print((max_y - min_y)/2); Serial.print(", ");
+        // Serial.print((max_z - min_z)/2); Serial.println(")");    
+        delay(1); 
+    }
 }
 
 void ClawManager::sensePet() {
