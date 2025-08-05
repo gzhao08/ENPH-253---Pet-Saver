@@ -42,6 +42,11 @@ bool baseNormallyOpen = true;
 
 ClawBase base(baseMotorPin1, baseMotorPin2, basePwmChannel1, basePwmChannel2, baseMuxLine, baseEncoderOnTerminalSide, baseSwitchPin, baseNormallyOpen);
 
+float HARD_IRON_OFFSET_X = 0;
+float HARD_IRON_OFFSET_Y = 0;
+float HARD_IRON_OFFSET_Z = 0;
+
+
 bool armHomed = false;
 bool verticalHomed = false;
 bool baseHomed = false;
@@ -429,6 +434,7 @@ void ClawTester::use() {
                 case 23:
                 {
                     sensePet();
+                    Serial.println("out of sense");
                     break;
                 }
 
@@ -441,17 +447,35 @@ void ClawTester::use() {
                         verticalStage.loop();
                     }
                     base.homingSequence();
+                    verticalStage.setPosition(100);
+                    while (!verticalStage.reachedTarget()) {
+                        verticalStage.loop();
+                    }
+                    base.setPosition(0); 
+                    while (!base.reachedTarget()) {
+                        base.loop();
+                    }
+                    arm.setPosition(120); 
+                    while (!arm.reachedTarget()) {
+                        arm.loop();
+                    }
                     break;
                 }
 
-                case -1:
+                case 25:
                 {
-                quit = true;
-                break;
+                    calibrateMagnet();
+                    break;
                 }
+                // case -1:
+                // {
+                // quit = true;
+                // break;
+                // }
             }
         }
         if (quit) {
+            Serial.println("exit claw tester");
             break;
         }
     }
@@ -469,10 +493,7 @@ float getMagnetReadingMagSq() {
     // float HARD_IRON_OFFSET_Y = 87.5;
     // float HARD_IRON_OFFSET_Z = 19.3;
 
-    
-    float HARD_IRON_OFFSET_X = 0;
-    float HARD_IRON_OFFSET_Y = 0;
-    float HARD_IRON_OFFSET_Z = 0;
+ 
 
     for (int i = 0; i < sampleSize; i++) {
         lis3mdl.getEvent(&event);
@@ -616,8 +637,8 @@ void sensePet() {
 
     }
 
-    Serial.printf("Max magnet reading position: %d\n", maxMagnetReadingPos);
-    Serial.printf("Done, samples: %d\n", samples);
+    // Serial.printf("Max magnet reading position: %d\n", maxMagnetReadingPos);
+    // Serial.printf("Done, samples: %d\n", samples);
 
     // // Try to find best position
     // int armExtension = 50;
@@ -682,12 +703,20 @@ void calibrateMagnet() {
         Serial.print(mid_x); Serial.print(", ");
         Serial.print(mid_y); Serial.print(", ");
         Serial.print(mid_z); Serial.print(")");  
+        HARD_IRON_OFFSET_X = mid_x;
+        HARD_IRON_OFFSET_Y = mid_y;
+        HARD_IRON_OFFSET_Z = mid_z;
+
 
         Serial.print(" Field: (");
         Serial.print((max_x - min_x)/2); Serial.print(", ");
         Serial.print((max_y - min_y)/2); Serial.print(", ");
         Serial.print((max_z - min_z)/2); Serial.println(")");    
         delay(10); 
+
+        if (Serial.available()) {
+            break;
+        }
     }
 }
 

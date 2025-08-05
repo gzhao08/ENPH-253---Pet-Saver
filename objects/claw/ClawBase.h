@@ -25,7 +25,7 @@ class ClawBase : public ClawPart {
 
         // Servo parameters
         const int _servoMaxVoltage = 8;
-        const int _servoTolerance = 15; // How much can angle deviate from target
+        const int _servoTolerance = 20; // How much can angle deviate from target
 
 
         

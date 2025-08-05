@@ -148,7 +148,7 @@ void ClawManager::sensePet() {
     // First sweep
     base.setPosition(baseInit + sweepAngle);
     while (!base.reachedTarget()) {
-        Serial.println("Moving correct base to position");
+        // Serial.println("Moving correct base to position");
         base.loop();
         arm.loop();
         float currentReading = getMagnetReadingMagSq();
@@ -161,7 +161,7 @@ void ClawManager::sensePet() {
     }
     base.setPosition(baseInit - sweepAngle);
     while (!base.reachedTarget()) {
-        Serial.println("Moving correct base to position");
+        // Serial.println("Moving correct base to position");
         base.loop();
         arm.loop();
         float currentReading = getMagnetReadingMagSq();
@@ -176,7 +176,7 @@ void ClawManager::sensePet() {
     // Second sweep
     base.setPosition(maxMagnetReadingPos+sweepAngle2);
     while (!base.reachedTarget()) {
-        Serial.println("Moving to other base position");
+        // Serial.println("Moving to other base position");
         base.loop();
         arm.loop();
 
@@ -191,7 +191,7 @@ void ClawManager::sensePet() {
     }
     base.setPosition(maxMagnetReadingPos-sweepAngle2);
     while (!base.reachedTarget()) {
-        Serial.println("Moving to other base position");
+        // Serial.println("Moving to other base position");
         base.loop();
         arm.loop();
 
@@ -208,7 +208,7 @@ void ClawManager::sensePet() {
     // Third sweep
     base.setPosition(maxMagnetReadingPos+sweepAngle3);
     while (!base.reachedTarget()) {
-        Serial.println("Moving correct base to position");
+        // Serial.println("Moving correct base to position");
         base.loop();
         arm.loop();
         float currentReading = getMagnetReadingMagSq();
@@ -221,7 +221,7 @@ void ClawManager::sensePet() {
     }
     base.setPosition(maxMagnetReadingPos-sweepAngle3);
     while (!base.reachedTarget()) {
-        Serial.println("Moving correct base to position");
+        // Serial.println("Moving correct base to position");
         base.loop();
         arm.loop();
         float currentReading = getMagnetReadingMagSq();
@@ -235,7 +235,7 @@ void ClawManager::sensePet() {
 
     base.setPosition(maxMagnetReadingPos);
     while (!base.reachedTarget()) {
-        Serial.println("moving to max reading position");
+        // Serial.println("moving to max reading position");
         base.loop();
         arm.loop();
 
