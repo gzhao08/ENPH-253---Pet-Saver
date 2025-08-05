@@ -107,7 +107,7 @@ class ClawManager {
         float getMagnetReadingMagSq();
         void calibrateMagnet();
 
-        void waitToReachTarget(int timeout);
+        void waitToReachTarget(int timeout=-1);
 
 
         void stopAll();
