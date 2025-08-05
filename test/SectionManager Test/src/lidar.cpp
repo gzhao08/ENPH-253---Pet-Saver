@@ -71,11 +71,7 @@ void objectDetected(void *parameter) {
             // Serial.println("lidar.cpp: LINE_FOLLOW");
             sectionManager.getNextSection(); 
             if (sectionManager.getCurrentSection() == SectionManager::RAMP_END) {
-              claw.base.setPosition(90);
-              claw.waitToReachTarget(2000);
-              claw.setPositionGrabber(100);
-              claw.base.setPosition(0);
-              claw.waitToReachTarget(2000);
+              claw.seq2RampDrop();
             }
             break;
         }
@@ -100,64 +96,8 @@ void objectDetected(void *parameter) {
               case SectionManager::RAMP:{
                 Serial.println("Picking up first pet");
                 int petDistance = sectionManager.getMeasurement(true);
-                claw.setPositionGrabber(20);  
-
-                claw.setPositionVertical(130);
-                while (!claw.vertical.reachedTarget()) {
-                  claw.loop();
-                }
-                claw.setPositionBase(-90);
-                while (!claw.base.reachedTarget()) {
-                  claw.loop();
-                }
-                claw.setPositionArm(178);
-                while (!claw.arm.reachedTarget()) {
-                  claw.loop();
-                }
-
-                Serial.println("Initial position of arm has been set");
-                claw.base.continuousServo.logPIDOutput = true;
-                claw.sensePet();
-
-                claw.arm.moveBy(50);
-                claw.base.moveBy(5);
-                claw.waitToReachTarget(3000);
-
-                claw.setPositionGrabber(110);
-
-
-                claw.setPositionVertical(30);
-                claw.waitToReachTarget();
-
-                // Let it grab
-                claw.setPositionGrabber(10);
-                delay(500);
-
-                claw.setPositionArm(100);
-                while (!claw.arm.reachedTarget()) {
-                  claw.loop();
-                }
-                
-                claw.setPositionVertical(100);
-                while (!claw.vertical.reachedTarget()) {
-                  claw.loop();
-                }
-
-                claw.setPositionBase(0);
-                while (!claw.base.reachedTarget()) {
-                  
-                  claw.loop();
-                }
-
-                // claw.setPositionArm(0);
-                // while (!claw.arm.reachedTarget()) {
-                //   claw.loop();
-                // }
-
-                // claw.setPositionVertical(100);
-                // while (!claw.vertical.reachedTarget()) {
-                //   claw.loop();
-                // }
+                //pet pick up
+                claw.seq1PetRetrieve();
         
                 Serial.println("Done picking up pet, starting line follow");
                 startLineFollow();
