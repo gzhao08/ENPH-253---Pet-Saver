@@ -93,10 +93,9 @@ void objectDetected(void *parameter) {
               case SectionManager::RAMP:{
                 Serial.println("Picking up pet");
                 int petDistance = sectionManager.getMeasurement(true);
-                
-                claw.setPositionGrabber(110);
-                claw.setPositionVertical(100);
+                claw.setPositionGrabber(20);  
 
+                claw.setPositionVertical(100);
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
                 }
@@ -113,11 +112,18 @@ void objectDetected(void *parameter) {
                 claw.base.continuousServo.logPIDOutput = true;
                 claw.sensePet();
 
+                claw.arm.moveBy(-10);
+                while (!claw.arm.reachedTarget()) {
+                  claw.loop();
+                }
+
+                claw.setPositionGrabber(110);
 
                 claw.setPositionVertical(30);
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
                 }
+
                 claw.setPositionGrabber(15);
                 delay(500);
 

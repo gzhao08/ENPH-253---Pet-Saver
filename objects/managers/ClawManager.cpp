@@ -138,7 +138,7 @@ float ClawManager::getMagnetReadingMagSq() {
 
 void ClawManager::calibrateMagnet() {
     int baseCalibrationMin = -110;
-    int baseCalibrationMax = 110;
+    int baseCalibrationMax = 0;
     float min_x, max_x, mid_x;
     float min_y, max_y, mid_y;
     float min_z, max_z, mid_z;
@@ -156,6 +156,8 @@ void ClawManager::calibrateMagnet() {
     this->base.setPosition(baseCalibrationMax);
 
     while (!this->base.reachedTarget()) {
+        this->loop();
+        Serial.println("stuck");
         lis3mdl.getEvent(&event);
         float x = event.magnetic.x;
         float y = event.magnetic.y;
