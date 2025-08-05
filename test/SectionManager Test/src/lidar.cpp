@@ -104,13 +104,13 @@ void objectDetected(void *parameter) {
                 while (!claw.base.reachedTarget()) {
                   claw.loop();
                 }
-                claw.setPositionArm(170);
+                claw.setPositionArm(178);
                 while (!claw.arm.reachedTarget()) {
                   claw.loop();
                 }
 
                 Serial.println("Initial position of arm has been set");
-
+                claw.base.continuousServo.logPIDOutput = true;
                 claw.sensePet();
 
 
@@ -126,7 +126,7 @@ void objectDetected(void *parameter) {
                   claw.loop();
                 }
                 
-                claw.setPositionVertical(50);
+                claw.setPositionVertical(110);
                 while (!claw.vertical.reachedTarget()) {
                   claw.loop();
                 }
@@ -141,6 +141,11 @@ void objectDetected(void *parameter) {
                 while (!claw.arm.reachedTarget()) {
                   claw.loop();
                 }
+
+                // claw.setPositionVertical(100);
+                // while (!claw.vertical.reachedTarget()) {
+                //   claw.loop();
+                // }
         
                 Serial.println("Done picking up pet, starting line follow");
                 startLineFollow();
