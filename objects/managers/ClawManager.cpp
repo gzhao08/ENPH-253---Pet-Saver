@@ -317,6 +317,55 @@ void ClawManager::stopAll() {
     this->base.stop();
 }
 
+
+//Comp Routines//
+
+/**
+ * pet retrieve 
+ */
+void ClawManager::seq1PetRetrieve(int lidarReading) {
+    this->grabber.setPositionDegrees(20);  
+
+    //set initial arm position
+    this->vertical.setPosition(130);
+    this->base.setPosition(-90);
+    this->arm.setPosition(lidarReading);
+    this->waitToReachTarget(2000);
+    Serial.println("Initial position of arm has been set");
+                
+    this->base.continuousServo.logPIDOutput = true;
+    this->sensePet();
+
+    //move forward and over to grab
+    this->arm.moveBy(50); //out 
+    this->base.moveBy(5); //left slightly
+    this->waitToReachTarget(3000);
+
+    this->grabber.setPositionDegrees(110); //open
+    this->vertical.setPosition(30); //down
+    this->waitToReachTarget();
+
+    // Let it grab
+    this->grabber.setPositionDegrees(10);
+    delay(500);
+
+    this->arm.setPosition(100); //back
+    this->vertical.setPosition(100); //up
+    this->base.setPosition(0); //front
+    this->waitToReachTarget(5000);   
+}
+
+/**
+ * PET 1: ramp drop
+ */
+void ClawManager::seq2RampDrop() {
+    this->base.setPosition(90); //left
+    this->waitToReachTarget(2000); 
+    this->grabber.setPositionDegrees(100);//open
+    this->base.setPosition(0); //front
+    this->waitToReachTarget(2000);
+}
+
 // ROUTINES //
 /** 
  * 1. Drive position V -- input height

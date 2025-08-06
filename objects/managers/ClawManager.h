@@ -109,8 +109,11 @@ class ClawManager {
 
         void waitToReachTarget(int timeout=-1);
 
-
         void stopAll();
+
+        void seq1PetRetrieve(int lidarReading);
+        void seq2RampDrop();
+
         void seqDrivePosition(float height);
         void seqPickUpLow();
         void seqRetract();
