@@ -7,6 +7,7 @@ volatile unsigned long startMovementTime = 0;
 
 volatile RobotState robotState = RobotState::IDLE;
 portMUX_TYPE robotStateMux = portMUX_INITIALIZER_UNLOCKED;
+portMUX_TYPE startTimeMux = portMUX_INITIALIZER_UNLOCKED;
 
 
 void stopDrive() {
@@ -26,7 +27,9 @@ void changeSpeed(int newSpeed) {
 }
 
 void recordStartTime() {
+    portENTER_CRITICAL(&startTimeMux);
     startMovementTime = millis();
+    portEXIT_CRITICAL(&startTimeMux);
 }
 
 void startForward() {

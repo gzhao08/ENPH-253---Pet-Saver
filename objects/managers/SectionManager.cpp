@@ -19,12 +19,22 @@ SectionManager::SectionManager()
     useDisplay(false),
     rightLidar(),
     leftLidar(),
-    display(128, 64, &Wire, -1) {}
+    display(128, 64, &Wire1, -1) {}
 
-void SectionManager::begin(boolean useDisplay) {
+void SectionManager::begin(boolean usingDisplay) {
 
-    if (useDisplay) {
+    Serial.println("Initializing display");
+
+    if (usingDisplay) {
         this->useDisplay = true;
+        
+        byte error = -1;
+        while (error != 0) {
+            Wire1.beginTransmission(0x3C);
+            error = Wire1.endTransmission();
+            delay(500);
+        }
+
         while (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
             Serial.println("SSD1306 allocation failed");
             delay(100);
@@ -36,13 +46,16 @@ void SectionManager::begin(boolean useDisplay) {
         display.setCursor(0, 0);
         display.println("Initializing VL53L0X...");
         display.display();
+        Serial.println("Succesfully initialized display");
     }
+
+    
 
     rightLidar.setBus(&Wire);
     leftLidar.setBus(&Wire1);
 
     Serial.println("Initializing Right VL53L0X...");
-    while (!rightLidar.init()) {
+    while (!rightLidar.init(false)) {
         Serial.println("Failed to boot Right VL53L0X, retrying...");
         delay(100);
     }
@@ -50,7 +63,7 @@ void SectionManager::begin(boolean useDisplay) {
     Serial.println("Right VL53L0X Initialized!");
 
     Serial.println("Initializing Left VL53L0X...");
-    while (!leftLidar.init()) {
+    while (!leftLidar.init(false)) {
         Serial.println("Failed to boot Left VL53L0X, retrying...");
         delay(100);
     }
@@ -76,12 +89,11 @@ void SectionManager::begin(boolean useDisplay) {
         delay(1000);
         display.setCursor(30, 24);
         display.setTextSize(2);
-        display.println("DOORWAY");
+        display.println("SWIPE RIGHT");
         display.display();
+        display.clearDisplay();
+        delay(500);
     }
-    
-    
-
 }
 
 boolean SectionManager::detectOutOfRange(bool useRight) {
@@ -203,7 +215,7 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::RAMP_END: {
-        if (millis() - startMovementTime > 1000) {
+        if (millis() - startMovementTime > 2000) {
                 if (detectCloser(false, 325, 3)) {
                     Serial.println("found ramp end");
                     incrementSection();
@@ -211,7 +223,7 @@ void SectionManager::getNextSection(){
                         display.clearDisplay();
                         display.setCursor(30, 24);
                         display.setTextSize(2);
-                        display.println("WINDOW");
+                        display.println("PET_3");
                         display.display();
                     }
                     recordStartTime();
@@ -223,7 +235,7 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::PET_3: {
-        if (millis() - startMovementTime >= 1000) {
+        if (millis() - startMovementTime >= 1500) {
             if (detectCloser(false, 300, 2)) {
                 Serial.println("found pet 3");
                 incrementSection();
@@ -231,7 +243,7 @@ void SectionManager::getNextSection(){
                     display.clearDisplay();
                     display.setCursor(30, 24);
                     display.setTextSize(2);
-                    display.println("PET_3");
+                    display.println("PET_4");
                     display.display();
                 }
                 recordStartTime();
@@ -244,6 +256,8 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::PET_4: {
+            // unsigned int timePassed = millis() - startMovementTime;
+            // Serial.printf("PET_4 time: %d\n", timePassed);
             if (millis() - startMovementTime >= 2000) {
                 if (detectCloser(false, 350, 2)) {
                     Serial.println("found pet 4");
@@ -252,10 +266,10 @@ void SectionManager::getNextSection(){
                         display.clearDisplay();
                         display.setCursor(30, 24);
                         display.setTextSize(2);
-                        display.println("PET_4");
+                        display.println("PET_2");
                         display.display();
                     }
-                    recordStartTime();
+                    //recordStartTime();
                     stopDrive();
                     currentSpeed = 1000;
                 }
@@ -265,7 +279,8 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::PET_2: {
-            if (millis() - startMovementTime >= 1750) {
+            
+            if (millis() - startMovementTime >= 2000) {
                 if (detectCloser(true, 300, 2)) {
                     incrementSection();
                     if (useDisplay) {
@@ -285,7 +300,7 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::PET_5: {
-            if (millis() - startMovementTime >= 2000) {
+            if (millis() - startMovementTime >= 1500) {
                 if (detectCloser(true, 350, 3)) {
                     incrementSection();
                     if (useDisplay) {

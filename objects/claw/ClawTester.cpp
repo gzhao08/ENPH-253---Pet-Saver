@@ -455,10 +455,10 @@ void ClawTester::use() {
                     while (!base.reachedTarget()) {
                         base.loop();
                     }
-                    arm.setPosition(120); 
-                    while (!arm.reachedTarget()) {
-                        arm.loop();
-                    }
+                    // arm.setPosition(120); 
+                    // while (!arm.reachedTarget()) {
+                    //     arm.loop();
+                    // }
                     armHomed = true;
                     verticalHomed = true;
                     baseHomed = true;

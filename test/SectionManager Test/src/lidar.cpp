@@ -9,7 +9,9 @@
 #include "SharedState.h"
 #include "ClawManager.h"
 
-ClawManager claw;
+#define ACTUATE_CLAW true
+
+void scanI2C(TwoWire &wire, const char* name);
 
 void objectDetected(void *parameter) {
 
@@ -20,9 +22,9 @@ void objectDetected(void *parameter) {
   
   Wire.begin(7, 5);  // SDA, SCL for right lidar 15, 13
   Wire1.begin(15, 13);  // SDA, SCL for
-  
+
   SectionManager sectionManager;
-  sectionManager.begin(false); // Initialize the section manager with display
+  sectionManager.begin(true); // Initialize the section manager with display
 
   while (!startRead) {
     Serial.println("Waiting for startRead to be true");
@@ -32,21 +34,31 @@ void objectDetected(void *parameter) {
   currentSpeed = 0;
   robotState = RobotState::IDLE;
 
-  // home claw
-  claw.begin();
-  claw.homingSequence();
-  claw.setPositionVertical(50);
-  while (!claw.vertical.reachedTarget()) {
+  
+  boolean pickedUpFirstPet = false;
+  boolean droppedFirstPet = false;
+  boolean pickedUpThirdPet = false;
+
+  ClawManager claw;
+
+  if (ACTUATE_CLAW) {
+    // home claw
+    claw.begin();
+    claw.homingSequence();
+    claw.setPositionVertical(50);
+    while (!claw.vertical.reachedTarget()) {
+      claw.loop();
+    }
+    claw.setPositionBase(0);
+    Serial.println("Set position base to 0");
+    while (!claw.base.reachedTarget()) {
+      // Serial.println(claw.base.getPosition());
+      claw.loop();
+    }
+    claw.stopAll();
     claw.loop();
   }
-  claw.setPositionBase(0);
-  Serial.println("Set position base to 0");
-  while (!claw.base.reachedTarget()) {
-    // Serial.println(claw.base.getPosition());
-    claw.loop();
-  }
-  claw.stopAll();
-  claw.loop();
+  
   Serial.println("Waiting for swipe");
 
   // swipe to start
@@ -58,12 +70,16 @@ void objectDetected(void *parameter) {
       break;
     }
   }
+
+  sectionManager.display.setCursor(30, 24);
+  sectionManager.display.setTextSize(2);
+  sectionManager.display.println("DOORWAY");
+  sectionManager.display.display();
+  delay(1000);
   Serial.println("Starting main loop!");
   
   
   // main loop
-  boolean droppedFirstPet = false;
-  boolean pickedUpThirdPet = false;
   while(true) {
 
     switch (robotState) {
@@ -73,26 +89,17 @@ void objectDetected(void *parameter) {
 
             switch (sectionManager.getCurrentSection()) {
               case SectionManager::RAMP_END: {
+                
                 if (!droppedFirstPet) {
-                  // Move to drop position
-                  claw.base.setPosition(90); //left
-                  claw.arm.setPosition(150); //out
-                  claw.waitToReachTarget(1000);
-                  // Open the claw
-                  Serial.println("Claw: 90 base 100 arm");
-                  claw.setPositionGrabber(100);  //open
-                  Serial.println("Grabber opened");
-                  delay(100); // Wait for grabber to open
-                  // Pull arm in 
-                  droppedFirstPet = true;
-                  claw.arm.setPosition(0); //in
-                  claw.base.setPosition(70); //forward
-                  claw.waitToReachTarget(3000);
+                  if (ACTUATE_CLAW) {
+                    claw.clawSeq2Ramp();
+                    droppedFirstPet = true;
+                  }
                 }
+                
                 break;
               }
             }
-            
             break;
         }
 
@@ -115,34 +122,16 @@ void objectDetected(void *parameter) {
             switch (sectionManager.getCurrentSection()) {
               case SectionManager::RAMP:{
                 //PET 1
-                Serial.println("Picking up first pet");
-                int petDistance = sectionManager.getMeasurement(true);
-                // Open grabber
-                claw.setPositionGrabber(110);  
-
-                // Move to sensing position
-                claw.setPositionBase(-90);
-                claw.setPositionArm(150);
-                claw.setPositionVertical(10);
-                claw.waitToReachTarget();
+                if (!pickedUpFirstPet) {
+                  if (ACTUATE_CLAW) {
+                    claw.clawSeq1Pet1();
+                  }
+                  else {
+                    delay(3000);
+                  }
+                }
                 
-                Serial.println("Initial position of arm has been set");
-                // claw.base.continuousServo.logPIDOutput = true;
-                claw.sensePet();
-
-                claw.arm.moveBy(65);
-                claw.waitToReachTarget(3000);
-
-                // Let it grab
-                claw.setPositionGrabber(10);
-                delay(500);
-
-                // Position while driving up ramp
-                claw.setPositionArm(80); //in
-                claw.setPositionVertical(80); //up
-                claw.setPositionBase(0); //forward
-                claw.waitToReachTarget(2000);
-        
+                
                 Serial.println("Done picking up pet, starting line follow");
                 startLineFollow();
                 break;
@@ -151,31 +140,14 @@ void objectDetected(void *parameter) {
               case SectionManager::PET_4: {
                 if (!pickedUpThirdPet) {
                   //claw sequence pet 3
-                  // Make sure arm in and home in to pillar
-                  // claw.arm.setPosition(0);
-                  // claw.base.setPosition(60);
-                  // claw.vertical.setPosition(140); //check if high enough
-                  // claw.waitToReachTarget(5000);
+                  if (ACTUATE_CLAW) {
+                    claw.clawSeq3Pet3();
+                    pickedUpThirdPet = true;
+                  }
 
-                  // // Extend the arm and sense the pet
-                  // claw.arm.setPosition(150);
-                  // claw.waitToReachTarget(5000);
-                  // claw.sensePet();
-
-                  // // Pick up pet
-                  // claw.setPositionGrabber(20);
-                  // delay(300);
-
-                  // // Move to basket position
-                  // claw.arm.setPosition(0);
-                  // claw.base.setPosition(-20);
-                  // claw.waitToReachTarget(2000);
-
-                  // // Lowers and drops to basket
-                  // claw.vertical.setPosition(80);
-                  // claw.waitToReachTarget(2000);
-                  // claw.setPositionGrabber(110);
-                  // pickedUpThirdPet = true;
+                  else {
+                    delay(3000);
+                  }
                 }
                 startLineFollow();
                 break;
@@ -201,14 +173,38 @@ void objectDetected(void *parameter) {
         }
         
     }
-    claw.loop();
+    if (ACTUATE_CLAW) {
+      if (sectionManager.getCurrentSection() == SectionManager::RAMP || sectionManager.getCurrentSection() == SectionManager::PET_3) {
+        claw.loop();
+      }
+      
+    }
   }  
 }
 
-void clawSeq1() {
+
+void scanI2C(TwoWire &wire, const char* name) {
+  Serial.print("Scanning ");
+  Serial.println(name);
   
+  byte count = 0;
+
+  for (byte address = 1; address < 127; address++) {
+    wire.beginTransmission(address);
+    byte error = wire.endTransmission();
+    
+    if (error == 0) {
+      Serial.print("Found device at 0x");
+      if (address < 16) Serial.print("0");
+      Serial.println(address, HEX);
+      count++;
+    }
+  }
+
+  if (count == 0) {
+    Serial.println("No I2C devices found.");
+  }
+  Serial.println();
 }
-
-
 
 

@@ -128,5 +128,11 @@ class ClawManager {
         void setPositionBase(int pos);
         void setPositionGrabber(int pos);
 
+
+        // real pet sequences
+        void clawSeq1Pet1();
+        void clawSeq2Ramp();
+        void clawSeq3Pet3();
+
         void loop();
 };

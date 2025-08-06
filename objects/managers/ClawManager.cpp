@@ -516,3 +516,77 @@ void ClawManager::seqWindowDrop(bool direction) {
     this->base.setPosition(this->BASE_FORWARD);
 }
 
+void ClawManager::clawSeq1Pet1() {
+  Serial.println("Picking up first pet");
+  // Open grabber
+  setPositionGrabber(110);  
+
+  // Move to sensing position
+  setPositionBase(-90);
+  setPositionArm(150);
+  setPositionVertical(10);
+  waitToReachTarget();
+  
+  Serial.println("Initial position of arm has been set");
+  // ->base.continuousServo.logPIDOutput = true;
+  sensePet();
+
+  this->arm.moveBy(65);
+  waitToReachTarget(3000);
+
+  // Let it grab
+  setPositionGrabber(10);
+  delay(500);
+
+  // Position while driving up ramp
+  setPositionArm(80); //in
+  setPositionVertical(80); //up
+  setPositionBase(0); //forward
+  waitToReachTarget(2000);
+        
+}
+
+void ClawManager::clawSeq2Ramp() {
+  // Move to drop position
+  this->base.setPosition(90); //left
+  this->arm.setPosition(150); //out
+  this->waitToReachTarget(1000);
+  // Open the claw
+  Serial.println("Claw: 90 base 100 arm");
+  setPositionGrabber(100);  //open
+  Serial.println("Grabber opened");
+  delay(100); // Wait for grabber to open
+  // Pull arm in 
+  this->arm.setPosition(0); //in
+  this->base.setPosition(70); //forward
+  waitToReachTarget(3000);
+}
+
+void ClawManager::clawSeq3Pet3() {
+// Make sure arm in and home in to pillar
+  this->arm.setPosition(0);
+  this->base.setPosition(60);
+  this->vertical.setPosition(140); //check if high enough
+  waitToReachTarget(5000);
+
+  // Extend the arm and sense the pet
+  this->arm.setPosition(150);
+  waitToReachTarget(5000);
+  sensePet();
+
+  // Pick up pet
+  setPositionGrabber(20);
+  delay(300);
+
+  // Move to basket position
+  this->arm.setPosition(0);
+  this->base.setPosition(-20);
+  waitToReachTarget(2000);
+
+  // Lowers and drops to basket
+  this->vertical.setPosition(100);
+  waitToReachTarget(2000);
+  setPositionGrabber(110);
+  delay(2000);
+}
+

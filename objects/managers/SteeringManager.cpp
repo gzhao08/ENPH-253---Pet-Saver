@@ -151,7 +151,7 @@ void SteeringManager::turnBackwards(int duty) {
         // turn in place until back on line
         leftMotor.drivePWM(-duty/4);
         rightMotor.drivePWM(-duty);
-        this->array.takeReading(true);
+        // this->array.takeReading(true);
         this->array.getError();
         this->array.update();
     }
