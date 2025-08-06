@@ -138,7 +138,7 @@ void objectDetected(void *parameter) {
                 delay(500);
 
                 // Position while driving up ramp
-                claw.setPositionArm(65); //in
+                claw.setPositionArm(80); //in
                 claw.setPositionVertical(80); //up
                 claw.setPositionBase(0); //forward
                 claw.waitToReachTarget(2000);

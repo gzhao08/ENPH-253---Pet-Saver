@@ -184,7 +184,7 @@ void SectionManager::getNextSection(){
         }
 
       case SectionManager::RAMP: {
-        if (millis() - startMovementTime > 700) {
+        if (millis() - startMovementTime > 500) {
                 if (detectCloser(true, 350, 3)) {
                     Serial.println("found ramp");
                     incrementSection();
@@ -223,7 +223,7 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::PET_3: {
-        if (millis() - startMovementTime >= 1500) {
+        if (millis() - startMovementTime >= 1000) {
             if (detectCloser(false, 300, 2)) {
                 Serial.println("found pet 3");
                 incrementSection();
