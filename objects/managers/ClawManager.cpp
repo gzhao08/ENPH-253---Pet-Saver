@@ -224,8 +224,10 @@ void ClawManager::sensePet() {
     int baseSweepCenter = baseInit;
     int maxMagnetReading = 0;
     int maxMagnetReadingBasePos = baseInit;
+    DelayManager timeoutSense(3000);
     for (int sweepAngle : sweepAngles) {
         base.setPosition(baseSweepCenter + sweepAngle);
+        timeoutSense.reset();
         while (!base.reachedTarget()) {
             // Serial.println("Moving correct base to position");
             base.loop();
@@ -237,7 +239,11 @@ void ClawManager::sensePet() {
                 maxMagnetReadingBasePos = base.getPosition();
             }
             samples += 1;
+            if (timeoutSense.isElapsed()) {
+                break;
+            }
         }
+        timeoutSense.reset();
         base.setPosition(baseSweepCenter - sweepAngle);
         while (!base.reachedTarget()) {
             // Serial.println("Moving correct base to position");
@@ -250,15 +256,15 @@ void ClawManager::sensePet() {
                 maxMagnetReadingBasePos = base.getPosition();
             }
             samples += 1;
+            if (timeoutSense.isElapsed()) {
+                break;
+            }
         }   
         baseSweepCenter = maxMagnetReadingBasePos;
     }
 
     base.setPosition(maxMagnetReadingBasePos);
-    while (!base.reachedTarget()) {
-        base.loop();
-        arm.loop();
-    }
+    this->waitToReachTarget(3000);
 
     Serial.printf("Max magnet reading position: %d\n", maxMagnetReadingBasePos);
     Serial.printf("Done, samples: %d\n", samples);

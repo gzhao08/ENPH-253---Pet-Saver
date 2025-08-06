@@ -22,7 +22,7 @@ void objectDetected(void *parameter) {
   Wire1.begin(15, 13);  // SDA, SCL for
   
   SectionManager sectionManager;
-  sectionManager.begin(false); // Initialize the section manager with display
+  sectionManager.begin(true); // Initialize the section manager with display
   
 
   while (!startRead) {
@@ -83,7 +83,7 @@ void objectDetected(void *parameter) {
                   Serial.println("Claw: 90 base 100 arm");
                   claw.setPositionGrabber(100);  //open
                   Serial.println("Grabber opened");
-                  delay(300); // Wait for grabber to open
+                  delay(100); // Wait for grabber to open
                   // Pull arm in 
                   droppedFirstPet = true;
                   claw.arm.setPosition(0); //in
@@ -111,59 +111,38 @@ void objectDetected(void *parameter) {
         
             
         case RobotState::STOPPED: {
-            Serial.println("lidar.cpp: STOPPED");
+            // Serial.println("lidar.cpp: STOPPED");
             recordStartTime();
             switch (sectionManager.getCurrentSection()) {
               case SectionManager::RAMP:{
                 //PET 1
                 Serial.println("Picking up first pet");
                 int petDistance = sectionManager.getMeasurement(true);
+                // Open grabber
                 claw.setPositionGrabber(110);  
 
-                claw.setPositionVertical(100);
+                // Move to sensing position
                 claw.setPositionBase(-90);
                 claw.setPositionArm(178);
                 claw.setPositionVertical(10);
                 claw.waitToReachTarget();
                 
                 Serial.println("Initial position of arm has been set");
-                claw.base.continuousServo.logPIDOutput = true;
+                // claw.base.continuousServo.logPIDOutput = true;
                 claw.sensePet();
 
                 claw.arm.moveBy(65);
-                //claw.base.moveBy(5);
                 claw.waitToReachTarget(3000);
-
-                //claw.setPositionGrabber(110);
-
-
-                //claw.setPositionVertical(30);
-                //claw.waitToReachTarget();
 
                 // Let it grab
                 claw.setPositionGrabber(10);
                 delay(500);
 
+                // Position while driving up ramp
                 claw.setPositionArm(65); //in
                 claw.setPositionVertical(80); //up
+                claw.setPositionBase(0); //forward
                 claw.waitToReachTarget(2000);
-                //claw.setPositionArm(20);
-                //claw.waitToReachTarget(2000);
-
-                claw.setPositionBase(0);
-                while (!claw.base.reachedTarget()) {                  
-                  claw.loop();
-                }
-
-                // claw.setPositionArm(0);
-                // while (!claw.arm.reachedTarget()) {
-                //   claw.loop();
-                // }
-
-                // claw.setPositionVertical(100);
-                // while (!claw.vertical.reachedTarget()) {
-                //   claw.loop();
-                // }
         
                 Serial.println("Done picking up pet, starting line follow");
                 startLineFollow();
@@ -173,21 +152,29 @@ void objectDetected(void *parameter) {
               case SectionManager::PET_4: {
                 if (!pickedUpThirdPet) {
                   //claw sequence pet 3
+                  // Make sure arm in and home in to pillar
+                  claw.arm.setPosition(0);
                   claw.base.setPosition(60);
-                  claw.vertical.setPosition(120); //check if high enough
-                  claw.arm.setPosition(150);
-                  claw.waitToReachTarget();
+                  claw.vertical.setPosition(140); //check if high enough
+                  claw.waitToReachTarget(5000);
 
+                  // Extend the arm and sense the pet
+                  claw.arm.setPosition(150);
+                  claw.waitToReachTarget(5000);
                   claw.sensePet();
 
+                  // Pick up pet
                   claw.setPositionGrabber(20);
                   delay(300);
+
+                  // Move to basket position
                   claw.arm.setPosition(0);
                   claw.base.setPosition(-20);
-                  claw.waitToReachTarget();
+                  claw.waitToReachTarget(2000);
 
+                  // Lowers and drops to basket
                   claw.vertical.setPosition(80);
-                  claw.waitToReachTarget();
+                  claw.waitToReachTarget(2000);
                   claw.setPositionGrabber(110);
                   pickedUpThirdPet = true;
                 }
