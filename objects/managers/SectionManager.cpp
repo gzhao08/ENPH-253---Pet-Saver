@@ -205,6 +205,7 @@ void SectionManager::getNextSection(){
       case SectionManager::RAMP_END: {
         if (millis() - startMovementTime > 1000) {
                 if (detectCloser(false, 325, 3)) {
+                    Serial.println("found ramp end");
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();
@@ -224,6 +225,7 @@ void SectionManager::getNextSection(){
       case SectionManager::PET_3: {
         if (millis() - startMovementTime >= 1500) {
             if (detectCloser(false, 300, 2)) {
+                Serial.println("found pet 3");
                 incrementSection();
                 if (useDisplay) {
                     display.clearDisplay();
@@ -234,7 +236,7 @@ void SectionManager::getNextSection(){
                 }
                 recordStartTime();
                 stopDrive();
-                currentSpeed = 1100;
+                currentSpeed = 900;
             }
         }
             
@@ -244,6 +246,7 @@ void SectionManager::getNextSection(){
       case SectionManager::PET_4: {
             if (millis() - startMovementTime >= 2000) {
                 if (detectCloser(false, 350, 2)) {
+                    Serial.println("found pet 4");
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();

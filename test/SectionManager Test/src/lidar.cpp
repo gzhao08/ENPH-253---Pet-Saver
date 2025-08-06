@@ -22,8 +22,7 @@ void objectDetected(void *parameter) {
   Wire1.begin(15, 13);  // SDA, SCL for
   
   SectionManager sectionManager;
-  sectionManager.begin(true); // Initialize the section manager with display
-  
+  sectionManager.begin(false); // Initialize the section manager with display
 
   while (!startRead) {
     Serial.println("Waiting for startRead to be true");
