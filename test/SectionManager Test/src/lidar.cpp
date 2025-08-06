@@ -77,7 +77,7 @@ void objectDetected(void *parameter) {
                   // Move to drop position
                   claw.base.setPosition(90); //left
                   claw.arm.setPosition(150); //out
-                  claw.waitToReachTarget(3000);
+                  claw.waitToReachTarget(1000);
                   // Open the claw
                   Serial.println("Claw: 90 base 100 arm");
                   claw.setPositionGrabber(100);  //open
@@ -122,7 +122,7 @@ void objectDetected(void *parameter) {
 
                 // Move to sensing position
                 claw.setPositionBase(-90);
-                claw.setPositionArm(178);
+                claw.setPositionArm(150);
                 claw.setPositionVertical(10);
                 claw.waitToReachTarget();
                 
@@ -152,30 +152,30 @@ void objectDetected(void *parameter) {
                 if (!pickedUpThirdPet) {
                   //claw sequence pet 3
                   // Make sure arm in and home in to pillar
-                  claw.arm.setPosition(0);
-                  claw.base.setPosition(60);
-                  claw.vertical.setPosition(140); //check if high enough
-                  claw.waitToReachTarget(5000);
+                  // claw.arm.setPosition(0);
+                  // claw.base.setPosition(60);
+                  // claw.vertical.setPosition(140); //check if high enough
+                  // claw.waitToReachTarget(5000);
 
-                  // Extend the arm and sense the pet
-                  claw.arm.setPosition(150);
-                  claw.waitToReachTarget(5000);
-                  claw.sensePet();
+                  // // Extend the arm and sense the pet
+                  // claw.arm.setPosition(150);
+                  // claw.waitToReachTarget(5000);
+                  // claw.sensePet();
 
-                  // Pick up pet
-                  claw.setPositionGrabber(20);
-                  delay(300);
+                  // // Pick up pet
+                  // claw.setPositionGrabber(20);
+                  // delay(300);
 
-                  // Move to basket position
-                  claw.arm.setPosition(0);
-                  claw.base.setPosition(-20);
-                  claw.waitToReachTarget(2000);
+                  // // Move to basket position
+                  // claw.arm.setPosition(0);
+                  // claw.base.setPosition(-20);
+                  // claw.waitToReachTarget(2000);
 
-                  // Lowers and drops to basket
-                  claw.vertical.setPosition(80);
-                  claw.waitToReachTarget(2000);
-                  claw.setPositionGrabber(110);
-                  pickedUpThirdPet = true;
+                  // // Lowers and drops to basket
+                  // claw.vertical.setPosition(80);
+                  // claw.waitToReachTarget(2000);
+                  // claw.setPositionGrabber(110);
+                  // pickedUpThirdPet = true;
                 }
                 startLineFollow();
                 break;
@@ -203,6 +203,10 @@ void objectDetected(void *parameter) {
     }
     claw.loop();
   }  
+}
+
+void clawSeq1() {
+  
 }
 
 
