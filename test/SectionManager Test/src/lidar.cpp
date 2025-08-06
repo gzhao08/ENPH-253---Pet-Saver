@@ -63,25 +63,40 @@ void objectDetected(void *parameter) {
   
   
   // main loop
-
+  boolean droppedFirstPet = false;
   while(true) {
 
     switch (robotState) {
         case RobotState::LINE_FOLLOW: {
             // Serial.println("lidar.cpp: LINE_FOLLOW");
             sectionManager.getNextSection(); 
-            if (sectionManager.getCurrentSection() == SectionManager::RAMP_END) {
-              claw.base.setPosition(90);
-              claw.waitToReachTarget(2000);
-              claw.setPositionGrabber(100);
-              claw.base.setPosition(0);
-              claw.waitToReachTarget(2000);
+
+            switch (sectionManager.getCurrentSection()) {
+              case SectionManager::RAMP_END: {
+                if (!droppedFirstPet) {
+                  // Move to drop position
+                  claw.base.setPosition(90); //left
+                  claw.arm.setPosition(100); //out
+                  claw.waitToReachTarget(3000);
+                  // Open the claw
+                  Serial.println("Claw: 90 base 100 arm");
+                  claw.setPositionGrabber(100);  //open
+                  Serial.println("Grabber opened");
+                  delay(300); // Wait for grabber to open
+                  // Pull arm in 
+                  claw.arm.setPosition(0); //in
+                  claw.waitToReachTarget(3000);
+                  droppedFirstPet = true;
+                }
+                break;
+              }
             }
+            
             break;
         }
 
         case RobotState::FORWARD: {
-            Serial.println("lidar.cpp: FORWARD");
+            // Serial.println("lidar.cpp: FORWARD");
             sectionManager.getNextSection();
             break;
         }
@@ -119,7 +134,7 @@ void objectDetected(void *parameter) {
                 claw.base.continuousServo.logPIDOutput = true;
                 claw.sensePet();
 
-                claw.arm.moveBy(50);
+                claw.arm.moveBy(65);
                 claw.base.moveBy(5);
                 claw.waitToReachTarget(3000);
 
@@ -133,19 +148,15 @@ void objectDetected(void *parameter) {
                 claw.setPositionGrabber(10);
                 delay(500);
 
-                claw.setPositionArm(100);
-                while (!claw.arm.reachedTarget()) {
-                  claw.loop();
-                }
-                
-                claw.setPositionVertical(100);
-                while (!claw.vertical.reachedTarget()) {
-                  claw.loop();
-                }
+                claw.setPositionArm(50); //in
+                claw.setPositionVertical(80); //up
+                claw.waitToReachTarget();
+                claw.setPositionArm(20);
+                claw.setPositionVertical(110);
+                claw.waitToReachTarget();
 
                 claw.setPositionBase(0);
-                while (!claw.base.reachedTarget()) {
-                  
+                while (!claw.base.reachedTarget()) {                  
                   claw.loop();
                 }
 
@@ -162,15 +173,24 @@ void objectDetected(void *parameter) {
                 Serial.println("Done picking up pet, starting line follow");
                 startLineFollow();
                 break;
-
-
               }
-              case SectionManager::WINDOW_FORWARD: {
-                  startForward();
-                  break;
-              }
-              case SectionManager::PET_3: {
-                  turnCW();
+              
+              case SectionManager::PET_4: {
+                  //claw sequence pet 3
+                  claw.base.setPosition(60);
+                  claw.vertical.setPosition(120); //check if high enough
+                  claw.arm.setPosition(160);
+                  claw.waitToReachTarget();
+                  claw.setPositionGrabber(20);
+                  delay(300);
+                  claw.arm.setPosition(0);
+                  claw.base.setPosition(-10);
+                  claw.waitToReachTarget();
+
+                  claw.vertical.setPosition(10);
+                  claw.waitToReachTarget();
+                  claw.setPositionGrabber(110);
+                  delay(10000);
                   break;
               }
               case SectionManager::RAMP_END_BACKWARD:{
@@ -188,8 +208,9 @@ void objectDetected(void *parameter) {
             
             break;
         }
-    }  
-  delay(10);
+        
+    }
+    claw.loop();
   }  
 }
 

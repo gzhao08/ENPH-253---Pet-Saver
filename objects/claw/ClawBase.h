@@ -21,7 +21,7 @@ class ClawBase : public ClawPart {
 
         // PID Parameters
         const float _Pk = 150;
-        const float _Dk = 8;
+        const float _Dk = 5;
 
         // Servo parameters
         const int _servoMaxVoltage = 8;

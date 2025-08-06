@@ -459,6 +459,9 @@ void ClawTester::use() {
                     while (!arm.reachedTarget()) {
                         arm.loop();
                     }
+                    armHomed = true;
+                    verticalHomed = true;
+                    baseHomed = true;
                     break;
                 }
 

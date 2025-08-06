@@ -157,7 +157,7 @@ void SectionManager::getNextSection(){
                     display.display();
                 }
                 recordStartTime();
-                currentSpeed = 1000;
+                currentSpeed = 900;
             }
             break;
         }
@@ -196,7 +196,7 @@ void SectionManager::getNextSection(){
                         display.display();
                     }
                     recordStartTime();
-                    currentSpeed = 2000;
+                    currentSpeed = 2200;
                 }
             }
         break;
@@ -214,33 +214,15 @@ void SectionManager::getNextSection(){
                         display.display();
                     }
                     recordStartTime();
-                    stopDrive();
-                    currentSpeed = 1100;
+                    startLineFollow();
+                    currentSpeed = 900;
                 }
             }
-        break;
-      }
-
-      case SectionManager::WINDOW_FORWARD: {
-            if (detectFurther(false, 300, 3)) {
-                incrementSection();
-                if (useDisplay) {
-                    display.clearDisplay();
-                    display.setCursor(30, 24);
-                    display.setTextSize(2);
-                    display.println("PET_3");
-                    display.display();
-                }
-                recordStartTime();
-                stopDrive();
-                currentSpeed = 1200;
-            }
-            
         break;
       }
 
       case SectionManager::PET_3: {
-        if (millis() - startMovementTime >= 1000) {
+        if (millis() - startMovementTime >= 2000) {
             if (detectCloser(false, 250, 3)) {
                 incrementSection();
                 if (useDisplay) {

@@ -28,7 +28,7 @@ class ContinuousServo {
         double Pk = 110;
         double Ik = 0;
         double Dk = 2.5;
-        const int PIDSampleTime = 10;
+        const int PIDSampleTime = 20;
         unsigned long lastPIDTime = 0;
 
         // PID Tuning
@@ -38,7 +38,7 @@ class ContinuousServo {
         int D_Pin; // Pin for tuning D
 
         // Stability check
-        const int stableThreshold = 20;
+        const int stableThreshold = 10;
         int stableCounter = 0;
 
         void updateStability();

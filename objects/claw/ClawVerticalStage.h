@@ -21,7 +21,7 @@ class ClawVerticalStage : public ClawPart {
 
         // PID Parameters
         const float _Pk = 55;
-        const float _Dk = 0.77;
+        const float _Dk = 2.15;
 
         // Servo parameters
         const int _servoMaxVoltage = 8;
