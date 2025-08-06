@@ -64,6 +64,7 @@ void objectDetected(void *parameter) {
   
   // main loop
   boolean droppedFirstPet = false;
+  boolean pickedUpThirdPet = false;
   while(true) {
 
     switch (robotState) {
@@ -76,7 +77,7 @@ void objectDetected(void *parameter) {
                 if (!droppedFirstPet) {
                   // Move to drop position
                   claw.base.setPosition(90); //left
-                  claw.arm.setPosition(100); //out
+                  claw.arm.setPosition(150); //out
                   claw.waitToReachTarget(3000);
                   // Open the claw
                   Serial.println("Claw: 90 base 100 arm");
@@ -84,9 +85,10 @@ void objectDetected(void *parameter) {
                   Serial.println("Grabber opened");
                   delay(300); // Wait for grabber to open
                   // Pull arm in 
-                  claw.arm.setPosition(0); //in
-                  claw.waitToReachTarget(3000);
                   droppedFirstPet = true;
+                  claw.arm.setPosition(0); //in
+                  claw.base.setPosition(70); //forward
+                  claw.waitToReachTarget(3000);
                 }
                 break;
               }
@@ -113,47 +115,40 @@ void objectDetected(void *parameter) {
             recordStartTime();
             switch (sectionManager.getCurrentSection()) {
               case SectionManager::RAMP:{
+                //PET 1
                 Serial.println("Picking up first pet");
                 int petDistance = sectionManager.getMeasurement(true);
-                claw.setPositionGrabber(20);  
+                claw.setPositionGrabber(110);  
 
-                claw.setPositionVertical(130);
-                while (!claw.vertical.reachedTarget()) {
-                  claw.loop();
-                }
+                claw.setPositionVertical(100);
                 claw.setPositionBase(-90);
-                while (!claw.base.reachedTarget()) {
-                  claw.loop();
-                }
                 claw.setPositionArm(178);
-                while (!claw.arm.reachedTarget()) {
-                  claw.loop();
-                }
-
+                claw.setPositionVertical(10);
+                claw.waitToReachTarget();
+                
                 Serial.println("Initial position of arm has been set");
                 claw.base.continuousServo.logPIDOutput = true;
                 claw.sensePet();
 
                 claw.arm.moveBy(65);
-                claw.base.moveBy(5);
+                //claw.base.moveBy(5);
                 claw.waitToReachTarget(3000);
 
-                claw.setPositionGrabber(110);
+                //claw.setPositionGrabber(110);
 
 
-                claw.setPositionVertical(30);
-                claw.waitToReachTarget();
+                //claw.setPositionVertical(30);
+                //claw.waitToReachTarget();
 
                 // Let it grab
                 claw.setPositionGrabber(10);
                 delay(500);
 
-                claw.setPositionArm(50); //in
+                claw.setPositionArm(65); //in
                 claw.setPositionVertical(80); //up
-                claw.waitToReachTarget();
-                claw.setPositionArm(20);
-                claw.setPositionVertical(110);
-                claw.waitToReachTarget();
+                claw.waitToReachTarget(2000);
+                //claw.setPositionArm(20);
+                //claw.waitToReachTarget(2000);
 
                 claw.setPositionBase(0);
                 while (!claw.base.reachedTarget()) {                  
@@ -176,29 +171,39 @@ void objectDetected(void *parameter) {
               }
               
               case SectionManager::PET_4: {
+                if (!pickedUpThirdPet) {
                   //claw sequence pet 3
                   claw.base.setPosition(60);
                   claw.vertical.setPosition(120); //check if high enough
-                  claw.arm.setPosition(160);
+                  claw.arm.setPosition(150);
                   claw.waitToReachTarget();
+
+                  claw.sensePet();
+
                   claw.setPositionGrabber(20);
                   delay(300);
                   claw.arm.setPosition(0);
-                  claw.base.setPosition(-10);
+                  claw.base.setPosition(-20);
                   claw.waitToReachTarget();
 
-                  claw.vertical.setPosition(10);
+                  claw.vertical.setPosition(80);
                   claw.waitToReachTarget();
                   claw.setPositionGrabber(110);
-                  delay(10000);
-                  break;
+                  pickedUpThirdPet = true;
+                }
+                startLineFollow();
+                break;
               }
-              case SectionManager::RAMP_END_BACKWARD:{
+              
+              case SectionManager::PET_2:{
+                delay(3000);
                 turnCW_Back();
                 break;
               }
-              case SectionManager::WINDOW_BACKWARD: {
-                  startBackward();
+
+              case SectionManager::PET_5: {
+                  delay(10000);
+                  // turnCCW_Back();
                   break;
               }
               default:

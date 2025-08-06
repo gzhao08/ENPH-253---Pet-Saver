@@ -139,6 +139,7 @@ float ClawManager::getMagnetReadingMagSq() {
 void ClawManager::calibrateMagnet() {
     int baseCalibrationMin = -110;
     int baseCalibrationMax = 0;
+
     float min_x, max_x, mid_x;
     float min_y, max_y, mid_y;
     float min_z, max_z, mid_z;
@@ -157,7 +158,7 @@ void ClawManager::calibrateMagnet() {
 
     while (!this->base.reachedTarget()) {
         this->loop();
-        Serial.println("stuck");
+        
         lis3mdl.getEvent(&event);
         float x = event.magnetic.x;
         float y = event.magnetic.y;
@@ -219,7 +220,7 @@ void ClawManager::sensePet() {
 
 
     // Try find best angle by sweeping
-    int sweepAngles[] = {30, 15};
+    int sweepAngles[] = {10, 5};
     int baseSweepCenter = baseInit;
     int maxMagnetReading = 0;
     int maxMagnetReadingBasePos = baseInit;
@@ -230,7 +231,7 @@ void ClawManager::sensePet() {
             base.loop();
             arm.loop();
             float currentReading = getMagnetReadingMagSq();
-            Serial.println(currentReading);
+            // Serial.println(currentReading);
             if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
                 maxMagnetReading = currentReading;
                 maxMagnetReadingBasePos = base.getPosition();
@@ -243,7 +244,7 @@ void ClawManager::sensePet() {
             base.loop();
             arm.loop();
             float currentReading = getMagnetReadingMagSq();
-            Serial.println(currentReading);
+            // Serial.println(currentReading);
             if (currentReading > maxMagnetReading && currentReading > MAGNETIC_THRESHOLD) {
                 maxMagnetReading = currentReading;
                 maxMagnetReadingBasePos = base.getPosition();

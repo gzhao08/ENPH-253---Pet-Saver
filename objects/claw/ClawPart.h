@@ -20,9 +20,7 @@ class ClawPart {
         float Pk;
         float Dk;
 
-        // Servo Parameters
-        int servoMaxVoltage;
-        int servoTolerance; // How much can angle deviate from target
+
 
         // Speed stuff
         float lastPosition;
@@ -31,6 +29,10 @@ class ClawPart {
 
         void updateSpeed();
     public:
+        // Servo Parameters
+        int servoMaxVoltage;
+        int servoTolerance; // How much can angle deviate from target
+
         int ABS_POS_LIMIT; // Position limit (for homing purposes)
         int MIN_POSITION;
         int MAX_POSITION;
