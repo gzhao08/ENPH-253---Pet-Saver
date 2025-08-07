@@ -5,6 +5,8 @@
 #include "../GlobalConstants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <Adafruit_LIS3MDL.h>
+#include <VL53L0X.h>
 
 // OLED display settings
 #define SCREEN_WIDTH 128
@@ -13,14 +15,14 @@
 
 
 IRArray array;
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET);
 
 void setup() {
   array.begin(OUTER_LEFT_PIN,INNER_LEFT_PIN,INNER_RIGHT_PIN,OUTER_RIGHT_PIN);
   Serial.begin(115200);  
 
   // DISPLAY
-  Wire.begin(15, 13);  // SDA = GPIO15, SCL = GPIO13
+  Wire1.begin(15, 13);  // SDA = GPIO15, SCL = GPIO13
 
   
   // Initialize display

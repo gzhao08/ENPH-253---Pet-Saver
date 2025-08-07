@@ -19,6 +19,7 @@ enum RobotState {
     FORWARD,
     BACKWARD,
     TURN_CW_BACK,
+    QUICK_STOP,
     IDLE
 };
 
@@ -34,3 +35,4 @@ void turnCW();
 void turnCW_Back();
 void turnCCW();
 void startBackward();
+void startQuickStop();

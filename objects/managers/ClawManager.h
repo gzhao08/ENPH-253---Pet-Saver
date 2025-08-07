@@ -133,6 +133,7 @@ class ClawManager {
         void clawSeq1Pet1();
         void clawSeq2Ramp();
         void clawSeq3Pet3();
+        void clawSeq4Pet3Drop();
 
         void loop();
 };

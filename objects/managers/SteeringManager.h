@@ -38,6 +38,7 @@ class SteeringManager {
         void backward(int duty, int timeInMS);
         void stop();
         void quickStop();
+        void quickStopTwo();
         void turnAround(int duty, boolean clockwise);
         void turnBackwards(int duty);
         void lineFollow(int baseSpeed);

@@ -39,6 +39,8 @@ void objectDetected(void *parameter) {
   boolean pickedUpFirstPet = false;
   boolean droppedFirstPet = false;
   boolean pickedUpThirdPet = false;
+  boolean droppedThirdPet = false;
+  boolean saveSecondPet = false;
 
   ClawManager claw;
 
@@ -66,7 +68,7 @@ void objectDetected(void *parameter) {
   while (true) {
     Serial.println(sectionManager.getMeasurement(true));
     if (sectionManager.detectCloser(true, 80, 15)) {
-      currentSpeed = 1300;
+      currentSpeed = 1400;
       robotState = RobotState::LINE_FOLLOW;
       break;
     }
@@ -89,6 +91,11 @@ void objectDetected(void *parameter) {
             sectionManager.getNextSection(); 
 
             switch (sectionManager.getCurrentSection()) {
+              // case SectionManager::DOORWAY: {
+              //   claw.setPositionBase(0);
+              //   claw.setPositionArm(60);
+              //   claw.loop();
+              // }
               case SectionManager::RAMP_END: {
                 
                 if (!droppedFirstPet) {
@@ -139,7 +146,7 @@ void objectDetected(void *parameter) {
                 break;
               }
               
-              case SectionManager::PET_4: {
+              case SectionManager::RAMP_END_BACK: {
                 if (!pickedUpThirdPet) {
                   //claw sequence pet 3
                   if (ACTUATE_CLAW) {
@@ -153,19 +160,42 @@ void objectDetected(void *parameter) {
                 }
                 recordStartTime();
                 Serial.println("Picked up pet 3, starting line follow");
-                startLineFollow();
+                turnCW_Back();
                 break;
               }
               
-              case SectionManager::PET_2:{
-                delay(3000);
-                turnCW_Back();
+              case SectionManager::WINDOW_BACKWARD:{
+                // drop 3rd pet off ramp
+                if (!droppedThirdPet) {
+                  if (ACTUATE_CLAW) {
+                    // drop 3rd pet seq
+                    claw.clawSeq4Pet3Drop();
+                  }
+                  else {
+                    delay(3000);
+                  }
+                }
+                recordStartTime();
+                startBackward();
+                break;
+              }
+
+              case SectionManager::WINDOW_FORWARD:{
+                recordStartTime();
+                startLineFollow();
                 break;
               }
 
               case SectionManager::PET_5: {
                   delay(10000);
-                  // turnCCW_Back();
+                  if (!saveSecondPet) {
+                    if (ACTUATE_CLAW) {
+                      // pick up and put second pet out window
+                    }
+                    else {
+                      delay(3000);
+                    }
+                  }
                   break;
               }
               default:

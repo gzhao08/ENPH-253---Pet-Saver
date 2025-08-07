@@ -130,3 +130,7 @@ boolean IRArray::isOnLine() {
 boolean IRArray::isCentered() {
     return (r2 && r3); // if both inner sensors are high then the robot is centered on the line
 }
+
+void IRArray::getReadings(char* readingBuffer) {
+    sprintf(readingBuffer, "%d %d %d %d", r1,r2,r3,r4);
+}

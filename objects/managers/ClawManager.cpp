@@ -77,12 +77,12 @@ void ClawManager::loop() {
 }
 
 void ClawManager::homingSequence() {
-    this->arm.homingSequence();
     this->vertical.homingSequence();
     this->vertical.setPosition(60);
     while (!this->vertical.reachedTarget()) {
         this->vertical.loop();
     }
+    this->arm.homingSequence();
     this->base.homingSequence();
     this->calibrateMagnet();
 }
@@ -103,6 +103,15 @@ void ClawManager::waitToReachTarget(int timeout) {
     while (!this->arm.reachedTarget() || !this->vertical.reachedTarget() || !this->base.reachedTarget()) {
         this->loop();
         if (hasTimeout && timeoutManager.isElapsed()) {
+            if (!this->arm.reachedTarget()) {
+                this->arm.stop();
+            }
+            if (!this->vertical.reachedTarget()) {
+                this->vertical.stop();
+            }
+            if (!this->base.reachedTarget()) {
+                this->base.stop();
+            }
             break;
         }
     }
@@ -328,7 +337,7 @@ void ClawManager::stopAll() {
 //Comp Routines//
 
 /**
- * pet retrieve 
+ * pet 1 retrieve 
  */
 void ClawManager::seq1PetRetrieve(int lidarReading) {
     this->grabber.setPositionDegrees(20);  
@@ -344,8 +353,7 @@ void ClawManager::seq1PetRetrieve(int lidarReading) {
     this->sensePet();
 
     //move forward and over to grab
-    this->arm.moveBy(50); //out 
-    this->base.moveBy(5); //left slightly
+    this->arm.moveBy(65); //out 
     this->waitToReachTarget(3000);
 
     this->grabber.setPositionDegrees(110); //open
@@ -367,10 +375,10 @@ void ClawManager::seq1PetRetrieve(int lidarReading) {
  */
 void ClawManager::seq2RampDrop() {
     this->base.setPosition(90); //left
-    this->waitToReachTarget(2000); 
+    this->waitToReachTarget(3000); 
     this->grabber.setPositionDegrees(100);//open
     this->base.setPosition(0); //front
-    this->waitToReachTarget(2000);
+    this->waitToReachTarget(3000);
 }
 
 // ROUTINES //
@@ -550,7 +558,7 @@ void ClawManager::clawSeq2Ramp() {
   // Move to drop position
   this->base.setPosition(90); //left
   this->arm.setPosition(150); //out
-  this->waitToReachTarget(1000);
+  this->waitToReachTarget(2000);
   // Open the claw
   Serial.println("Claw: 90 base 100 arm");
   setPositionGrabber(100);  //open
@@ -565,7 +573,7 @@ void ClawManager::clawSeq2Ramp() {
 void ClawManager::clawSeq3Pet3() {
 // Make sure arm in and home in to pillar
   this->arm.setPosition(0);
-  this->base.setPosition(60);
+  this->base.setPosition(70);
   this->vertical.setPosition(140); //check if high enough
   waitToReachTarget(5000);
 
@@ -584,8 +592,21 @@ void ClawManager::clawSeq3Pet3() {
   waitToReachTarget(2000);
 
   // Lowers and drops to basket
-  this->vertical.setPosition(100);
-  waitToReachTarget();
-  setPositionGrabber(110);
+  //this->vertical.setPosition(100);
+  //waitToReachTarget(1000);
+  //setPositionGrabber(110);
+}
+
+void ClawManager::clawSeq4Pet3Drop() {
+    this->base.setPosition(-60);
+    this->arm.setPosition(170);
+    waitToReachTarget(2000);
+    setPositionGrabber(110);
+    delay(300);
+    setPositionGrabber(20);
+    delay(300);
+    this->arm.setPosition(0);
+    this->base.setPosition(0);
+    waitToReachTarget(2000);
 }
 

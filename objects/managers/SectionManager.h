@@ -28,10 +28,10 @@ class SectionManager {
             RAMP,
             RAMP_END,
             PET_3,
-            PET_4,
-            PET_2,
-            PET_5,
-            WINDOW_BACKWARD
+            RAMP_END_BACK,
+            WINDOW_BACKWARD,
+            WINDOW_FORWARD,
+            PET_5
         };
 
         SectionManager();

@@ -65,3 +65,9 @@ void startBackward() {
     robotState = BACKWARD;
     portEXIT_CRITICAL(&robotStateMux);
 }
+
+void startQuickStop() {
+    portENTER_CRITICAL(&robotStateMux);
+    robotState = QUICK_STOP;
+    portEXIT_CRITICAL(&robotStateMux);
+}
