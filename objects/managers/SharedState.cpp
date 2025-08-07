@@ -9,6 +9,8 @@ volatile RobotState robotState = RobotState::IDLE;
 portMUX_TYPE robotStateMux = portMUX_INITIALIZER_UNLOCKED;
 portMUX_TYPE startTimeMux = portMUX_INITIALIZER_UNLOCKED;
 
+// TaskHandle_t drivetrainTaskHandle;
+
 
 void stopDrive() {
     portENTER_CRITICAL(&robotStateMux);
@@ -17,6 +19,7 @@ void stopDrive() {
 }
 
 void startLineFollow() {
+    // xTaskNotifyGive(drivetrainTaskHandle);
     portENTER_CRITICAL(&robotStateMux);
     robotState = LINE_FOLLOW;
     portEXIT_CRITICAL(&robotStateMux);
@@ -54,6 +57,7 @@ void turnCW_Back() {
     portENTER_CRITICAL(&robotStateMux);
     robotState = TURN_CW_BACK;
     portEXIT_CRITICAL(&robotStateMux);
+    // xTaskNotifyGive(drivetrainTaskHandle);
 }
 
 void startBackward() {

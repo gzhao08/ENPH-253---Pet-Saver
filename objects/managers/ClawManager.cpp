@@ -585,8 +585,7 @@ void ClawManager::clawSeq3Pet3() {
 
   // Lowers and drops to basket
   this->vertical.setPosition(100);
-  waitToReachTarget(2000);
+  waitToReachTarget();
   setPositionGrabber(110);
-  delay(2000);
 }
 

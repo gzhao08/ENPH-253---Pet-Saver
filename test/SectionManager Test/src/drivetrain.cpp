@@ -15,7 +15,8 @@ void driveTrain(void *parameter) {
 
     Serial.begin(115200);
     steer.setPID(KP_DEFAULT,KD_DEFAULT);
-    delay(2000);
+    // drivetrainTaskHandle = xTaskGetCurrentTaskHandle();
+    delay(1000);
 
     startRead = true; // start reading the lidar data
 

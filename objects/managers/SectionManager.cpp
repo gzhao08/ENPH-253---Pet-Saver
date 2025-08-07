@@ -87,7 +87,7 @@ void SectionManager::begin(boolean usingDisplay) {
         display.display();
         display.clearDisplay();
         delay(1000);
-        display.setCursor(30, 24);
+        display.setCursor(0, 24);
         display.setTextSize(2);
         display.println("SWIPE RIGHT");
         display.display();
@@ -256,8 +256,8 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::PET_4: {
-            // unsigned int timePassed = millis() - startMovementTime;
-            // Serial.printf("PET_4 time: %d\n", timePassed);
+            unsigned int timePassed = millis() - startMovementTime;
+            Serial.printf("PET_4 time: %d\n", timePassed);
             if (millis() - startMovementTime >= 2000) {
                 if (detectCloser(false, 350, 2)) {
                     Serial.println("found pet 4");

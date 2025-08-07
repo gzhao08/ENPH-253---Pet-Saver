@@ -17,11 +17,12 @@ void objectDetected(void *parameter) {
 
   Serial.begin(115200);
   while (!Serial);
-  // Initialize I2C
-  // Wire.begin(15, 13);  // Wire.begin(sda-21, scl-22)
-  
+  // Initialize I2C  
   Wire.begin(7, 5);  // SDA, SCL for right lidar 15, 13
   Wire1.begin(15, 13);  // SDA, SCL for
+
+  // scanI2C(Wire,"Wire");
+  // scanI2C(Wire1,"Wire1");
 
   SectionManager sectionManager;
   sectionManager.begin(true); // Initialize the section manager with display
@@ -133,6 +134,7 @@ void objectDetected(void *parameter) {
                 
                 
                 Serial.println("Done picking up pet, starting line follow");
+                recordStartTime();
                 startLineFollow();
                 break;
               }
@@ -149,6 +151,8 @@ void objectDetected(void *parameter) {
                     delay(3000);
                   }
                 }
+                recordStartTime();
+                Serial.println("Picked up pet 3, starting line follow");
                 startLineFollow();
                 break;
               }
@@ -177,7 +181,9 @@ void objectDetected(void *parameter) {
       if (sectionManager.getCurrentSection() == SectionManager::RAMP || sectionManager.getCurrentSection() == SectionManager::PET_3) {
         claw.loop();
       }
-      
+    }
+    else {
+      delay(1);
     }
   }  
 }
