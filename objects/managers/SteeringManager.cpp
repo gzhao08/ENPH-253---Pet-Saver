@@ -139,16 +139,16 @@ void SteeringManager::turnAround(int duty, boolean clockwise) {
         this->array.takeReading(true);
         this->array.getError();
         this->array.update();
-        leftMotor.drivePWM(-1200);
-        rightMotor.drivePWM(-1800);
+        leftMotor.drivePWM(duty);
+        rightMotor.drivePWM(-duty);
     }
 
     Serial.println("Off line now");
 
     while (!this->array.isOnLine()) {
         // turn in place until back on line
-        leftMotor.drivePWM(-1200);
-        rightMotor.drivePWM(-1800);
+        leftMotor.drivePWM(duty);
+        rightMotor.drivePWM(-duty);
         this->array.takeReading(true);
         this->array.getError();
         this->array.update();
@@ -176,6 +176,34 @@ void SteeringManager::turnBackwards(int duty) {
         // turn in place until back on line
         leftMotor.drivePWM(500);
         rightMotor.drivePWM(-2100);
+        this->array.takeReading(false);
+        this->array.getError();
+        this->array.update();
+        delay(1);
+    }
+    Serial.println("Finish turnBackwards()");
+    startLineFollow();
+}
+
+void SteeringManager::turnBackwards_CCW() {
+    Serial.println("Turning backwards");
+    // counter clockwise
+    while (this->array.isOnLine()) {
+        // turn in place until off line
+        this->array.takeReading(false);
+        this->array.getError();
+        this->array.update();
+        leftMotor.drivePWM(-2100);
+        rightMotor.drivePWM(500);
+        delay(1);
+    }
+
+    Serial.println("Off line now");
+
+    while (!this->array.isCentered()) {
+        // turn in place until back on line
+        leftMotor.drivePWM(-2100);
+        rightMotor.drivePWM(500);
         this->array.takeReading(false);
         this->array.getError();
         this->array.update();

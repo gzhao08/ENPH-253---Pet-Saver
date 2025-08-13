@@ -40,7 +40,9 @@ void objectDetected(void *parameter) {
   boolean droppedFirstPet = false;
   boolean pickedUpThirdPet = false;
   boolean droppedThirdPet = false;
-  boolean saveSecondPet = false;
+  // boolean saveSecondPet = false; 
+  boolean pickedUpFifthPet = false;
+  boolean droppedFifthPet = false;
 
   ClawManager claw;
 
@@ -174,30 +176,59 @@ void objectDetected(void *parameter) {
                   else {
                     delay(3000);
                   }
+                  droppedThirdPet = true;
                 }
                 recordStartTime();
                 startBackward();
                 break;
               }
 
-              case SectionManager::WINDOW_FORWARD:{
-                recordStartTime();
-                startLineFollow();
-                break;
-              }
+              // case SectionManager::WINDOW_FORWARD:{
+              //   recordStartTime();
+              //   turnCCW();
+              //   break;
+              // }
 
               case SectionManager::PET_5: {
-                  delay(10000);
-                  if (!saveSecondPet) {
+                  recordStartTime();
+                  turnCCW();
+                  break;
+              }
+
+              case SectionManager::RAMP_END_BACK_2: {
+                  if (!pickedUpFifthPet) {
                     if (ACTUATE_CLAW) {
-                      // pick up and put second pet out window
+                      // pick up 5th pet 5
+                      claw.clawSeq5Pet5PickUp();
+                      pickedUpFifthPet = true;
                     }
                     else {
                       delay(3000);
                     }
+
                   }
+                  recordStartTime();
+                  turnCW();
                   break;
               }
+
+              case SectionManager::PET_6: {
+                  if (!droppedFifthPet) {
+                    if (ACTUATE_CLAW) {
+                      // pick up 5th pet 5
+                      claw.clawSeq6Pet5DropOff();
+                      
+                    }
+                    else {
+                      delay(3000);
+                    }
+                    droppedFifthPet = true;
+                  }
+                  recordStartTime();
+                  turnCW();
+                  break;
+              }
+
               default:
                 startLineFollow();
                 break;

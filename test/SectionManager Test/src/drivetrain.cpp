@@ -48,7 +48,7 @@ void driveTrain(void *parameter) {
                 steer.turnAround(currentSpeed,true);
                 break;
             case RobotState::TURN_CCW:
-                steer.turnAround(currentSpeed,false);
+                steer.turnBackwards_CCW();
                 break;
             case RobotState::FORWARD: {
                 steer.forward(currentSpeed);

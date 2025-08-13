@@ -243,7 +243,7 @@ void SectionManager::getNextSection(){
                     display.clearDisplay();
                     display.setCursor(30, 24);
                     display.setTextSize(2);
-                    display.println("RAMP");
+                    display.println("RAMP_B");
                     display.display();
                 }
                 recordStartTime();
@@ -258,7 +258,7 @@ void SectionManager::getNextSection(){
       case SectionManager::RAMP_END_BACK: {
             // unsigned int timePassed = millis() - startMovementTime;
             // Serial.printf("PET_4 time: %d\n", timePassed);
-            if (millis() - startMovementTime >= 500) {
+            if (millis() - startMovementTime >= 1000) {
                 if (detectFurther(true, 350, 3)) {
                     Serial.println("found ramp");
                     incrementSection();
@@ -271,7 +271,7 @@ void SectionManager::getNextSection(){
                     }
                     recordStartTime();
                     stopDrive();
-                    currentSpeed = 1200;
+                    currentSpeed = 1000;
                 }
             }
             
@@ -279,62 +279,108 @@ void SectionManager::getNextSection(){
       }
 
       case SectionManager::WINDOW_BACKWARD: {
-            if (millis() - startMovementTime > 1000) {
-                if (detectFurther(true, 300, 2)) {
-                        incrementSection();
-                        if (useDisplay) {
-                            display.clearDisplay();
-                            display.setCursor(0, 24);
-                            display.setTextSize(2);
-                            display.println("WINDOW_F");
-                            display.display();
-                        }
-                        recordStartTime();
-                        stopDrive();
-                        currentSpeed = 800;
-                }
-            }
-            break;
-    }
-
-    case SectionManager::WINDOW_FORWARD: {
             
-        if (detectCloser(true, 300, 2)) {
+            if (detectCloser(true, 350, 2)) {
                 incrementSection();
                 if (useDisplay) {
                     display.clearDisplay();
-                    display.setCursor(30, 24);
+                    display.setCursor(0, 24);
                     display.setTextSize(2);
                     display.println("PET_5");
                     display.display();
                 }
                 recordStartTime();
                 stopDrive();
-                currentSpeed = 1100;
-        }
+                currentSpeed = 1200;
+            }
             
-        break;
+            
+            
+            break;
     }
 
+    // case SectionManager::WINDOW_FORWARD: {
+            
+    //     if (detectCloser(true, 300, 2)) {
+    //             incrementSection();
+    //             if (useDisplay) {
+    //                 display.clearDisplay();
+    //                 display.setCursor(30, 24);
+    //                 display.setTextSize(2);
+    //                 display.println("PET_5");
+    //                 display.display();
+    //             }
+    //             recordStartTime();
+    //             stopDrive();
+    //             currentSpeed = 1100;
+    //     }
+            
+    //     break;
+    // }
+
       case SectionManager::PET_5: {
-            if (millis() - startMovementTime >= 1500) {
-                if (detectCloser(true, 350, 3)) {
+            if (millis() - startMovementTime >= 2500) {
+                if (detectCloser(false, 400, 2)) {
+                    currentSection = RAMP_END_BACK_2;
+                    if (useDisplay) {
+                        display.clearDisplay();
+                        display.setCursor(15, 24);
+                        display.setTextSize(2);
+                        display.println("RAMP_B2");
+                        display.display();
+                    }
+                    recordStartTime();
+                    stopDrive();
+                    currentSpeed = 900;
+                }
+            }
+            
+            break;
+      }
+      case SectionManager::RAMP_END_BACK_2: {
+            // unsigned int timePassed = millis() - startMovementTime;
+            // Serial.printf("PET_4 time: %d\n", timePassed);
+            if (millis() - startMovementTime >= 3000) {
+                if (detectFurther(true, 350, 3)) {
+                    Serial.println("found ramp");
                     incrementSection();
                     if (useDisplay) {
                         display.clearDisplay();
-                        display.setCursor(30, 24);
+                        display.setCursor(0, 24);
                         display.setTextSize(2);
                         display.println("DONE");
                         display.display();
                     }
                     recordStartTime();
                     stopDrive();
+                    //currentSpeed = 1000;
                 }
             }
             
             break;
+        }
       }
-    }
+
+    //   case SectionManager::PET_6: {
+    //         if (millis() - startMovementTime >= 2000) {
+    //             if (detectCloser(true, 350, 2)) {
+    //                 currentSection = RAMP_END_BACK_3;
+    //                 if (useDisplay) {
+    //                     display.clearDisplay();
+    //                     display.setCursor(30, 24);
+    //                     display.setTextSize(2);
+    //                     display.println("DONE");
+    //                     display.display();
+    //                 }
+    //                 recordStartTime();
+    //                 stopDrive();
+    //                 currentSpeed = 1000;
+    //             }
+    //         }
+            
+    //         break;
+    //   }
+    
 }
 
 void SectionManager::setDetectionTime() {

@@ -41,6 +41,7 @@ class SteeringManager {
         void quickStopTwo();
         void turnAround(int duty, boolean clockwise);
         void turnBackwards(int duty);
+        void turnBackwards_CCW();
         void lineFollow(int baseSpeed);
         void lineFollow();
 

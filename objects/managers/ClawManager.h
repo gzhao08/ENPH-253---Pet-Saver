@@ -134,6 +134,8 @@ class ClawManager {
         void clawSeq2Ramp();
         void clawSeq3Pet3();
         void clawSeq4Pet3Drop();
+        void clawSeq5Pet5PickUp();
+        void clawSeq6Pet5DropOff();
 
         void loop();
 };
